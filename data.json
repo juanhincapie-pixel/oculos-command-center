@@ -1,6 +1,6 @@
 {
-  "_version": "1775760210603",
-  "_exportedAt": "2026-04-09T18:43:30.603Z",
+  "_version": "1775861549701",
+  "_exportedAt": "2026-04-10T22:52:29.701Z",
   "logistica": [
     {
       "id": "2",
@@ -206,7 +206,7 @@
       "dataEncomenda": "2026-04-06",
       "dataEntrada": "2026-04-06",
       "embarque": "2026-07-05",
-      "entrega": "2026-06-15",
+      "entrega": "2026-07-20",
       "campanha": "",
       "duracao": 104,
       "status": "Em Fábrica",
@@ -241,6 +241,21 @@
       "duracao": 137,
       "status": "Em Fábrica",
       "obs": "Pedido se pagó adelantado 100% al proveedor, \n"
+    },
+    {
+      "id": "17",
+      "fornecedor": "Lingshi",
+      "proforma": "26PX037",
+      "produtos": "Reorder Esportivos (Agatha, Vitoria, Bernardo -1200 pcs)",
+      "via": "Aéreo",
+      "dataEncomenda": "2026-04-13",
+      "dataEntrada": "2026-04-13",
+      "embarque": "2026-05-11",
+      "entrega": "2026-05-25",
+      "campanha": "",
+      "duracao": 0,
+      "status": "Em Fábrica",
+      "obs": ""
     }
   ],
   "payments": {
@@ -403,7 +418,7 @@
       },
       {
         "oQue": "Tags RFID",
-        "invoice": "26PX030 RFID Tag",
+        "invoice": "26PX030",
         "total": 5258.5,
         "dataPaid30": "2026-04-06",
         "amount30": 1577.55,
@@ -415,8 +430,8 @@
         "status70": "Pendente"
       },
       {
-        "oQue": "New Order (Akira,Yuki,Kenji,Hiro,Hanna)",
-        "invoice": "26PX017 (2.250 pçs)",
+        "oQue": "New Order (Akira,Yuki,Kenji,Hiro,Hanna)  (2.250 pçs)",
+        "invoice": "26PX017",
         "total": 17865,
         "dataPaid30": "2026-04-06",
         "amount30": 5359.5,
@@ -425,6 +440,19 @@
         "amount70": 12505.5,
         "mesAno": "11-26",
         "status30": "Pago",
+        "status70": "Pendente"
+      },
+      {
+        "oQue": "Reorder Esportivos (Agatha, Vitoria, Bernardo, Robert -750 pcs)",
+        "invoice": "26PX037",
+        "total": 750,
+        "dataPaid30": "2026-04-13",
+        "amount30": 7830,
+        "blDate": "2026-05-11",
+        "dataPaid70": "2026-05-11",
+        "amount70": 2349,
+        "mesAno": "05-26",
+        "status30": "Pendente",
         "status70": "Pendente"
       }
     ],
