@@ -544,9 +544,6 @@
                     <li class="nav-item">
                         <button class="nav-link" onclick="showSection('produtos-matar', this)">Productos a Matar</button>
                     </li>
-                    <li class="nav-item">
-                        <button class="nav-link" onclick="showSection('importacoes', this)">Importaciones Activas</button>
-                    </li>
                 </ul>
             </div>
         </aside>
@@ -703,49 +700,6 @@
                 </div>
             </section>
 
-            <!-- ==================== IMPORTAÇÕES ATIVAS ==================== -->
-            <section id="importacoes" class="section">
-                <h2 class="section-title">Importaciones Activas</h2>
-
-                <h3 style="font-size:16px;font-weight:600;margin-bottom:12px;">SKUs con Importación Pendiente</h3>
-                <p class="section-description">SKUs que LIVO tiene en producción o en tránsito. Datos de Metabase.</p>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Curva</th>
-                                <th>SKU</th>
-                                <th>Producto</th>
-                                <th>Clase</th>
-                                <th>Piezas Pendientes</th>
-                                <th>Stock Actual Matriz</th>
-                            </tr>
-                        </thead>
-                        <tbody id="importSkusBody">
-                            <tr><td colspan="6" class="empty-state">Cargando datos...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <h3 style="font-size:16px;font-weight:600;margin:32px 0 12px;">Pedidos Activos</h3>
-                <p class="section-description">Pedidos en curso hacia matriz LIVO. Información orientativa sobre disponibilidad futura.</p>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Pedido</th>
-                                <th>Proveedor</th>
-                                <th>Status</th>
-                                <th>Fecha Embarque</th>
-                                <th>Llegada Estimada (matriz)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="importacoesTableBody">
-                            <tr><td colspan="5" class="empty-state">Cargando datos...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
         </main>
     </div>
 
@@ -769,7 +723,6 @@
         let storeColumns = [];
         let franchiseeStores = [];
         let _perfStockData = [];
-        let _sharedData = { logistica: [] };
 
         // Chart instances
         let stockChart = null;
@@ -826,7 +779,6 @@
                 processedData = processSalesData(rawSalesData);
                 renderAllSections();
                 updateLastUpdate();
-                loadSharedData();
             } catch (error) {
                 console.error('Error loading data:', error);
                 alert('Error al cargar datos. Verifique la conexión con Metabase.');
@@ -949,8 +901,6 @@
             renderPainelGeral(classified);
             initPerformanceStock(classified);
             renderProdutosMatar(classified);
-            renderImportSKUs(classified);
-            renderImportacoes();
         }
 
         function renderPainelGeral(data) {
@@ -1474,86 +1424,6 @@
             }
         }
 
-        function renderImportSKUs(data) {
-            const tbody = document.getElementById('importSkusBody');
-            tbody.innerHTML = '';
-
-            const skusWithImport = data.filter(d => (d.importacoesPendentes || 0) > 0)
-                .sort((a, b) => b.importacoesPendentes - a.importacoesPendentes);
-
-            if (skusWithImport.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Sin SKUs con importación pendiente</td></tr>';
-                return;
-            }
-
-            skusWithImport.forEach(row => {
-                const tr = document.createElement('tr');
-                const classe = row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol';
-                tr.innerHTML = `
-                    <td><span class="badge badge-${(row.curva||'d').toLowerCase()}">${row.curva || 'D'}</span></td>
-                    <td>${row.sku}</td>
-                    <td>${row.nome_produto || ''}</td>
-                    <td>${classe}</td>
-                    <td style="font-weight:600;">${row.importacoesPendentes}</td>
-                    <td>${row.estoqueMatriz}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function renderImportacoes() {
-            const tbody = document.getElementById('importacoesTableBody');
-            tbody.innerHTML = '';
-
-            if (!_sharedData.logistica || _sharedData.logistica.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Sin datos de importación</td></tr>';
-                return;
-            }
-
-            const active = _sharedData.logistica.filter(o =>
-                o.status && o.status !== 'Entregado' && o.status !== 'Entregue a Terceiro'
-            );
-
-            if (active.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Sin importaciones activas</td></tr>';
-                return;
-            }
-
-            active.forEach(order => {
-                const tr = document.createElement('tr');
-                const embarque = order.embarque ? new Date(order.embarque).toLocaleDateString('pt-BR') : '—';
-                const entrega = order.entrega ? new Date(order.entrega).toLocaleDateString('pt-BR') : '—';
-
-                tr.innerHTML = `
-                    <td>${order.produtos || '—'}</td>
-                    <td>${order.fornecedor || '—'}</td>
-                    <td>${order.status || '—'}</td>
-                    <td>${embarque}</td>
-                    <td>${entrega}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function loadSharedData() {
-            fetch('data.json?v=' + Date.now())
-                .then(resp => {
-                    if (!resp.ok) throw new Error('data.json not found');
-                    return resp.json();
-                })
-                .then(data => {
-                    if (data.logistica) {
-                        _sharedData.logistica = data.logistica;
-                        const classified = classifySKUsByABC(processedData);
-                        renderImportacoes();
-                    }
-                })
-                .catch(err => {
-                    console.log('[data.json] Not found, using defaults');
-                    renderImportacoes();
-                });
-        }
-
         // ==================== UI FUNCTIONS ====================
         function showSection(sectionId, btn) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -1565,8 +1435,7 @@
             const titles = {
                 'painel-geral': 'Painel Geral',
                 'performance-stock': 'Performance & Stock',
-                'produtos-matar': 'Productos a Matar',
-                'importacoes': 'Importaciones Activas'
+                'produtos-matar': 'Productos a Matar'
             };
             document.getElementById('pageTitle').textContent = titles[sectionId] || 'Panel';
         }
