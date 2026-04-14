@@ -1167,6 +1167,7 @@
                     <li class="nav-item"><a class="nav-link" data-section="importacoes">Importações Ativas</a></li>
                     <li class="nav-item"><a class="nav-link" data-section="produtos-matar">Produtos a Matar</a></li>
                     <li class="nav-item"><a class="nav-link" data-section="estoque-lojas">Estoque Lojas</a></li>
+                    <li class="nav-item"><a class="nav-link" data-section="informe-loja">Informe por Loja</a></li>
                     <li class="nav-item"><a class="nav-link" data-section="ideias">Ideias & Sugestões</a></li>
                     <li class="nav-item" style="margin-top:16px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.1);">
                         <a class="nav-link" data-section="fornecedores">Fornecedores</a>
@@ -1820,6 +1821,81 @@
                 </div>
             </section>
 
+            <!-- Informe por Loja Section -->
+            <section class="section" id="informe-loja">
+                <h2 class="section-title">Informe por Loja — Excesos & Faltantes</h2>
+
+                <div class="alert-box">
+                    Selecciona una tienda para ver el detalle de cada SKU: stock actual vs mínimo ideal (Curva A = 2 piezas, B/C/D = 1 pieza). Puedes descargar el Excel para enviar directamente a la tienda con instrucciones de devolución o solicitud de producto.
+                </div>
+
+                <div style="margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                    <label style="font-size:13px;font-weight:600;">Seleccionar Loja:</label>
+                    <select id="informeLojaSelect" onchange="renderInformeLoja()" style="padding:8px 14px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;min-width:200px;">
+                        <option value="">-- Seleccionar --</option>
+                    </select>
+                    <button onclick="downloadInformeLojaExcel()" id="btnInformeExcel" style="padding:10px 20px;background:var(--accent-green);color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;font-weight:600;display:none;align-items:center;gap:6px;">
+                        &#8681; Descargar Excel para esta Loja
+                    </button>
+                </div>
+
+                <div id="informeLojaKPIs" style="display:none;">
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-label">Total SKUs en Loja</div>
+                            <div class="kpi-value" id="ilTotalSKUs">0</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Total Piezas</div>
+                            <div class="kpi-value" id="ilTotalPcs">0</div>
+                        </div>
+                        <div class="kpi-card" style="border-left: 4px solid var(--accent-green);">
+                            <div class="kpi-label">SKUs OK</div>
+                            <div class="kpi-value" id="ilOKCount">0</div>
+                            <div class="kpi-subtitle" style="color:var(--accent-green);">Stock = mínimo ideal</div>
+                        </div>
+                        <div class="kpi-card" style="border-left: 4px solid var(--accent-red);">
+                            <div class="kpi-label">Faltantes</div>
+                            <div class="kpi-value" id="ilFaltantes">0</div>
+                            <div class="kpi-subtitle" style="color:var(--accent-red);">Necesitan reposición</div>
+                        </div>
+                        <div class="kpi-card" style="border-left: 4px solid var(--accent-orange);">
+                            <div class="kpi-label">Excesos</div>
+                            <div class="kpi-value" id="ilExcesos">0</div>
+                            <div class="kpi-subtitle" style="color:var(--accent-orange);">Posible devolución/troca</div>
+                        </div>
+                        <div class="kpi-card" style="border-left: 4px solid var(--accent-blue);">
+                            <div class="kpi-label">SKUs sin Stock Ideal</div>
+                            <div class="kpi-value" id="ilSinIdeal">0</div>
+                            <div class="kpi-subtitle" style="color:var(--accent-blue);">Curva D sin stock matriz</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="informeLojaTable">
+                        <thead>
+                            <tr>
+                                <th>Estado</th>
+                                <th>Curva</th>
+                                <th data-sort="sku">SKU</th>
+                                <th>Produto</th>
+                                <th>Classe</th>
+                                <th>Share Vendas</th>
+                                <th>Venda Mensal</th>
+                                <th>Stock Loja</th>
+                                <th>Mínimo Ideal</th>
+                                <th>Diferencia</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="informeLojaBody">
+                            <tr><td colspan="11" class="empty-state">Selecciona una loja para ver el informe</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
             <!-- Ideias & Sugestões Section -->
             <section class="section" id="ideias">
                 <h2 class="section-title">Ideias & Sugestões</h2>
@@ -2331,6 +2407,7 @@
             renderImportacoes(classified);
             renderProdutosMatar(classified);
             renderEstoqueLojas(classified);
+            initInformeLoja(classified);
             renderIdeias(classified);
         }
 
@@ -3058,6 +3135,246 @@
                 `;
                 overstockBody.appendChild(tr);
             });
+        }
+
+        // ==================== INFORME POR LOJA ====================
+        let _informeLojaClassified = [];
+
+        function initInformeLoja(data) {
+            _informeLojaClassified = data;
+            const select = document.getElementById('informeLojaSelect');
+            // Clear existing options except the first
+            select.innerHTML = '<option value="">-- Seleccionar --</option>';
+            if (storeColumns.length === 0) return;
+            storeColumns.forEach(col => {
+                const opt = document.createElement('option');
+                opt.value = col;
+                opt.textContent = col.replace(/_/g, ' ').toUpperCase();
+                select.appendChild(opt);
+            });
+        }
+
+        function renderInformeLoja() {
+            const storeName = document.getElementById('informeLojaSelect').value;
+            const tbody = document.getElementById('informeLojaBody');
+            const kpis = document.getElementById('informeLojaKPIs');
+            const btnExcel = document.getElementById('btnInformeExcel');
+
+            if (!storeName) {
+                tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Selecciona una loja para ver el informe</td></tr>';
+                kpis.style.display = 'none';
+                btnExcel.style.display = 'none';
+                return;
+            }
+
+            kpis.style.display = 'block';
+            btnExcel.style.display = 'flex';
+
+            const data = _informeLojaClassified;
+            const totalRevenue = data.reduce((s, d) => s + d.vendaMedia, 0);
+
+            // Build rows for this store
+            const rows = [];
+            data.forEach(d => {
+                const sd = rawStoreData.find(s => s.sku === d.sku);
+                const stockLoja = sd ? (sd[storeName] || 0) : 0;
+
+                // Minimum ideal: only if there's stock in matriz
+                const hasMatrizStock = d.estoqueMatriz > 0;
+                const minIdeal = hasMatrizStock ? (d.curva === 'A' ? 2 : 1) : 0;
+                const diff = stockLoja - minIdeal;
+                const share = totalRevenue > 0 ? ((d.vendaMedia / totalRevenue) * 100) : 0;
+
+                let estado, accion;
+                if (minIdeal === 0 && stockLoja === 0) {
+                    // No stock in matriz and no stock in store - skip unless store has stock
+                    return;
+                }
+                if (minIdeal === 0 && stockLoja > 0) {
+                    // Store has stock but matriz doesn't - possible excess/dead
+                    estado = 'EXCESO';
+                    accion = 'Devolver a matriz o trocar';
+                } else if (diff > 0) {
+                    estado = 'EXCESO';
+                    accion = 'Devolver ' + diff + ' pzs a matriz';
+                } else if (diff < 0) {
+                    estado = 'FALTANTE';
+                    accion = 'Enviar ' + Math.abs(diff) + ' pzs a loja';
+                } else {
+                    estado = 'OK';
+                    accion = 'Mantener';
+                }
+
+                rows.push({
+                    ...d, stockLoja, minIdeal, diff, share, estado, accion
+                });
+            });
+
+            // Also include SKUs that the store has but are not in classified (edge case)
+            if (rawStoreData) {
+                rawStoreData.forEach(sd => {
+                    const stockLoja = sd[storeName] || 0;
+                    if (stockLoja > 0 && !rows.find(r => r.sku === sd.sku)) {
+                        rows.push({
+                            sku: sd.sku,
+                            nome_produto: sd.nome_produto || '—',
+                            descricao_classe: sd.descricao_classe || '',
+                            curva: 'D',
+                            vendaMedia: 0,
+                            estoqueMatriz: 0,
+                            stockLoja,
+                            minIdeal: 0,
+                            diff: stockLoja,
+                            share: 0,
+                            estado: 'EXCESO',
+                            accion: 'Devolver ' + stockLoja + ' pzs a matriz'
+                        });
+                    }
+                });
+            }
+
+            // Sort: FALTANTE first, then EXCESO, then OK. Within each group by curva
+            const estadoOrder = { 'FALTANTE': 0, 'EXCESO': 1, 'OK': 2 };
+            const curvaOrder = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+            rows.sort((a, b) => {
+                if (estadoOrder[a.estado] !== estadoOrder[b.estado]) return estadoOrder[a.estado] - estadoOrder[b.estado];
+                return (curvaOrder[a.curva] ?? 9) - (curvaOrder[b.curva] ?? 9);
+            });
+
+            // KPIs
+            const totalSKUs = rows.filter(r => r.stockLoja > 0).length;
+            const totalPcs = rows.reduce((s, r) => s + r.stockLoja, 0);
+            const okCount = rows.filter(r => r.estado === 'OK').length;
+            const faltantes = rows.filter(r => r.estado === 'FALTANTE').length;
+            const excesos = rows.filter(r => r.estado === 'EXCESO').length;
+            const sinIdeal = rows.filter(r => r.minIdeal === 0 && r.stockLoja > 0).length;
+
+            document.getElementById('ilTotalSKUs').textContent = totalSKUs;
+            document.getElementById('ilTotalPcs').textContent = totalPcs;
+            document.getElementById('ilOKCount').textContent = okCount;
+            document.getElementById('ilFaltantes').textContent = faltantes;
+            document.getElementById('ilExcesos').textContent = excesos;
+            document.getElementById('ilSinIdeal').textContent = sinIdeal;
+
+            // Table
+            tbody.innerHTML = '';
+            if (rows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Sin datos para esta loja</td></tr>';
+                return;
+            }
+
+            rows.forEach(row => {
+                const tr = document.createElement('tr');
+                const estadoColor = row.estado === 'OK' ? '#10b981' : row.estado === 'FALTANTE' ? '#ef4444' : '#f59e0b';
+                const estadoBg = row.estado === 'OK' ? 'rgba(16,185,129,0.1)' : row.estado === 'FALTANTE' ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)';
+                const diffText = row.diff > 0 ? '+' + row.diff : row.diff < 0 ? String(row.diff) : '0';
+                const diffColor = row.diff > 0 ? '#f59e0b' : row.diff < 0 ? '#ef4444' : '#10b981';
+                const classe = row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol';
+
+                tr.innerHTML = `
+                    <td><span style="padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;color:${estadoColor};background:${estadoBg};">${row.estado}</span></td>
+                    <td><span class="badge badge-${(row.curva||'d').toLowerCase()}">${row.curva || 'D'}</span></td>
+                    <td>${row.sku}</td>
+                    <td>${row.nome_produto}</td>
+                    <td>${classe}</td>
+                    <td>${row.share.toFixed(1)}%</td>
+                    <td>${Math.round(row.vendaMedia || 0)}</td>
+                    <td style="font-weight:600;">${row.stockLoja}</td>
+                    <td>${row.minIdeal}</td>
+                    <td style="font-weight:600;color:${diffColor}">${diffText}</td>
+                    <td style="font-size:11px;">${row.accion}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function downloadInformeLojaExcel() {
+            const storeName = document.getElementById('informeLojaSelect').value;
+            if (!storeName) { alert('Selecciona una loja primero.'); return; }
+
+            const data = _informeLojaClassified;
+            const totalRevenue = data.reduce((s, d) => s + d.vendaMedia, 0);
+
+            // Rebuild rows (same logic as render)
+            const rows = [];
+            data.forEach(d => {
+                const sd = rawStoreData.find(s => s.sku === d.sku);
+                const stockLoja = sd ? (sd[storeName] || 0) : 0;
+                const hasMatrizStock = d.estoqueMatriz > 0;
+                const minIdeal = hasMatrizStock ? (d.curva === 'A' ? 2 : 1) : 0;
+                const diff = stockLoja - minIdeal;
+                const share = totalRevenue > 0 ? ((d.vendaMedia / totalRevenue) * 100) : 0;
+
+                let estado, accion;
+                if (minIdeal === 0 && stockLoja === 0) return;
+                if (minIdeal === 0 && stockLoja > 0) {
+                    estado = 'EXCESO'; accion = 'Devolver a matriz o trocar';
+                } else if (diff > 0) {
+                    estado = 'EXCESO'; accion = 'Devolver ' + diff + ' pzs a matriz';
+                } else if (diff < 0) {
+                    estado = 'FALTANTE'; accion = 'Enviar ' + Math.abs(diff) + ' pzs a loja';
+                } else {
+                    estado = 'OK'; accion = 'Mantener';
+                }
+                rows.push({ ...d, stockLoja, minIdeal, diff, share, estado, accion });
+            });
+
+            if (rawStoreData) {
+                rawStoreData.forEach(sd => {
+                    const stockLoja = sd[storeName] || 0;
+                    if (stockLoja > 0 && !rows.find(r => r.sku === sd.sku)) {
+                        rows.push({
+                            sku: sd.sku, nome_produto: sd.nome_produto || '—',
+                            descricao_classe: sd.descricao_classe || '', curva: 'D',
+                            vendaMedia: 0, estoqueMatriz: 0, stockLoja, minIdeal: 0,
+                            diff: stockLoja, share: 0, estado: 'EXCESO',
+                            accion: 'Devolver ' + stockLoja + ' pzs a matriz'
+                        });
+                    }
+                });
+            }
+
+            const estadoOrder = { 'FALTANTE': 0, 'EXCESO': 1, 'OK': 2 };
+            const curvaOrder = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+            rows.sort((a, b) => {
+                if (estadoOrder[a.estado] !== estadoOrder[b.estado]) return estadoOrder[a.estado] - estadoOrder[b.estado];
+                return (curvaOrder[a.curva] ?? 9) - (curvaOrder[b.curva] ?? 9);
+            });
+
+            const faltantes = rows.filter(r => r.estado === 'FALTANTE');
+            const excesos = rows.filter(r => r.estado === 'EXCESO');
+            const ok = rows.filter(r => r.estado === 'OK');
+            const displayName = storeName.replace(/_/g, ' ').toUpperCase();
+
+            let csv = '\uFEFF';
+            csv += 'INFORME DE STOCK - ' + displayName + '\n';
+            csv += 'Generado: ' + new Date().toLocaleDateString('pt-BR') + '\n';
+            csv += 'Regla: Curva A = min 2 piezas | Curva B/C/D = min 1 pieza\n';
+            csv += '\n';
+            csv += 'RESUMEN\n';
+            csv += 'SKUs en loja,' + rows.filter(r => r.stockLoja > 0).length + '\n';
+            csv += 'Total piezas,' + rows.reduce((s,r) => s + r.stockLoja, 0) + '\n';
+            csv += 'Faltantes (necesitan reposicion),' + faltantes.length + '\n';
+            csv += 'Excesos (posible devolucion),' + excesos.length + '\n';
+            csv += 'OK (stock correcto),' + ok.length + '\n';
+            csv += '\n';
+            csv += 'DETALLE\n';
+            csv += 'Estado,Curva,SKU,Produto,Classe,Share Vendas %,Venda Mensal,Stock Loja,Minimo Ideal,Diferencia,Accion\n';
+
+            rows.forEach(r => {
+                const classe = r.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol';
+                const nome = (r.nome_produto || '').replace(/,/g, ' ');
+                const diffText = r.diff > 0 ? '+' + r.diff : r.diff;
+                csv += `${r.estado},${r.curva || 'D'},${r.sku},"${nome}",${classe},${r.share.toFixed(1)},${Math.round(r.vendaMedia || 0)},${r.stockLoja},${r.minIdeal},${diffText},"${r.accion}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'informe_' + storeName + '_' + new Date().toISOString().slice(0,10) + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
         }
 
         function renderIdeias(data) {
