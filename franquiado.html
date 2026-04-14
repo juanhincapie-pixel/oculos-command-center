@@ -748,12 +748,14 @@
         let storeColumns = [];
         let franchiseeStores = [];
         let _perfStockData = [];
-        let _deadItems = [];
         let _sharedData = { logistica: [] };
 
         // Chart instances
         let stockChart = null;
         let excesosChart = null;
+
+        // Register Chart.js datalabels plugin
+        Chart.register(ChartDataLabels);
 
         // ==================== HELPER FUNCTIONS ====================
         function getMinIdeal(sku, storeData) {
@@ -876,9 +878,7 @@
                 };
             });
 
-            // Save dead items for Produtos a Matar before filtering
-            _deadItems = all.filter(item => item.isDead);
-            return all.filter(item => !item.isDead);
+            return all;
         }
 
         function classifySKUsByABC(skus) {
@@ -912,7 +912,7 @@
             const classified = classifySKUsByABC(processedData);
             renderPainelGeral(classified);
             initPerformanceStock(classified);
-            renderProdutosMatar();
+            renderProdutosMatar(classified);
             renderImportacoes();
         }
 
@@ -1184,10 +1184,7 @@
                 </tr>`;
 
                 const colCount = 8 + franchiseeStores.length + 1;
-                const sorted = classified.sort((a, b) => {
-                    const curvaOrder = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
-                    return (curvaOrder[a.curva] || 9) - (curvaOrder[b.curva] || 9) || b.vendaMedia - a.vendaMedia;
-                });
+                const sorted = classified.sort((a, b) => b.share - a.share);
 
                 tbody.innerHTML = '';
                 if (sorted.length === 0) {
@@ -1309,10 +1306,9 @@
             }
         }
 
-        function renderProdutosMatar() {
-            // SKUs where: last6MonthsSales === 0 AND estoqueMatriz === 0 AND importacoesPendentes === 0 (MATRIZ notification)
-            // These come from _deadItems which were saved before filtering in processSalesData
-            const candidates = _deadItems;
+        function renderProdutosMatar(data) {
+            // SKUs where: estoqueMatriz === 0 AND last6MonthsSales === 0 (LIVO discontinuing notification)
+            const candidates = data.filter(d => d.estoqueMatriz === 0 && d.last6MonthsSales === 0);
 
             const tbody = document.getElementById('mataTableBody');
             tbody.innerHTML = '';
@@ -1490,6 +1486,7 @@
                 })
                 .catch(err => {
                     console.log('[data.json] Not found, using defaults');
+                    renderImportacoes();
                 });
         }
 
