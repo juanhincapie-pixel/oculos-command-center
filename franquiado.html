@@ -533,7 +533,7 @@
             </div>
 
             <div class="sidebar-section">
-                <div class="sidebar-section-title">Navegación</div>
+                <div class="sidebar-section-title">Navegação</div>
                 <ul class="sidebar-nav">
                     <li class="nav-item">
                         <button class="nav-link active" onclick="showSection('painel-geral', this)">Painel Geral</button>
@@ -542,7 +542,7 @@
                         <button class="nav-link" onclick="showSection('performance-stock', this)">Performance & Stock</button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" onclick="showSection('produtos-matar', this)">Productos a Matar</button>
+                        <button class="nav-link" onclick="showSection('produtos-matar', this)">Produtos a Matar</button>
                     </li>
                 </ul>
             </div>
@@ -552,7 +552,7 @@
         <main class="main-content">
             <div class="loading-spinner" id="loadingSpinner">
                 <div class="spinner"></div>
-                <p>Cargando datos...</p>
+                <p>Carregando dados...</p>
             </div>
 
             <div class="header">
@@ -572,7 +572,7 @@
                         <div class="kpi-value" id="pgActiveSKUs">0</div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-label">Distribución ABC</div>
+                        <div class="kpi-label">Distribuição ABC</div>
                         <div id="pgDistribution" class="abc-distribution">
                             <div class="abc-letter abc-a">
                                 <div class="abc-letter-label">A</div>
@@ -593,17 +593,12 @@
                         </div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-label">Total Piezas</div>
+                        <div class="kpi-label">Total Peças</div>
                         <div class="kpi-value" id="pgTotalPiezas">0</div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label">Faltantes</div>
                         <div class="kpi-value status-critical" id="pgFaltantes">0</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Cobertura Matriz LIVO</div>
-                        <div class="kpi-value" id="pgCoberturaMeses">0</div>
-                        <div class="kpi-subtitle">Disponibilidad en inventario central</div>
                     </div>
                 </div>
 
@@ -618,21 +613,24 @@
             <section id="performance-stock" class="section">
                 <h2 class="section-title">Performance & Stock</h2>
 
-                <div style="margin-bottom: 24px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Filtrar por Tienda</label>
-                    <select id="perfStockStoreSelect" onchange="renderPerformanceStock()" style="min-width: 250px;">
-                        <option value="">Todas las Tiendas</option>
-                    </select>
+                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Filtrar por Loja</label>
+                        <select id="perfStockStoreSelect" onchange="renderPerformanceStock()" style="min-width: 250px;">
+                            <option value="">Todas as Lojas</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="btnPerfStockExcel" onclick="downloadPerformanceStockExcel()" style="margin-top: 20px;">Baixar Excel (.xlsx)</button>
                 </div>
 
                 <div id="perfStockKPIs" style="display: none; margin-bottom: 24px;">
                     <div class="kpi-grid">
                         <div class="kpi-card">
-                            <div class="kpi-label">SKUs en Tienda</div>
+                            <div class="kpi-label">SKUs na Loja</div>
                             <div class="kpi-value" id="psTotalSKUs">0</div>
                         </div>
                         <div class="kpi-card">
-                            <div class="kpi-label">Total Piezas</div>
+                            <div class="kpi-label">Total Peças</div>
                             <div class="kpi-value" id="psTotalPcs">0</div>
                         </div>
                         <div class="kpi-card">
@@ -644,20 +642,20 @@
                             <div class="kpi-value status-critical" id="psFaltantes">0</div>
                         </div>
                         <div class="kpi-card">
-                            <div class="kpi-label">Excesos</div>
-                            <div class="kpi-value status-alert" id="psExcesos">0</div>
+                            <div class="kpi-label">Excessos</div>
+                            <div class="kpi-value status-alert" id="psExcessos">0</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="table-container">
+                <div class="table-container" style="max-height: 1200px; overflow-y: auto;">
                     <table>
-                        <thead id="perfStockHead">
+                        <thead id="perfStockHead" style="position: sticky; top: 0; z-index: 10; background: #f8f9fa;">
                             <tr>
                                 <th>Curva</th>
                                 <th>SKU</th>
                                 <th>Produto</th>
-                                <th>Clase</th>
+                                <th>Classe</th>
                                 <th>Share Vendas % (LIVO)</th>
                                 <th>Venda Média Mensal (LIVO)</th>
                                 <th>Stock Total</th>
@@ -667,34 +665,30 @@
                             </tr>
                         </thead>
                         <tbody id="perfStockBody">
-                            <tr><td colspan="12" class="empty-state">Cargando datos...</td></tr>
+                            <tr><td colspan="12" class="empty-state">Carregando dados...</td></tr>
                         </tbody>
                     </table>
-                </div>
-
-                <div style="margin-top: 16px;">
-                    <button class="btn btn-primary" id="btnPerfStockExcel" onclick="downloadPerformanceStockExcel()">Descargar Excel (.xlsx)</button>
                 </div>
             </section>
 
             <!-- ==================== PRODUTOS A MATAR ==================== -->
             <section id="produtos-matar" class="section">
-                <h2 class="section-title">Productos a Matar</h2>
-                <p class="section-description">Notificación: LIVO está descontinuando estos SKUs por falta de ventas y stock en matriz. Si tienes unidades en tienda, son las últimas piezas disponibles.</p>
+                <h2 class="section-title">Produtos a Matar</h2>
+                <p class="section-description">Notificação: LIVO está descontinuando estes SKUs por falta de vendas e estoque em matriz. Se você tem unidades em loja, são as últimas peças disponíveis.</p>
 
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
                                 <th>SKU</th>
-                                <th>Producto</th>
-                                <th>Clase</th>
+                                <th>Produto</th>
+                                <th>Classe</th>
                                 <th>Curva</th>
-                                <th>Stock en tus Tiendas</th>
+                                <th>Stock nas suas Lojas</th>
                             </tr>
                         </thead>
                         <tbody id="mataTableBody">
-                            <tr><td colspan="5" class="empty-state">Cargando datos...</td></tr>
+                            <tr><td colspan="5" class="empty-state">Carregando dados...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -781,7 +775,7 @@
                 updateLastUpdate();
             } catch (error) {
                 console.error('Error loading data:', error);
-                alert('Error al cargar datos. Verifique la conexión con Metabase.');
+                alert('Erro ao carregar dados. Verifique a conexão com Metabase.');
             } finally {
                 showLoadingSpinner(false);
             }
@@ -941,19 +935,6 @@
             });
             document.getElementById('pgFaltantes').textContent = faltantes;
 
-            // Cobertura Matriz LIVO (average months of coverage in matriz)
-            let totalCobertura = 0;
-            let countActive = 0;
-            data.forEach(sku => {
-                if (sku.vendaMedia > 0) {
-                    totalCobertura += sku.coberturaMeses;
-                    countActive++;
-                }
-            });
-            const avgCobertura = countActive > 0 ? (totalCobertura / countActive) : 0;
-            const coberturaText = avgCobertura === Infinity ? '∞' : avgCobertura.toFixed(1);
-            document.getElementById('pgCoberturaMeses').textContent = coberturaText;
-
             // Render charts
             renderPainelGeralCharts(data);
 
@@ -988,7 +969,7 @@
                 data: {
                     labels: Object.keys(storeStockData).map(s => s.replace(/_/g, ' ').toUpperCase()),
                     datasets: [{
-                        label: 'Stock por Tienda',
+                        label: 'Stock por Loja',
                         data: Object.values(storeStockData),
                         backgroundColor: 'rgba(59, 130, 246, 0.6)',
                         borderColor: 'rgba(59, 130, 246, 1)',
@@ -1008,7 +989,7 @@
                 }
             });
 
-            // Excesos vs Faltantes per store chart
+            // Excessos vs Faltantes per store chart
             const storeExcessData = {};
             const storeShortageData = {};
 
@@ -1046,7 +1027,7 @@
                     labels: Object.keys(storeExcessData).map(s => s.replace(/_/g, ' ').toUpperCase()),
                     datasets: [
                         {
-                            label: 'Excesos',
+                            label: 'Excessos',
                             data: Object.values(storeExcessData),
                             backgroundColor: 'rgba(245, 158, 11, 0.6)',
                             borderColor: 'rgba(245, 158, 11, 1)',
@@ -1108,7 +1089,7 @@
                 card.innerHTML = `
                     <div class="per-store-kpi-title">${title}</div>
                     <div class="per-store-kpi-item">
-                        <span class="per-store-kpi-label">Total Piezas</span>
+                        <span class="per-store-kpi-label">Total Peças</span>
                         <span class="per-store-kpi-value">${totalPcs}</span>
                     </div>
                     <div class="per-store-kpi-item">
@@ -1116,7 +1097,7 @@
                         <span class="per-store-kpi-value" style="color: #ef4444;">${faltantes}</span>
                     </div>
                     <div class="per-store-kpi-item">
-                        <span class="per-store-kpi-label">Excesos</span>
+                        <span class="per-store-kpi-label">Excessos</span>
                         <span class="per-store-kpi-value" style="color: #f59e0b;">${excesos}</span>
                     </div>
                 `;
@@ -1130,7 +1111,7 @@
         function initPerformanceStock(data) {
             _perfStockData = data;
             const select = document.getElementById('perfStockStoreSelect');
-            select.innerHTML = '<option value="">Todas las Tiendas</option>';
+            select.innerHTML = '<option value="">Todas as Lojas</option>';
             franchiseeStores.forEach(store => {
                 const opt = document.createElement('option');
                 opt.value = store;
@@ -1163,7 +1144,7 @@
                     storeHeaders += `<th>${store.replace(/_/g, ' ').toUpperCase()}</th>`;
                 });
                 thead.innerHTML = `<tr>
-                    <th>Curva</th><th>SKU</th><th>Produto</th><th>Clase</th>
+                    <th>Curva</th><th>SKU</th><th>Produto</th><th>Classe</th>
                     <th>Share Vendas % (LIVO)</th><th>Venda Média Mensal (LIVO)</th>
                     <th>Stock Total</th><th>Mín. Ideal</th>
                     ${storeHeaders}
@@ -1175,7 +1156,7 @@
 
                 tbody.innerHTML = '';
                 if (sorted.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="${colCount}" class="empty-state">Sin datos</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="${colCount}" class="empty-state">Sem dados</td></tr>`;
                     return;
                 }
 
@@ -1212,9 +1193,9 @@
                 kpis.style.display = 'block';
 
                 thead.innerHTML = `<tr>
-                    <th>Estado</th><th>Curva</th><th>SKU</th><th>Producto</th><th>Clase</th>
+                    <th>Estado</th><th>Curva</th><th>SKU</th><th>Produto</th><th>Classe</th>
                     <th>Share Vendas % (LIVO)</th><th>Venda Mensal (LIVO)</th>
-                    <th>Stock en Tienda</th><th>Mínimo Ideal</th><th>Diferencia</th>
+                    <th>Stock na Loja</th><th>Mínimo Ideal</th><th>Diferença</th>
                     <th>Cobertura Meses (LIVO)</th>
                 </tr>`;
 
@@ -1228,9 +1209,9 @@
                     let estado;
                     if (minIdeal === 0 && stockLoja === 0) return;
                     if (minIdeal === 0 && stockLoja > 0) {
-                        estado = 'EXCESO';
+                        estado = 'EXCESSO';
                     } else if (diff > 0) {
-                        estado = 'EXCESO';
+                        estado = 'EXCESSO';
                     } else if (diff < 0) {
                         estado = 'FALTANTE';
                     } else {
@@ -1240,7 +1221,7 @@
                     rows.push({ ...d, stockLoja, minIdeal, diff, estado });
                 });
 
-                const estadoOrder = { 'FALTANTE': 0, 'EXCESO': 1, 'OK': 2 };
+                const estadoOrder = { 'FALTANTE': 0, 'EXCESSO': 1, 'OK': 2 };
                 const curvaOrder = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
                 rows.sort((a, b) => {
                     if (estadoOrder[a.estado] !== estadoOrder[b.estado]) return estadoOrder[a.estado] - estadoOrder[b.estado];
@@ -1252,17 +1233,17 @@
                 const totalPcs = rows.reduce((s, r) => s + r.stockLoja, 0);
                 const okCount = rows.filter(r => r.estado === 'OK').length;
                 const faltantes = rows.filter(r => r.estado === 'FALTANTE').length;
-                const excesos = rows.filter(r => r.estado === 'EXCESO').length;
+                const excesos = rows.filter(r => r.estado === 'EXCESSO').length;
 
                 document.getElementById('psTotalSKUs').textContent = totalSKUs;
                 document.getElementById('psTotalPcs').textContent = totalPcs;
                 document.getElementById('psOKCount').textContent = okCount;
                 document.getElementById('psFaltantes').textContent = faltantes;
-                document.getElementById('psExcesos').textContent = excesos;
+                document.getElementById('psExcessos').textContent = excesos;
 
                 tbody.innerHTML = '';
                 if (rows.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Sin datos para esta tienda</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Sem dados para esta loja</td></tr>';
                     return;
                 }
 
@@ -1301,7 +1282,7 @@
             tbody.innerHTML = '';
 
             if (candidates.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Sin productos para matar en este momento</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Sem produtos para matar no momento</td></tr>';
                 return;
             }
 
@@ -1347,7 +1328,7 @@
                 });
 
                 const storeNames = franchiseeStores.map(s => s.replace(/_/g, ' ').toUpperCase());
-                const header = ['Curva', 'SKU', 'Producto', 'Clase', 'Share %', 'Venda Mensal (LIVO)', 'Stock Total', 'Min Ideal', ...storeNames, 'Cobertura Meses (LIVO)'];
+                const header = ['Curva', 'SKU', 'Produto', 'Classe', 'Share %', 'Venda Mensal (LIVO)', 'Stock Total', 'Min Ideal', ...storeNames, 'Cobertura Meses (LIVO)'];
                 const detalleData = [header];
 
                 classified.forEach(row => {
@@ -1376,15 +1357,15 @@
 
                     let estado;
                     if (minIdeal === 0 && stockLoja === 0) return;
-                    if (minIdeal === 0 && stockLoja > 0) { estado = 'EXCESO'; }
-                    else if (diff > 0) { estado = 'EXCESO'; }
+                    if (minIdeal === 0 && stockLoja > 0) { estado = 'EXCESSO'; }
+                    else if (diff > 0) { estado = 'EXCESSO'; }
                     else if (diff < 0) { estado = 'FALTANTE'; }
                     else { estado = 'OK'; }
 
                     rows.push({ ...d, stockLoja, minIdeal, diff, share, estado });
                 });
 
-                const estadoOrder = { 'FALTANTE': 0, 'EXCESO': 1, 'OK': 2 };
+                const estadoOrder = { 'FALTANTE': 0, 'EXCESSO': 1, 'OK': 2 };
                 const curvaOrder2 = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
                 rows.sort((a, b) => {
                     if (estadoOrder[a.estado] !== estadoOrder[b.estado]) return estadoOrder[a.estado] - estadoOrder[b.estado];
@@ -1396,21 +1377,21 @@
                 // Resumen sheet
                 const resumenData = [
                     ['INFORME DE STOCK - ' + displayName],
-                    ['Generado:', new Date().toLocaleDateString('pt-BR')],
-                    ['Regla:', 'Curva A = min 2 piezas | Curva B/C/D = min 1 pieza'],
+                    ['Gerado:', new Date().toLocaleDateString('pt-BR')],
+                    ['Regra:', 'Curva A = min 2 peças | Curva B/C/D = min 1 peça'],
                     [],
-                    ['RESUMEN'],
-                    ['SKUs en tienda', rows.filter(r => r.stockLoja > 0).length],
-                    ['Total piezas', rows.reduce((s,r) => s + r.stockLoja, 0)],
+                    ['RESUMO'],
+                    ['SKUs na loja', rows.filter(r => r.stockLoja > 0).length],
+                    ['Total peças', rows.reduce((s,r) => s + r.stockLoja, 0)],
                     ['Faltantes', rows.filter(r => r.estado === 'FALTANTE').length],
-                    ['Excesos', rows.filter(r => r.estado === 'EXCESO').length],
+                    ['Excessos', rows.filter(r => r.estado === 'EXCESSO').length],
                     ['OK', rows.filter(r => r.estado === 'OK').length]
                 ];
                 const wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
-                XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen');
+                XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumo');
 
                 // Detalle sheet
-                const detalleData = [['Estado', 'Curva', 'SKU', 'Producto', 'Clase', 'Share %', 'Venda Mensal (LIVO)', 'Stock', 'Minimo', 'Diferencia', 'Cobertura Meses (LIVO)']];
+                const detalleData = [['Estado', 'Curva', 'SKU', 'Produto', 'Classe', 'Share %', 'Venda Mensal (LIVO)', 'Stock', 'Mínimo', 'Diferença', 'Cobertura Meses (LIVO)']];
                 rows.forEach(r => {
                     const classe = r.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol';
                     const diffText = r.diff > 0 ? '+' + r.diff : r.diff;
@@ -1419,7 +1400,7 @@
                 });
 
                 const wsDetalle = XLSX.utils.aoa_to_sheet(detalleData);
-                XLSX.utils.book_append_sheet(wb, wsDetalle, 'Detalle');
+                XLSX.utils.book_append_sheet(wb, wsDetalle, 'Detalhe');
                 XLSX.writeFile(wb, 'informe_' + storeName + '_' + new Date().toISOString().slice(0, 10) + '.xlsx');
             }
         }
@@ -1435,7 +1416,7 @@
             const titles = {
                 'painel-geral': 'Painel Geral',
                 'performance-stock': 'Performance & Stock',
-                'produtos-matar': 'Productos a Matar'
+                'produtos-matar': 'Produtos a Matar'
             };
             document.getElementById('pageTitle').textContent = titles[sectionId] || 'Panel';
         }
@@ -1451,7 +1432,7 @@
 
         function updateLastUpdate() {
             const now = new Date();
-            document.getElementById('updateIndicator').textContent = 'Actualizado: ' + now.toLocaleTimeString('pt-BR');
+            document.getElementById('updateIndicator').textContent = 'Atualizado: ' + now.toLocaleTimeString('pt-BR');
         }
 
         // Initialize on page load
