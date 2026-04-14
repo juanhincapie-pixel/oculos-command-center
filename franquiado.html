@@ -12,6 +12,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
+    <!-- SheetJS for Excel export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
     <!-- NOTE: Requires _redirects proxy config: /api/metabase/* https://instance.metabase.com/api/:splat 200 -->
 
     <style>
@@ -144,18 +147,18 @@
         }
 
         .main-content select {
+            background-color: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             width: auto;
             padding: 10px 12px;
             margin-bottom: 16px;
-            border: 1px solid var(--border-color);
             border-radius: 6px;
-            background-color: var(--card-bg);
-            color: var(--text-primary);
             font-size: 13px;
             font-family: 'Inter', sans-serif;
             appearance: none;
             cursor: pointer;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
             background-position: right 8px center;
             background-size: 20px;
@@ -165,6 +168,11 @@
         .main-content select:hover {
             border-color: var(--accent-blue);
             background-color: #f9fafb;
+        }
+
+        .main-content select option {
+            background-color: white;
+            color: var(--text-primary);
         }
 
         .header {
@@ -268,6 +276,67 @@
             font-size: 11px;
             color: var(--text-secondary);
             margin-top: 4px;
+        }
+
+        /* ABC Distribution special styling */
+        .abc-distribution {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .abc-letter {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 4px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .abc-letter-label {
+            font-size: 18px;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+
+        .abc-letter-count {
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        .abc-a {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #1e40af;
+        }
+
+        .abc-b {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #166534;
+        }
+
+        .abc-c {
+            background-color: rgba(234, 179, 8, 0.1);
+            color: #713f12;
+        }
+
+        .abc-d {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #7f1d1d;
+        }
+
+        /* Chart Box */
+        .chart-box {
+            background-color: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-box canvas {
+            max-height: 300px;
         }
 
         /* Badge Styles */
@@ -398,6 +467,60 @@
             color: #ef4444;
             font-weight: 600;
         }
+
+        /* Section description */
+        .section-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        /* Per-store KPIs grid */
+        .per-store-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+            margin-top: 24px;
+        }
+
+        .per-store-kpi-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f7 100%);
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .per-store-kpi-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .per-store-kpi-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-size: 12px;
+        }
+
+        .per-store-kpi-item:last-child {
+            border-bottom: none;
+        }
+
+        .per-store-kpi-label {
+            color: var(--text-secondary);
+        }
+
+        .per-store-kpi-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
     </style>
 </head>
 <body>
@@ -416,13 +539,10 @@
                         <button class="nav-link active" onclick="showSection('painel-geral', this)">Painel Geral</button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" onclick="showSection('performance-sku', this)">Performance SKU</button>
+                        <button class="nav-link" onclick="showSection('performance-stock', this)">Performance & Stock</button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" onclick="showSection('produtos-matar', this)">Produtos a Matar</button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link" onclick="showSection('informe-loja', this)">Informe por Tienda</button>
+                        <button class="nav-link" onclick="showSection('produtos-matar', this)">Productos a Matar</button>
                     </li>
                     <li class="nav-item">
                         <button class="nav-link" onclick="showSection('importacoes', this)">Importaciones Activas</button>
@@ -456,7 +576,24 @@
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label">Distribución ABC</div>
-                        <div class="kpi-value" id="pgDistribution" style="font-size: 14px; line-height: 1.3;">—</div>
+                        <div id="pgDistribution" class="abc-distribution">
+                            <div class="abc-letter abc-a">
+                                <div class="abc-letter-label">A</div>
+                                <div class="abc-letter-count" id="pgAbcA">0</div>
+                            </div>
+                            <div class="abc-letter abc-b">
+                                <div class="abc-letter-label">B</div>
+                                <div class="abc-letter-count" id="pgAbcB">0</div>
+                            </div>
+                            <div class="abc-letter abc-c">
+                                <div class="abc-letter-label">C</div>
+                                <div class="abc-letter-count" id="pgAbcC">0</div>
+                            </div>
+                            <div class="abc-letter abc-d">
+                                <div class="abc-letter-label">D</div>
+                                <div class="abc-letter-count" id="pgAbcD">0</div>
+                            </div>
+                        </div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label">Total Piezas</div>
@@ -466,145 +603,124 @@
                         <div class="kpi-label">Faltantes</div>
                         <div class="kpi-value status-critical" id="pgFaltantes">0</div>
                     </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Cobertura Matriz LIVO</div>
+                        <div class="kpi-value" id="pgCoberturaMeses">0</div>
+                        <div class="kpi-subtitle">Disponibilidad en inventario central</div>
+                    </div>
                 </div>
+
+                <!-- Charts -->
+                <div id="chartsContainer"></div>
+
+                <!-- Per-store KPIs -->
+                <div id="perStoreKpisContainer"></div>
             </section>
 
-            <!-- ==================== PERFORMANCE SKU ==================== -->
-            <section id="performance-sku" class="section">
-                <h2 class="section-title">Performance SKU</h2>
-
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th onclick="sortTable('curva')">Curva</th>
-                                <th onclick="sortTable('sku')">SKU</th>
-                                <th onclick="sortTable('nome')">Produto</th>
-                                <th onclick="sortTable('classe')">Clase</th>
-                                <th onclick="sortTable('share')">Share Vendas %</th>
-                                <th onclick="sortTable('venda')">Venda Média Mensal</th>
-                                <th onclick="sortTable('stock')">Stock Total (3 Tiendas)</th>
-                                <th id="storeHeader1" onclick="sortTable('store1')">—</th>
-                                <th id="storeHeader2" onclick="sortTable('store2')">—</th>
-                                <th id="storeHeader3" onclick="sortTable('store3')">—</th>
-                                <th onclick="sortTable('cobertura')">Cobertura (meses)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="performanceTableBody">
-                            <tr><td colspan="11" class="empty-state">Cargando datos...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- ==================== PRODUTOS A MATAR ==================== -->
-            <section id="produtos-matar" class="section">
-                <h2 class="section-title">Productos a Matar</h2>
-                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">SKUs sin ventas en los últimos 6 meses pero que aún tienen stock en alguna tienda</p>
-
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>SKU</th>
-                                <th>Producto</th>
-                                <th>Clase</th>
-                                <th>Curva</th>
-                                <th>Stock en Tienda(s)</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="mataTableBody">
-                            <tr><td colspan="6" class="empty-state">Cargando datos...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- ==================== INFORME POR LOJA ==================== -->
-            <section id="informe-loja" class="section">
-                <h2 class="section-title">Informe por Tienda</h2>
+            <!-- ==================== PERFORMANCE & STOCK ==================== -->
+            <section id="performance-stock" class="section">
+                <h2 class="section-title">Performance & Stock</h2>
 
                 <div style="margin-bottom: 24px;">
-                    <label style="display: block; margin-bottom: 8px; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Seleccionar Tienda</label>
-                    <select id="informeLojaSelect" onchange="renderInformeLoja()" style="min-width: 250px;">
-                        <option value="">-- Seleccionar --</option>
+                    <label style="display: block; margin-bottom: 8px; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Filtrar por Tienda</label>
+                    <select id="perfStockStoreSelect" onchange="renderPerformanceStock()" style="min-width: 250px;">
+                        <option value="">Todas las Tiendas</option>
                     </select>
                 </div>
 
-                <div id="informeLojaKPIs" style="display: none; margin-bottom: 24px;">
+                <div id="perfStockKPIs" style="display: none; margin-bottom: 24px;">
                     <div class="kpi-grid">
                         <div class="kpi-card">
                             <div class="kpi-label">SKUs en Tienda</div>
-                            <div class="kpi-value" id="ilTotalSKUs">0</div>
+                            <div class="kpi-value" id="psTotalSKUs">0</div>
                         </div>
                         <div class="kpi-card">
                             <div class="kpi-label">Total Piezas</div>
-                            <div class="kpi-value" id="ilTotalPcs">0</div>
+                            <div class="kpi-value" id="psTotalPcs">0</div>
                         </div>
                         <div class="kpi-card">
                             <div class="kpi-label">Stock OK</div>
-                            <div class="kpi-value status-ok" id="ilOKCount">0</div>
+                            <div class="kpi-value status-ok" id="psOKCount">0</div>
                         </div>
                         <div class="kpi-card">
                             <div class="kpi-label">Faltantes</div>
-                            <div class="kpi-value status-critical" id="ilFaltantes">0</div>
+                            <div class="kpi-value status-critical" id="psFaltantes">0</div>
                         </div>
                         <div class="kpi-card">
                             <div class="kpi-label">Excesos</div>
-                            <div class="kpi-value status-alert" id="ilExcesos">0</div>
+                            <div class="kpi-value status-alert" id="psExcesos">0</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="table-container">
                     <table>
-                        <thead>
+                        <thead id="perfStockHead">
                             <tr>
-                                <th>Estado</th>
                                 <th>Curva</th>
                                 <th>SKU</th>
-                                <th>Producto</th>
+                                <th>Produto</th>
                                 <th>Clase</th>
-                                <th>Share Vendas %</th>
-                                <th>Venda Mensal</th>
-                                <th>Stock en Tienda</th>
-                                <th>Mínimo Ideal</th>
-                                <th>Diferencia</th>
-                                <th>Acción</th>
+                                <th>Share Vendas % (LIVO)</th>
+                                <th>Venda Média Mensal (LIVO)</th>
+                                <th>Stock Total</th>
+                                <th>Mín. Ideal</th>
+                                <th>—</th><th>—</th><th>—</th>
+                                <th>Cobertura Meses (LIVO)</th>
                             </tr>
                         </thead>
-                        <tbody id="informeLojaBody">
-                            <tr><td colspan="11" class="empty-state">Selecciona una tienda para ver el informe</td></tr>
+                        <tbody id="perfStockBody">
+                            <tr><td colspan="12" class="empty-state">Cargando datos...</td></tr>
                         </tbody>
                     </table>
                 </div>
 
                 <div style="margin-top: 16px;">
-                    <button class="btn btn-primary" id="btnInformeExcel" onclick="downloadInformeLojaExcel()" style="display: none;">Descargar Excel</button>
+                    <button class="btn btn-primary" id="btnPerfStockExcel" onclick="downloadPerformanceStockExcel()">Descargar Excel (.xlsx)</button>
+                </div>
+            </section>
+
+            <!-- ==================== PRODUTOS A MATAR ==================== -->
+            <section id="produtos-matar" class="section">
+                <h2 class="section-title">Productos a Matar</h2>
+                <p class="section-description">Notificación: LIVO está descontinuando estos SKUs por falta de ventas y stock en matriz. Si tienes unidades en tienda, son las últimas piezas disponibles.</p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>SKU</th>
+                                <th>Producto</th>
+                                <th>Clase</th>
+                                <th>Curva</th>
+                                <th>Stock en tus Tiendas</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mataTableBody">
+                            <tr><td colspan="5" class="empty-state">Cargando datos...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </section>
 
             <!-- ==================== IMPORTAÇÕES ATIVAS ==================== -->
             <section id="importacoes" class="section">
                 <h2 class="section-title">Importaciones Activas</h2>
-                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">Ordenes de importación que aún no han sido entregadas</p>
+                <p class="section-description">Productos en camino a matriz LIVO. Esta información es solo orientativa sobre la disponibilidad futura de SKUs.</p>
 
                 <div class="table-container">
                     <table>
                         <thead>
                             <tr>
+                                <th>Productos/SKUs</th>
                                 <th>Fornecedor</th>
-                                <th>Proforma</th>
-                                <th>Productos</th>
-                                <th>Via</th>
                                 <th>Status</th>
-                                <th>Embarque</th>
-                                <th>Entrega Estimada</th>
+                                <th>Fecha Embarque</th>
+                                <th>Fecha Llegada Estimada (matriz)</th>
                             </tr>
                         </thead>
                         <tbody id="importacoesTableBody">
-                            <tr><td colspan="7" class="empty-state">Cargando datos...</td></tr>
+                            <tr><td colspan="5" class="empty-state">Cargando datos...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -631,8 +747,29 @@
         let processedData = [];
         let storeColumns = [];
         let franchiseeStores = [];
-        let _informeLojaClassified = [];
+        let _perfStockData = [];
         let _sharedData = { logistica: [] };
+
+        // Chart instances
+        let stockChart = null;
+        let excesosChart = null;
+
+        // ==================== HELPER FUNCTIONS ====================
+        function getMinIdeal(sku, storeData) {
+            // NEW RULE: Calculate total stock = estoqueMatriz + sum of franchisee store stock
+            // If totalStock > 0: A=2, B/C/D=1. If totalStock === 0, return 0.
+            const totalStoreStock = franchiseeStores.reduce((sum, store) => {
+                return sum + (storeData[store] || 0);
+            }, 0);
+
+            const totalStock = (sku.estoqueMatriz || 0) + totalStoreStock;
+
+            if (totalStock === 0) {
+                return 0;
+            }
+
+            return sku.curva === 'A' ? 2 : 1;
+        }
 
         // ==================== DATA LOADING ====================
         async function loadData() {
@@ -769,9 +906,8 @@
         function renderAllSections() {
             const classified = classifySKUsByABC(processedData);
             renderPainelGeral(classified);
-            renderPerformanceSKU(classified);
+            initPerformanceStock(classified);
             renderProdutosMatar(classified);
-            initInformeLoja(classified);
             renderImportacoes();
         }
 
@@ -783,7 +919,10 @@
             const dCount = data.filter(d => d.curva === 'D').length;
 
             document.getElementById('pgActiveSKUs').textContent = activeSKUs;
-            document.getElementById('pgDistribution').textContent = `A: ${aCount} | B: ${bCount} | C: ${cCount} | D: ${dCount}`;
+            document.getElementById('pgAbcA').textContent = aCount;
+            document.getElementById('pgAbcB').textContent = bCount;
+            document.getElementById('pgAbcC').textContent = cCount;
+            document.getElementById('pgAbcD').textContent = dCount;
 
             // Calculate total piezas across franchisee stores
             let totalPiezas = 0;
@@ -794,90 +933,388 @@
             });
             document.getElementById('pgTotalPiezas').textContent = totalPiezas.toLocaleString('pt-BR');
 
-            // Faltantes: below minimum across franchisee stores
+            // Faltantes: below minimum across franchisee stores using NEW RULE
             let faltantes = 0;
             data.forEach(sku => {
-                if (sku.estoqueMatriz === 0) return;
-                const minQty = sku.curva === 'A' ? 2 : 1;
                 const storeData = rawStoreData.find(s => s.sku === sku.sku);
                 if (!storeData) return;
+
+                const minIdeal = getMinIdeal(sku, storeData);
                 franchiseeStores.forEach(store => {
                     const current = storeData[store] || 0;
-                    if (current < minQty) {
-                        faltantes += (minQty - current);
+                    if (current < minIdeal) {
+                        faltantes += (minIdeal - current);
                     }
                 });
             });
             document.getElementById('pgFaltantes').textContent = faltantes;
+
+            // Cobertura Matriz LIVO (average months of coverage in matriz)
+            let totalCobertura = 0;
+            let countActive = 0;
+            data.forEach(sku => {
+                if (sku.vendaMedia > 0) {
+                    totalCobertura += sku.coberturaMeses;
+                    countActive++;
+                }
+            });
+            const avgCobertura = countActive > 0 ? (totalCobertura / countActive) : 0;
+            const coberturaText = avgCobertura === Infinity ? '∞' : avgCobertura.toFixed(1);
+            document.getElementById('pgCoberturaMeses').textContent = coberturaText;
+
+            // Render charts
+            renderPainelGeralCharts(data);
+
+            // Render per-store KPIs
+            renderPerStoreKPIs(data);
         }
 
-        function renderPerformanceSKU(data) {
-            const totalRevenue = data.reduce((sum, d) => sum + d.vendaMedia, 0);
-            const classified = data.map(d => {
-                const share = totalRevenue > 0 ? ((d.vendaMedia / totalRevenue) * 100) : 0;
-                return { ...d, share };
-            }).sort((a, b) => {
-                const curvaOrder = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
-                return (curvaOrder[a.curva] || 9) - (curvaOrder[b.curva] || 9) || b.vendaMedia - a.vendaMedia;
+        function renderPainelGeralCharts(data) {
+            const container = document.getElementById('chartsContainer');
+            container.innerHTML = '';
+
+            // Stock per store chart
+            const storeStockData = {};
+            franchiseeStores.forEach(store => {
+                let totalStock = 0;
+                rawStoreData.forEach(row => {
+                    totalStock += (row[store] || 0);
+                });
+                storeStockData[store] = totalStock;
             });
 
-            // Set store header names
-            franchiseeStores.forEach((store, idx) => {
-                const header = document.getElementById(`storeHeader${idx + 1}`);
-                if (header) {
-                    header.textContent = store.replace(/_/g, ' ').toUpperCase();
+            const stockChartBox = document.createElement('div');
+            stockChartBox.className = 'chart-box';
+            const stockCanvas = document.createElement('canvas');
+            stockChartBox.appendChild(stockCanvas);
+            container.appendChild(stockChartBox);
+
+            const stockCtx = stockCanvas.getContext('2d');
+            if (stockChart) stockChart.destroy();
+            stockChart = new Chart(stockCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(storeStockData).map(s => s.replace(/_/g, ' ').toUpperCase()),
+                    datasets: [{
+                        label: 'Stock por Tienda',
+                        data: Object.values(storeStockData),
+                        backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: true },
+                        datalabels: { display: true, anchor: 'end', align: 'top' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
                 }
             });
 
-            const tbody = document.getElementById('performanceTableBody');
-            tbody.innerHTML = '';
+            // Excesos vs Faltantes per store chart
+            const storeExcessData = {};
+            const storeShortageData = {};
 
-            if (classified.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Sin datos</td></tr>';
-                return;
-            }
+            franchiseeStores.forEach(store => {
+                let excesos = 0;
+                let faltantes = 0;
 
-            classified.forEach(row => {
-                const tr = document.createElement('tr');
-                const storeData = rawStoreData.find(s => s.sku === row.sku);
-                const storeStocks = franchiseeStores.map(store => storeData ? (storeData[store] || 0) : 0);
-                const totalStock = storeStocks.reduce((a, b) => a + b, 0);
-                const coverageText = row.coberturaMeses === Infinity ? '∞' : row.coberturaMeses.toFixed(1);
+                data.forEach(sku => {
+                    const storeData = rawStoreData.find(s => s.sku === sku.sku);
+                    if (!storeData) return;
 
-                let storeCells = '';
-                storeStocks.forEach(qty => {
-                    storeCells += `<td>${qty}</td>`;
+                    const minIdeal = getMinIdeal(sku, storeData);
+                    const current = storeData[store] || 0;
+                    const diff = current - minIdeal;
+
+                    if (diff > 0) excesos += diff;
+                    if (diff < 0) faltantes += Math.abs(diff);
                 });
 
-                tr.innerHTML = `
-                    <td><span class="badge badge-${row.curva.toLowerCase()}">${row.curva}</span></td>
-                    <td>${row.sku}</td>
-                    <td>${row.nome_produto}</td>
-                    <td>${row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol'}</td>
-                    <td>${row.share.toFixed(1)}%</td>
-                    <td>${Math.round(row.vendaMedia)}</td>
-                    <td style="font-weight:600;">${totalStock}</td>
-                    ${storeCells}
-                    <td>${coverageText}</td>
-                `;
-                tbody.appendChild(tr);
+                storeExcessData[store] = excesos;
+                storeShortageData[store] = faltantes;
+            });
+
+            const excesosChartBox = document.createElement('div');
+            excesosChartBox.className = 'chart-box';
+            const excesosCanvas = document.createElement('canvas');
+            excesosChartBox.appendChild(excesosCanvas);
+            container.appendChild(excesosChartBox);
+
+            const excesosCtx = excesosCanvas.getContext('2d');
+            if (excesosChart) excesosChart.destroy();
+            excesosChart = new Chart(excesosCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(storeExcessData).map(s => s.replace(/_/g, ' ').toUpperCase()),
+                    datasets: [
+                        {
+                            label: 'Excesos',
+                            data: Object.values(storeExcessData),
+                            backgroundColor: 'rgba(245, 158, 11, 0.6)',
+                            borderColor: 'rgba(245, 158, 11, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Faltantes',
+                            data: Object.values(storeShortageData),
+                            backgroundColor: 'rgba(239, 68, 68, 0.6)',
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: true },
+                        datalabels: { display: true, anchor: 'end', align: 'top' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
             });
         }
 
+        function renderPerStoreKPIs(data) {
+            const container = document.getElementById('perStoreKpisContainer');
+            container.innerHTML = '';
+
+            const grid = document.createElement('div');
+            grid.className = 'per-store-kpi-grid';
+
+            franchiseeStores.forEach(store => {
+                const card = document.createElement('div');
+                card.className = 'per-store-kpi-card';
+
+                let totalPcs = 0;
+                let faltantes = 0;
+                let excesos = 0;
+
+                data.forEach(sku => {
+                    const storeData = rawStoreData.find(s => s.sku === sku.sku);
+                    if (!storeData) return;
+
+                    const current = storeData[store] || 0;
+                    totalPcs += current;
+
+                    const minIdeal = getMinIdeal(sku, storeData);
+                    const diff = current - minIdeal;
+
+                    if (diff < 0) faltantes += Math.abs(diff);
+                    if (diff > 0) excesos += diff;
+                });
+
+                const title = store.replace(/_/g, ' ').toUpperCase();
+                card.innerHTML = `
+                    <div class="per-store-kpi-title">${title}</div>
+                    <div class="per-store-kpi-item">
+                        <span class="per-store-kpi-label">Total Piezas</span>
+                        <span class="per-store-kpi-value">${totalPcs}</span>
+                    </div>
+                    <div class="per-store-kpi-item">
+                        <span class="per-store-kpi-label">Faltantes</span>
+                        <span class="per-store-kpi-value" style="color: #ef4444;">${faltantes}</span>
+                    </div>
+                    <div class="per-store-kpi-item">
+                        <span class="per-store-kpi-label">Excesos</span>
+                        <span class="per-store-kpi-value" style="color: #f59e0b;">${excesos}</span>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            container.appendChild(grid);
+        }
+
+        function initPerformanceStock(data) {
+            _perfStockData = data;
+            const select = document.getElementById('perfStockStoreSelect');
+            select.innerHTML = '<option value="">Todas las Tiendas</option>';
+            franchiseeStores.forEach(store => {
+                const opt = document.createElement('option');
+                opt.value = store;
+                opt.textContent = store.replace(/_/g, ' ').toUpperCase();
+                select.appendChild(opt);
+            });
+            renderPerformanceStock();
+        }
+
+        function renderPerformanceStock() {
+            const storeName = document.getElementById('perfStockStoreSelect').value;
+            const data = _perfStockData;
+            const totalRevenue = data.reduce((sum, d) => sum + d.vendaMedia, 0);
+            const thead = document.getElementById('perfStockHead');
+            const tbody = document.getElementById('perfStockBody');
+            const kpis = document.getElementById('perfStockKPIs');
+
+            const classified = data.map(d => {
+                const share = totalRevenue > 0 ? ((d.vendaMedia / totalRevenue) * 100) : 0;
+                return { ...d, share };
+            });
+
+            if (!storeName) {
+                // === MODE: TODAS LAS TIENDAS ===
+                kpis.style.display = 'none';
+
+                // Build header with store columns
+                let storeHeaders = '';
+                franchiseeStores.forEach(store => {
+                    storeHeaders += `<th>${store.replace(/_/g, ' ').toUpperCase()}</th>`;
+                });
+                thead.innerHTML = `<tr>
+                    <th>Curva</th><th>SKU</th><th>Produto</th><th>Clase</th>
+                    <th>Share Vendas % (LIVO)</th><th>Venda Média Mensal (LIVO)</th>
+                    <th>Stock Total</th><th>Mín. Ideal</th>
+                    ${storeHeaders}
+                    <th>Cobertura Meses (LIVO)</th>
+                </tr>`;
+
+                const colCount = 8 + franchiseeStores.length + 1;
+                const sorted = classified.sort((a, b) => {
+                    const curvaOrder = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+                    return (curvaOrder[a.curva] || 9) - (curvaOrder[b.curva] || 9) || b.vendaMedia - a.vendaMedia;
+                });
+
+                tbody.innerHTML = '';
+                if (sorted.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="${colCount}" class="empty-state">Sin datos</td></tr>`;
+                    return;
+                }
+
+                sorted.forEach(row => {
+                    const tr = document.createElement('tr');
+                    const storeData = rawStoreData.find(s => s.sku === row.sku);
+                    const storeStocks = franchiseeStores.map(store => storeData ? (storeData[store] || 0) : 0);
+                    const totalStock = storeStocks.reduce((a, b) => a + b, 0);
+                    const coverageText = row.coberturaMeses === Infinity ? '∞' : row.coberturaMeses.toFixed(1);
+                    const minIdeal = storeData ? getMinIdeal(row, storeData) : 0;
+
+                    let storeCells = '';
+                    storeStocks.forEach(qty => {
+                        storeCells += `<td>${qty}</td>`;
+                    });
+
+                    tr.innerHTML = `
+                        <td><span class="badge badge-${row.curva.toLowerCase()}">${row.curva}</span></td>
+                        <td>${row.sku}</td>
+                        <td>${row.nome_produto}</td>
+                        <td>${row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol'}</td>
+                        <td>${row.share.toFixed(1)}%</td>
+                        <td>${Math.round(row.vendaMedia)}</td>
+                        <td style="font-weight:600;">${totalStock}</td>
+                        <td style="font-weight:600;">${minIdeal}</td>
+                        ${storeCells}
+                        <td>${coverageText}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+            } else {
+                // === MODE: TIENDA ESPECÍFICA ===
+                kpis.style.display = 'block';
+
+                thead.innerHTML = `<tr>
+                    <th>Estado</th><th>Curva</th><th>SKU</th><th>Producto</th><th>Clase</th>
+                    <th>Share Vendas % (LIVO)</th><th>Venda Mensal (LIVO)</th>
+                    <th>Stock en Tienda</th><th>Mínimo Ideal</th><th>Diferencia</th>
+                    <th>Cobertura Meses (LIVO)</th>
+                </tr>`;
+
+                const rows = [];
+                classified.forEach(d => {
+                    const sd = rawStoreData.find(s => s.sku === d.sku);
+                    const stockLoja = sd ? (sd[storeName] || 0) : 0;
+                    const minIdeal = sd ? getMinIdeal(d, sd) : 0;
+                    const diff = stockLoja - minIdeal;
+
+                    let estado;
+                    if (minIdeal === 0 && stockLoja === 0) return;
+                    if (minIdeal === 0 && stockLoja > 0) {
+                        estado = 'EXCESO';
+                    } else if (diff > 0) {
+                        estado = 'EXCESO';
+                    } else if (diff < 0) {
+                        estado = 'FALTANTE';
+                    } else {
+                        estado = 'OK';
+                    }
+
+                    rows.push({ ...d, stockLoja, minIdeal, diff, estado });
+                });
+
+                const estadoOrder = { 'FALTANTE': 0, 'EXCESO': 1, 'OK': 2 };
+                const curvaOrder = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+                rows.sort((a, b) => {
+                    if (estadoOrder[a.estado] !== estadoOrder[b.estado]) return estadoOrder[a.estado] - estadoOrder[b.estado];
+                    return (curvaOrder[a.curva] ?? 9) - (curvaOrder[b.curva] ?? 9);
+                });
+
+                // KPIs
+                const totalSKUs = rows.filter(r => r.stockLoja > 0).length;
+                const totalPcs = rows.reduce((s, r) => s + r.stockLoja, 0);
+                const okCount = rows.filter(r => r.estado === 'OK').length;
+                const faltantes = rows.filter(r => r.estado === 'FALTANTE').length;
+                const excesos = rows.filter(r => r.estado === 'EXCESO').length;
+
+                document.getElementById('psTotalSKUs').textContent = totalSKUs;
+                document.getElementById('psTotalPcs').textContent = totalPcs;
+                document.getElementById('psOKCount').textContent = okCount;
+                document.getElementById('psFaltantes').textContent = faltantes;
+                document.getElementById('psExcesos').textContent = excesos;
+
+                tbody.innerHTML = '';
+                if (rows.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Sin datos para esta tienda</td></tr>';
+                    return;
+                }
+
+                rows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    const estadoColor = row.estado === 'OK' ? '#10b981' : row.estado === 'FALTANTE' ? '#ef4444' : '#f59e0b';
+                    const estadoBg = row.estado === 'OK' ? 'rgba(16,185,129,0.1)' : row.estado === 'FALTANTE' ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)';
+                    const diffText = row.diff > 0 ? '+' + row.diff : row.diff < 0 ? String(row.diff) : '0';
+                    const diffColor = row.diff > 0 ? '#f59e0b' : row.diff < 0 ? '#ef4444' : '#10b981';
+                    const classe = row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol';
+                    const coverageText = row.coberturaMeses === Infinity ? '∞' : row.coberturaMeses.toFixed(1);
+
+                    tr.innerHTML = `
+                        <td><span style="padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;color:${estadoColor};background:${estadoBg};">${row.estado}</span></td>
+                        <td><span class="badge badge-${(row.curva||'d').toLowerCase()}">${row.curva || 'D'}</span></td>
+                        <td>${row.sku}</td>
+                        <td>${row.nome_produto}</td>
+                        <td>${classe}</td>
+                        <td>${row.share.toFixed(1)}%</td>
+                        <td>${Math.round(row.vendaMedia || 0)}</td>
+                        <td style="font-weight:600;">${row.stockLoja}</td>
+                        <td>${row.minIdeal}</td>
+                        <td style="font-weight:600;color:${diffColor}">${diffText}</td>
+                        <td>${coverageText}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
         function renderProdutosMatar(data) {
-            // SKUs with no sales in last 6 months but with stock in any franchisee store
+            // SKUs where: last6MonthsSales === 0 AND estoqueMatriz === 0 AND importacoesPendentes === 0 (MATRIZ notification)
             const candidates = data.filter(d => {
-                if (d.last6MonthsSales > 0) return false;
-                const sd = rawStoreData.find(s => s.sku === d.sku);
-                if (!sd) return false;
-                return franchiseeStores.some(store => (sd[store] || 0) > 0);
+                return d.last6MonthsSales === 0 && d.estoqueMatriz === 0 && d.importacoesPendentes === 0;
             });
 
             const tbody = document.getElementById('mataTableBody');
             tbody.innerHTML = '';
 
             if (candidates.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Sin productos para matar en este momento</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Sin productos para matar en este momento</td></tr>';
                 return;
             }
 
@@ -885,14 +1322,14 @@
                 const storeData = rawStoreData.find(s => s.sku === row.sku);
                 const storesWithStock = [];
 
-                franchiseeStores.forEach(store => {
-                    const qty = storeData ? (storeData[store] || 0) : 0;
-                    if (qty > 0) {
-                        storesWithStock.push(`${store.replace(/_/g, ' ')} (${qty})`);
-                    }
-                });
-
-                if (storesWithStock.length === 0) return;
+                if (storeData) {
+                    franchiseeStores.forEach(store => {
+                        const qty = storeData[store] || 0;
+                        if (qty > 0) {
+                            storesWithStock.push(`${store.replace(/_/g, ' ')} (${qty})`);
+                        }
+                    });
+                }
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -900,185 +1337,104 @@
                     <td>${row.nome_produto}</td>
                     <td>${row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol'}</td>
                     <td><span class="badge badge-${row.curva.toLowerCase()}">${row.curva}</span></td>
-                    <td>${storesWithStock.join(', ')}</td>
-                    <td><button class="btn btn-secondary" onclick="alert('Devolver a matriz')">Devolver a matriz</button></td>
+                    <td>${storesWithStock.length > 0 ? storesWithStock.join(', ') : '—'}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function initInformeLoja(data) {
-            _informeLojaClassified = data;
-            const select = document.getElementById('informeLojaSelect');
-            select.innerHTML = '<option value="">-- Seleccionar --</option>';
-            franchiseeStores.forEach(store => {
-                const opt = document.createElement('option');
-                opt.value = store;
-                opt.textContent = store.replace(/_/g, ' ').toUpperCase();
-                select.appendChild(opt);
-            });
-        }
-
-        function renderInformeLoja() {
-            const storeName = document.getElementById('informeLojaSelect').value;
-            const tbody = document.getElementById('informeLojaBody');
-            const kpis = document.getElementById('informeLojaKPIs');
-            const btnExcel = document.getElementById('btnInformeExcel');
+        function downloadPerformanceStockExcel() {
+            const storeName = document.getElementById('perfStockStoreSelect').value;
+            const data = _perfStockData;
+            const totalRevenue = data.reduce((s, d) => s + d.vendaMedia, 0);
+            const wb = XLSX.utils.book_new();
 
             if (!storeName) {
-                tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Selecciona una tienda para ver el informe</td></tr>';
-                kpis.style.display = 'none';
-                btnExcel.style.display = 'none';
-                return;
+                // === EXPORT: TODAS LAS TIENDAS ===
+                const classified = data.map(d => {
+                    const share = totalRevenue > 0 ? ((d.vendaMedia / totalRevenue) * 100) : 0;
+                    return { ...d, share };
+                }).sort((a, b) => {
+                    const curvaOrder = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+                    return (curvaOrder[a.curva] || 9) - (curvaOrder[b.curva] || 9) || b.vendaMedia - a.vendaMedia;
+                });
+
+                const storeNames = franchiseeStores.map(s => s.replace(/_/g, ' ').toUpperCase());
+                const header = ['Curva', 'SKU', 'Producto', 'Clase', 'Share %', 'Venda Mensal (LIVO)', 'Stock Total', 'Min Ideal', ...storeNames, 'Cobertura Meses (LIVO)'];
+                const detalleData = [header];
+
+                classified.forEach(row => {
+                    const sd = rawStoreData.find(s => s.sku === row.sku);
+                    const storeStocks = franchiseeStores.map(store => sd ? (sd[store] || 0) : 0);
+                    const totalStock = storeStocks.reduce((a, b) => a + b, 0);
+                    const minIdeal = sd ? getMinIdeal(row, sd) : 0;
+                    const coverageText = row.coberturaMeses === Infinity ? '∞' : row.coberturaMeses.toFixed(1);
+                    const classe = row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol';
+                    detalleData.push([row.curva, row.sku, row.nome_produto || '', classe, row.share.toFixed(1), Math.round(row.vendaMedia), totalStock, minIdeal, ...storeStocks, coverageText]);
+                });
+
+                const ws = XLSX.utils.aoa_to_sheet(detalleData);
+                XLSX.utils.book_append_sheet(wb, ws, 'Performance');
+                XLSX.writeFile(wb, 'performance_stock_todas_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+
+            } else {
+                // === EXPORT: TIENDA ESPECÍFICA ===
+                const rows = [];
+                data.forEach(d => {
+                    const sd = rawStoreData.find(s => s.sku === d.sku);
+                    const stockLoja = sd ? (sd[storeName] || 0) : 0;
+                    const minIdeal = sd ? getMinIdeal(d, sd) : 0;
+                    const diff = stockLoja - minIdeal;
+                    const share = totalRevenue > 0 ? ((d.vendaMedia / totalRevenue) * 100) : 0;
+
+                    let estado;
+                    if (minIdeal === 0 && stockLoja === 0) return;
+                    if (minIdeal === 0 && stockLoja > 0) { estado = 'EXCESO'; }
+                    else if (diff > 0) { estado = 'EXCESO'; }
+                    else if (diff < 0) { estado = 'FALTANTE'; }
+                    else { estado = 'OK'; }
+
+                    rows.push({ ...d, stockLoja, minIdeal, diff, share, estado });
+                });
+
+                const estadoOrder = { 'FALTANTE': 0, 'EXCESO': 1, 'OK': 2 };
+                const curvaOrder2 = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+                rows.sort((a, b) => {
+                    if (estadoOrder[a.estado] !== estadoOrder[b.estado]) return estadoOrder[a.estado] - estadoOrder[b.estado];
+                    return (curvaOrder2[a.curva] ?? 9) - (curvaOrder2[b.curva] ?? 9);
+                });
+
+                const displayName = storeName.replace(/_/g, ' ').toUpperCase();
+
+                // Resumen sheet
+                const resumenData = [
+                    ['INFORME DE STOCK - ' + displayName],
+                    ['Generado:', new Date().toLocaleDateString('pt-BR')],
+                    ['Regla:', 'Curva A = min 2 piezas | Curva B/C/D = min 1 pieza'],
+                    [],
+                    ['RESUMEN'],
+                    ['SKUs en tienda', rows.filter(r => r.stockLoja > 0).length],
+                    ['Total piezas', rows.reduce((s,r) => s + r.stockLoja, 0)],
+                    ['Faltantes', rows.filter(r => r.estado === 'FALTANTE').length],
+                    ['Excesos', rows.filter(r => r.estado === 'EXCESO').length],
+                    ['OK', rows.filter(r => r.estado === 'OK').length]
+                ];
+                const wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
+                XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen');
+
+                // Detalle sheet
+                const detalleData = [['Estado', 'Curva', 'SKU', 'Producto', 'Clase', 'Share %', 'Venda Mensal (LIVO)', 'Stock', 'Minimo', 'Diferencia', 'Cobertura Meses (LIVO)']];
+                rows.forEach(r => {
+                    const classe = r.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol';
+                    const diffText = r.diff > 0 ? '+' + r.diff : r.diff;
+                    const coverageText = r.coberturaMeses === Infinity ? '∞' : r.coberturaMeses.toFixed(1);
+                    detalleData.push([r.estado, r.curva || 'D', r.sku, r.nome_produto || '', classe, r.share.toFixed(1), Math.round(r.vendaMedia || 0), r.stockLoja, r.minIdeal, diffText, coverageText]);
+                });
+
+                const wsDetalle = XLSX.utils.aoa_to_sheet(detalleData);
+                XLSX.utils.book_append_sheet(wb, wsDetalle, 'Detalle');
+                XLSX.writeFile(wb, 'informe_' + storeName + '_' + new Date().toISOString().slice(0, 10) + '.xlsx');
             }
-
-            kpis.style.display = 'block';
-            btnExcel.style.display = 'block';
-
-            const data = _informeLojaClassified;
-            const totalRevenue = data.reduce((s, d) => s + d.vendaMedia, 0);
-            const rows = [];
-
-            data.forEach(d => {
-                const sd = rawStoreData.find(s => s.sku === d.sku);
-                const stockLoja = sd ? (sd[storeName] || 0) : 0;
-                const hasMatrizStock = d.estoqueMatriz > 0;
-                const minIdeal = hasMatrizStock ? (d.curva === 'A' ? 2 : 1) : 0;
-                const diff = stockLoja - minIdeal;
-                const share = totalRevenue > 0 ? ((d.vendaMedia / totalRevenue) * 100) : 0;
-
-                let estado, accion;
-                if (minIdeal === 0 && stockLoja === 0) return;
-                if (minIdeal === 0 && stockLoja > 0) {
-                    estado = 'EXCESO'; accion = 'Devolver a matriz';
-                } else if (diff > 0) {
-                    estado = 'EXCESO'; accion = 'Devolver ' + diff + ' pzs';
-                } else if (diff < 0) {
-                    estado = 'FALTANTE'; accion = 'Enviar ' + Math.abs(diff) + ' pzs';
-                } else {
-                    estado = 'OK'; accion = 'Mantener';
-                }
-
-                rows.push({ ...d, stockLoja, minIdeal, diff, share, estado, accion });
-            });
-
-            const estadoOrder = { 'FALTANTE': 0, 'EXCESO': 1, 'OK': 2 };
-            const curvaOrder = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
-            rows.sort((a, b) => {
-                if (estadoOrder[a.estado] !== estadoOrder[b.estado]) return estadoOrder[a.estado] - estadoOrder[b.estado];
-                return (curvaOrder[a.curva] ?? 9) - (curvaOrder[b.curva] ?? 9);
-            });
-
-            const totalSKUs = rows.filter(r => r.stockLoja > 0).length;
-            const totalPcs = rows.reduce((s, r) => s + r.stockLoja, 0);
-            const okCount = rows.filter(r => r.estado === 'OK').length;
-            const faltantes = rows.filter(r => r.estado === 'FALTANTE').length;
-            const excesos = rows.filter(r => r.estado === 'EXCESO').length;
-
-            document.getElementById('ilTotalSKUs').textContent = totalSKUs;
-            document.getElementById('ilTotalPcs').textContent = totalPcs;
-            document.getElementById('ilOKCount').textContent = okCount;
-            document.getElementById('ilFaltantes').textContent = faltantes;
-            document.getElementById('ilExcesos').textContent = excesos;
-
-            tbody.innerHTML = '';
-            if (rows.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Sin datos para esta tienda</td></tr>';
-                return;
-            }
-
-            rows.forEach(row => {
-                const tr = document.createElement('tr');
-                const estadoColor = row.estado === 'OK' ? '#10b981' : row.estado === 'FALTANTE' ? '#ef4444' : '#f59e0b';
-                const estadoBg = row.estado === 'OK' ? 'rgba(16,185,129,0.1)' : row.estado === 'FALTANTE' ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)';
-                const diffText = row.diff > 0 ? '+' + row.diff : row.diff < 0 ? String(row.diff) : '0';
-                const diffColor = row.diff > 0 ? '#f59e0b' : row.diff < 0 ? '#ef4444' : '#10b981';
-                const classe = row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol';
-
-                tr.innerHTML = `
-                    <td><span style="padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;color:${estadoColor};background:${estadoBg};">${row.estado}</span></td>
-                    <td><span class="badge badge-${(row.curva||'d').toLowerCase()}">${row.curva || 'D'}</span></td>
-                    <td>${row.sku}</td>
-                    <td>${row.nome_produto}</td>
-                    <td>${classe}</td>
-                    <td>${row.share.toFixed(1)}%</td>
-                    <td>${Math.round(row.vendaMedia || 0)}</td>
-                    <td style="font-weight:600;">${row.stockLoja}</td>
-                    <td>${row.minIdeal}</td>
-                    <td style="font-weight:600;color:${diffColor}">${diffText}</td>
-                    <td style="font-size:11px;">${row.accion}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function downloadInformeLojaExcel() {
-            const storeName = document.getElementById('informeLojaSelect').value;
-            if (!storeName) { alert('Selecciona una tienda primero.'); return; }
-
-            const data = _informeLojaClassified;
-            const totalRevenue = data.reduce((s, d) => s + d.vendaMedia, 0);
-            const rows = [];
-
-            data.forEach(d => {
-                const sd = rawStoreData.find(s => s.sku === d.sku);
-                const stockLoja = sd ? (sd[storeName] || 0) : 0;
-                const hasMatrizStock = d.estoqueMatriz > 0;
-                const minIdeal = hasMatrizStock ? (d.curva === 'A' ? 2 : 1) : 0;
-                const diff = stockLoja - minIdeal;
-                const share = totalRevenue > 0 ? ((d.vendaMedia / totalRevenue) * 100) : 0;
-
-                let estado, accion;
-                if (minIdeal === 0 && stockLoja === 0) return;
-                if (minIdeal === 0 && stockLoja > 0) {
-                    estado = 'EXCESO'; accion = 'Devolver a matriz';
-                } else if (diff > 0) {
-                    estado = 'EXCESO'; accion = 'Devolver ' + diff + ' pzs';
-                } else if (diff < 0) {
-                    estado = 'FALTANTE'; accion = 'Enviar ' + Math.abs(diff) + ' pzs';
-                } else {
-                    estado = 'OK'; accion = 'Mantener';
-                }
-                rows.push({ ...d, stockLoja, minIdeal, diff, share, estado, accion });
-            });
-
-            const estadoOrder = { 'FALTANTE': 0, 'EXCESO': 1, 'OK': 2 };
-            const curvaOrder = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
-            rows.sort((a, b) => {
-                if (estadoOrder[a.estado] !== estadoOrder[b.estado]) return estadoOrder[a.estado] - estadoOrder[b.estado];
-                return (curvaOrder[a.curva] ?? 9) - (curvaOrder[b.curva] ?? 9);
-            });
-
-            const displayName = storeName.replace(/_/g, ' ').toUpperCase();
-            let csv = '\uFEFF';
-            csv += 'INFORME DE STOCK - ' + displayName + '\n';
-            csv += 'Generado: ' + new Date().toLocaleDateString('pt-BR') + '\n';
-            csv += 'Regla: Curva A = min 2 piezas | Curva B/C/D = min 1 pieza\n';
-            csv += '\n';
-            csv += 'RESUMEN\n';
-            csv += 'SKUs en tienda,' + rows.filter(r => r.stockLoja > 0).length + '\n';
-            csv += 'Total piezas,' + rows.reduce((s,r) => s + r.stockLoja, 0) + '\n';
-            csv += 'Faltantes,' + rows.filter(r => r.estado === 'FALTANTE').length + '\n';
-            csv += 'Excesos,' + rows.filter(r => r.estado === 'EXCESO').length + '\n';
-            csv += 'OK,' + rows.filter(r => r.estado === 'OK').length + '\n';
-            csv += '\n';
-            csv += 'DETALLE\n';
-            csv += 'Estado,Curva,SKU,Producto,Clase,Share %,Venda Mensal,Stock,Minimo,Diferencia,Accion\n';
-
-            rows.forEach(r => {
-                const classe = r.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol';
-                const nome = (r.nome_produto || '').replace(/,/g, ' ');
-                const diffText = r.diff > 0 ? '+' + r.diff : r.diff;
-                csv += `${r.estado},${r.curva || 'D'},${r.sku},"${nome}",${classe},${r.share.toFixed(1)},${Math.round(r.vendaMedia || 0)},${r.stockLoja},${r.minIdeal},${diffText},"${r.accion}"\n`;
-            });
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'informe_' + storeName + '_' + new Date().toISOString().slice(0,10) + '.csv';
-            a.click();
-            URL.revokeObjectURL(url);
         }
 
         function renderImportacoes() {
@@ -1086,7 +1442,7 @@
             tbody.innerHTML = '';
 
             if (!_sharedData.logistica || _sharedData.logistica.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Sin datos de importación</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Sin datos de importación</td></tr>';
                 return;
             }
 
@@ -1095,7 +1451,7 @@
             );
 
             if (active.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Sin importaciones activas</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Sin importaciones activas</td></tr>';
                 return;
             }
 
@@ -1105,10 +1461,8 @@
                 const entrega = order.entrega ? new Date(order.entrega).toLocaleDateString('pt-BR') : '—';
 
                 tr.innerHTML = `
-                    <td>${order.fornecedor || '—'}</td>
-                    <td>${order.proforma || '—'}</td>
                     <td>${order.produtos || '—'}</td>
-                    <td>${order.via || '—'}</td>
+                    <td>${order.fornecedor || '—'}</td>
                     <td>${order.status || '—'}</td>
                     <td>${embarque}</td>
                     <td>${entrega}</td>
@@ -1145,9 +1499,8 @@
 
             const titles = {
                 'painel-geral': 'Painel Geral',
-                'performance-sku': 'Performance SKU',
-                'produtos-matar': 'Produtos a Matar',
-                'informe-loja': 'Informe por Tienda',
+                'performance-stock': 'Performance & Stock',
+                'produtos-matar': 'Productos a Matar',
                 'importacoes': 'Importaciones Activas'
             };
             document.getElementById('pageTitle').textContent = titles[sectionId] || 'Panel';
