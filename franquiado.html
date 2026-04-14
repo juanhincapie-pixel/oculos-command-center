@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ÓCULOS — Franquiado</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js + Datalabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
+    <!-- NOTE: Requires _redirects proxy config: /api/metabase/* https://instance.metabase.com/api/:splat 200 -->
+
+    <style>
+        :root {
+            --dark-sidebar: #1a1a2e;
+            --sidebar-text: #ffffff;
+            --content-bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --border-color: #e0e0e0;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --accent-orange: #f59e0b;
+            --accent-yellow: #eab308;
+            --color-a: #3b82f6;
+            --color-b: #10b981;
+            --color-c: #eab308;
+            --color-d: #ef4444;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--content-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Layout */
+        .container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background-color: var(--dark-sidebar);
+            color: var(--sidebar-text);
+            padding: 24px 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-title {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 32px;
+        }
+
+        .sidebar-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 8px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 12px 16px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: var(--sidebar-text);
+        }
+
+        .nav-link.active {
+            background-color: var(--accent-blue);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .main-content select {
+            width: auto;
+            padding: 10px 12px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 20px;
+            padding-right: 36px;
+        }
+
+        .main-content select:hover {
+            border-color: var(--accent-blue);
+            background-color: #f9fafb;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .header-title {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .update-indicator {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            text-align: center;
+        }
+
+        .loading-spinner.visible {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0,0,0,0.1);
+            border-top: 4px solid var(--accent-blue);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-md);
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f7 100%);
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .kpi-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .kpi-subtitle {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Badge Styles */
+        .badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-a {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-b {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-c {
+            background-color: #fef08a;
+            color: #713f12;
+        }
+
+        .badge-d {
+            background-color: #fee2e2;
+            color: #7f1d1d;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background-color: #f9fafb;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            user-select: none;
+            text-transform: capitalize;
+        }
+
+        th:hover {
+            background-color: #f3f4f6;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        tr:hover {
+            background-color: #f9fafb;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 32px 12px !important;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        /* Status indicators */
+        .status-ok {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .status-alert {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        .status-critical {
+            color: #ef4444;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">ÓCULOS</div>
+                <div class="sidebar-subtitle">Franquiado</div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Navegación</div>
+                <ul class="sidebar-nav">
+                    <li class="nav-item">
+                        <button class="nav-link active" onclick="showSection('painel-geral')">Painel Geral</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" onclick="showSection('performance-sku')">Performance SKU</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" onclick="showSection('produtos-matar')">Produtos a Matar</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" onclick="showSection('informe-loja')">Informe por Tienda</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" onclick="showSection('importacoes')">Importaciones Activas</button>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner"></div>
+                <p>Cargando datos...</p>
+            </div>
+
+            <div class="header">
+                <div>
+                    <h1 class="header-title" id="pageTitle">Painel Geral</h1>
+                    <p class="update-indicator" id="updateIndicator"></p>
+                </div>
+            </div>
+
+            <!-- ==================== PAINEL GERAL ==================== -->
+            <section id="painel-geral" class="section active">
+                <h2 class="section-title">Painel Geral</h2>
+
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">SKUs Ativos</div>
+                        <div class="kpi-value" id="pgActiveSKUs">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Distribución ABC</div>
+                        <div class="kpi-value" id="pgDistribution" style="font-size: 14px; line-height: 1.3;">—</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total Piezas</div>
+                        <div class="kpi-value" id="pgTotalPiezas">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Faltantes</div>
+                        <div class="kpi-value status-critical" id="pgFaltantes">0</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== PERFORMANCE SKU ==================== -->
+            <section id="performance-sku" class="section">
+                <h2 class="section-title">Performance SKU</h2>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('curva')">Curva</th>
+                                <th onclick="sortTable('sku')">SKU</th>
+                                <th onclick="sortTable('nome')">Produto</th>
+                                <th onclick="sortTable('classe')">Clase</th>
+                                <th onclick="sortTable('share')">Share Vendas %</th>
+                                <th onclick="sortTable('venda')">Venda Média Mensal</th>
+                                <th onclick="sortTable('stock')">Stock Total (3 Tiendas)</th>
+                                <th id="storeHeader1" onclick="sortTable('store1')">—</th>
+                                <th id="storeHeader2" onclick="sortTable('store2')">—</th>
+                                <th id="storeHeader3" onclick="sortTable('store3')">—</th>
+                                <th onclick="sortTable('cobertura')">Cobertura (meses)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="performanceTableBody">
+                            <tr><td colspan="11" class="empty-state">Cargando datos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ==================== PRODUTOS A MATAR ==================== -->
+            <section id="produtos-matar" class="section">
+                <h2 class="section-title">Productos a Matar</h2>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">SKUs sin ventas en los últimos 6 meses pero que aún tienen stock en alguna tienda</p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>SKU</th>
+                                <th>Producto</th>
+                                <th>Clase</th>
+                                <th>Curva</th>
+                                <th>Stock en Tienda(s)</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mataTableBody">
+                            <tr><td colspan="6" class="empty-state">Cargando datos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ==================== INFORME POR LOJA ==================== -->
+            <section id="informe-loja" class="section">
+                <h2 class="section-title">Informe por Tienda</h2>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; margin-bottom: 8px; font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase;">Seleccionar Tienda</label>
+                    <select id="informeLojaSelect" onchange="renderInformeLoja()" style="min-width: 250px;">
+                        <option value="">-- Seleccionar --</option>
+                    </select>
+                </div>
+
+                <div id="informeLojaKPIs" style="display: none; margin-bottom: 24px;">
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-label">SKUs en Tienda</div>
+                            <div class="kpi-value" id="ilTotalSKUs">0</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Total Piezas</div>
+                            <div class="kpi-value" id="ilTotalPcs">0</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Stock OK</div>
+                            <div class="kpi-value status-ok" id="ilOKCount">0</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Faltantes</div>
+                            <div class="kpi-value status-critical" id="ilFaltantes">0</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Excesos</div>
+                            <div class="kpi-value status-alert" id="ilExcesos">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Estado</th>
+                                <th>Curva</th>
+                                <th>SKU</th>
+                                <th>Producto</th>
+                                <th>Clase</th>
+                                <th>Share Vendas %</th>
+                                <th>Venda Mensal</th>
+                                <th>Stock en Tienda</th>
+                                <th>Mínimo Ideal</th>
+                                <th>Diferencia</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="informeLojaBody">
+                            <tr><td colspan="11" class="empty-state">Selecciona una tienda para ver el informe</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top: 16px;">
+                    <button class="btn btn-primary" id="btnInformeExcel" onclick="downloadInformeLojaExcel()" style="display: none;">Descargar Excel</button>
+                </div>
+            </section>
+
+            <!-- ==================== IMPORTAÇÕES ATIVAS ==================== -->
+            <section id="importacoes" class="section">
+                <h2 class="section-title">Importaciones Activas</h2>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">Ordenes de importación que aún no han sido entregadas</p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fornecedor</th>
+                                <th>Proforma</th>
+                                <th>Productos</th>
+                                <th>Via</th>
+                                <th>Status</th>
+                                <th>Embarque</th>
+                                <th>Entrega Estimada</th>
+                            </tr>
+                        </thead>
+                        <tbody id="importacoesTableBody">
+                            <tr><td colspan="7" class="empty-state">Cargando datos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Metabase configuration
+        const METABASE_CONFIG = {
+            proxyPath: '/api/metabase',
+            apiKey: 'mb_ezQmg2Ho6e9TCtITMK0wfPjWVcGccErTVn+cEmJ1GN0=',
+            salesQuestionId: '9377',
+            storeStockQuestionId: '9309'
+        };
+
+        // Franchisee stores
+        const FRANCHISEE_STORES = ['moema', 'eldorado', 'el_dorado', 'analia'];
+        const CLOSED_STORES = ['balneario', 'jardim_sul', 'itaim', 'plaza_sul'];
+
+        // Global state
+        let rawSalesData = [];
+        let rawStoreData = [];
+        let processedData = [];
+        let storeColumns = [];
+        let franchiseeStores = [];
+        let _informeLojaClassified = [];
+        let _sharedData = { logistica: [] };
+
+        // ==================== DATA LOADING ====================
+        async function loadData() {
+            showLoadingSpinner(true);
+            try {
+                const [salesData, storeData] = await Promise.all([
+                    fetchMetabaseQuery(METABASE_CONFIG.salesQuestionId),
+                    fetchMetabaseQuery(METABASE_CONFIG.storeStockQuestionId)
+                ]);
+
+                rawSalesData = salesData || [];
+                rawStoreData = storeData || [];
+
+                // Detect store columns and identify franchisee stores
+                if (rawStoreData.length > 0) {
+                    const firstRow = rawStoreData[0];
+                    const allStores = Object.keys(firstRow).filter(key =>
+                        !['sku', 'nome_produto', 'descricao_classe', 'share', 'estoque_matriz',
+                          'estoque_importacao', 'estoque_total_matriz_importacao', 'matriz'].includes(key)
+                        && !CLOSED_STORES.includes(key)
+                    );
+
+                    storeColumns = allStores;
+                    franchiseeStores = allStores.filter(store => {
+                        const lower = store.toLowerCase();
+                        return FRANCHISEE_STORES.some(fq => lower.includes(fq));
+                    });
+                }
+
+                processedData = processSalesData(rawSalesData);
+                renderAllSections();
+                updateLastUpdate();
+                loadSharedData();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('Error al cargar datos. Verifique la conexión con Metabase.');
+            } finally {
+                showLoadingSpinner(false);
+            }
+        }
+
+        async function fetchMetabaseQuery(questionId) {
+            const url = `${METABASE_CONFIG.proxyPath}/card/${questionId}/query/json`;
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'x-api-key': METABASE_CONFIG.apiKey,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                console.error(`Error fetching query ${questionId}:`, error);
+                return [];
+            }
+        }
+
+        // ==================== DATA PROCESSING ====================
+        function processSalesData(data) {
+            if (!data || data.length === 0) return [];
+
+            return data.map(row => {
+                const monthlyValues = [
+                    row.vendas_m00 || 0, row.vendas_m01 || 0, row.vendas_m02 || 0, row.vendas_m03 || 0,
+                    row.vendas_m04 || 0, row.vendas_m05 || 0, row.vendas_m06 || 0, row.vendas_m07 || 0,
+                    row.vendas_m08 || 0, row.vendas_m09 || 0, row.vendas_m10 || 0, row.vendas_m11 || 0
+                ];
+
+                const totalSales = monthlyValues.reduce((a, b) => a + b, 0);
+                const estoqueMatriz = row.estoque_matriz || 0;
+                const importacoesPendentes = row.importacoes_pendentes || 0;
+
+                const reversedValues = [...monthlyValues].reverse();
+                const firstSaleIdx = reversedValues.findIndex(v => v > 0);
+                const activeMonths = firstSaleIdx === -1 ? 0 : 12 - firstSaleIdx;
+                const vendaMedia = activeMonths > 0 ? totalSales / activeMonths : 0;
+
+                const coberturaMeses = vendaMedia > 0 ? estoqueMatriz / vendaMedia : Infinity;
+                const last6MonthsSales = monthlyValues.slice(0, 6).reduce((a, b) => a + b, 0);
+                const sales3M = monthlyValues.slice(0, 3).reduce((a, b) => a + b, 0);
+
+                const isActive = last6MonthsSales > 0 || estoqueMatriz > 0;
+                const isDead = last6MonthsSales === 0 && estoqueMatriz === 0 && importacoesPendentes === 0;
+                const paraMatar = last6MonthsSales === 0 && estoqueMatriz > 0;
+
+                return {
+                    ...row,
+                    estoqueMatriz,
+                    importacoesPendentes,
+                    vendaMedia,
+                    totalSales,
+                    coberturaMeses,
+                    sales3M,
+                    last6MonthsSales,
+                    paraMatar,
+                    activeMonths,
+                    isActive,
+                    isDead
+                };
+            }).filter(item => !item.isDead);
+        }
+
+        function classifySKUsByABC(skus) {
+            const active = skus.filter(s => s.isActive);
+
+            if (active.length === 0) {
+                return skus.map(s => ({ ...s, curva: 'D' }));
+            }
+
+            const sorted = [...active].sort((a, b) => b.vendaMedia - a.vendaMedia);
+            const totalRevenue = sorted.reduce((sum, s) => sum + s.vendaMedia, 0);
+
+            let cumulativeShare = 0;
+            const classified = sorted.map(sku => {
+                cumulativeShare += totalRevenue > 0 ? (sku.vendaMedia / totalRevenue) * 100 : 0;
+                let curva = 'D';
+                if (cumulativeShare <= 25) curva = 'A';
+                else if (cumulativeShare <= 50) curva = 'B';
+                else if (cumulativeShare <= 75) curva = 'C';
+                return { ...sku, curva, shareAcumulado: cumulativeShare.toFixed(1) };
+            });
+
+            return skus.map(s => {
+                const found = classified.find(c => c.sku === s.sku);
+                return found ? found : { ...s, curva: 'D', shareAcumulado: '100' };
+            });
+        }
+
+        // ==================== RENDER FUNCTIONS ====================
+        function renderAllSections() {
+            const classified = classifySKUsByABC(processedData);
+            renderPainelGeral(classified);
+            renderPerformanceSKU(classified);
+            renderProdutosMatar(classified);
+            initInformeLoja(classified);
+            renderImportacoes();
+        }
+
+        function renderPainelGeral(data) {
+            const activeSKUs = data.filter(d => d.isActive).length;
+            const aCount = data.filter(d => d.curva === 'A').length;
+            const bCount = data.filter(d => d.curva === 'B').length;
+            const cCount = data.filter(d => d.curva === 'C').length;
+            const dCount = data.filter(d => d.curva === 'D').length;
+
+            document.getElementById('pgActiveSKUs').textContent = activeSKUs;
+            document.getElementById('pgDistribution').textContent = `A: ${aCount} | B: ${bCount} | C: ${cCount} | D: ${dCount}`;
+
+            // Calculate total piezas across franchisee stores
+            let totalPiezas = 0;
+            franchiseeStores.forEach(store => {
+                rawStoreData.forEach(row => {
+                    totalPiezas += (row[store] || 0);
+                });
+            });
+            document.getElementById('pgTotalPiezas').textContent = totalPiezas.toLocaleString('pt-BR');
+
+            // Faltantes: below minimum across franchisee stores
+            let faltantes = 0;
+            data.forEach(sku => {
+                if (sku.estoqueMatriz === 0) return;
+                const minQty = sku.curva === 'A' ? 2 : 1;
+                const storeData = rawStoreData.find(s => s.sku === sku.sku);
+                if (!storeData) return;
+                franchiseeStores.forEach(store => {
+                    const current = storeData[store] || 0;
+                    if (current < minQty) {
+                        faltantes += (minQty - current);
+                    }
+                });
+            });
+            document.getElementById('pgFaltantes').textContent = faltantes;
+        }
+
+        function renderPerformanceSKU(data) {
+            const totalRevenue = data.reduce((sum, d) => sum + d.vendaMedia, 0);
+            const classified = data.map(d => {
+                const share = totalRevenue > 0 ? ((d.vendaMedia / totalRevenue) * 100) : 0;
+                return { ...d, share };
+            }).sort((a, b) => {
+                const curvaOrder = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+                return (curvaOrder[a.curva] || 9) - (curvaOrder[b.curva] || 9) || b.vendaMedia - a.vendaMedia;
+            });
+
+            // Set store header names
+            franchiseeStores.forEach((store, idx) => {
+                const header = document.getElementById(`storeHeader${idx + 1}`);
+                if (header) {
+                    header.textContent = store.replace(/_/g, ' ').toUpperCase();
+                }
+            });
+
+            const tbody = document.getElementById('performanceTableBody');
+            tbody.innerHTML = '';
+
+            if (classified.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Sin datos</td></tr>';
+                return;
+            }
+
+            classified.forEach(row => {
+                const tr = document.createElement('tr');
+                const storeData = rawStoreData.find(s => s.sku === row.sku);
+                const storeStocks = franchiseeStores.map(store => storeData ? (storeData[store] || 0) : 0);
+                const totalStock = storeStocks.reduce((a, b) => a + b, 0);
+                const coverageText = row.coberturaMeses === Infinity ? '∞' : row.coberturaMeses.toFixed(1);
+
+                let storeCells = '';
+                storeStocks.forEach(qty => {
+                    storeCells += `<td>${qty}</td>`;
+                });
+
+                tr.innerHTML = `
+                    <td><span class="badge badge-${row.curva.toLowerCase()}">${row.curva}</span></td>
+                    <td>${row.sku}</td>
+                    <td>${row.nome_produto}</td>
+                    <td>${row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol'}</td>
+                    <td>${row.share.toFixed(1)}%</td>
+                    <td>${Math.round(row.vendaMedia)}</td>
+                    <td style="font-weight:600;">${totalStock}</td>
+                    ${storeCells}
+                    <td>${coverageText}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderProdutosMatar(data) {
+            // SKUs with no sales in last 6 months but with stock in any franchisee store
+            const candidates = data.filter(d => {
+                if (d.last6MonthsSales > 0) return false;
+                const sd = rawStoreData.find(s => s.sku === d.sku);
+                if (!sd) return false;
+                return franchiseeStores.some(store => (sd[store] || 0) > 0);
+            });
+
+            const tbody = document.getElementById('mataTableBody');
+            tbody.innerHTML = '';
+
+            if (candidates.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Sin productos para matar en este momento</td></tr>';
+                return;
+            }
+
+            candidates.forEach(row => {
+                const storeData = rawStoreData.find(s => s.sku === row.sku);
+                const storesWithStock = [];
+
+                franchiseeStores.forEach(store => {
+                    const qty = storeData ? (storeData[store] || 0) : 0;
+                    if (qty > 0) {
+                        storesWithStock.push(`${store.replace(/_/g, ' ')} (${qty})`);
+                    }
+                });
+
+                if (storesWithStock.length === 0) return;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.sku}</td>
+                    <td>${row.nome_produto}</td>
+                    <td>${row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol'}</td>
+                    <td><span class="badge badge-${row.curva.toLowerCase()}">${row.curva}</span></td>
+                    <td>${storesWithStock.join(', ')}</td>
+                    <td><button class="btn btn-secondary" onclick="alert('Devolver a matriz')">Devolver a matriz</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function initInformeLoja(data) {
+            _informeLojaClassified = data;
+            const select = document.getElementById('informeLojaSelect');
+            select.innerHTML = '<option value="">-- Seleccionar --</option>';
+            franchiseeStores.forEach(store => {
+                const opt = document.createElement('option');
+                opt.value = store;
+                opt.textContent = store.replace(/_/g, ' ').toUpperCase();
+                select.appendChild(opt);
+            });
+        }
+
+        function renderInformeLoja() {
+            const storeName = document.getElementById('informeLojaSelect').value;
+            const tbody = document.getElementById('informeLojaBody');
+            const kpis = document.getElementById('informeLojaKPIs');
+            const btnExcel = document.getElementById('btnInformeExcel');
+
+            if (!storeName) {
+                tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Selecciona una tienda para ver el informe</td></tr>';
+                kpis.style.display = 'none';
+                btnExcel.style.display = 'none';
+                return;
+            }
+
+            kpis.style.display = 'block';
+            btnExcel.style.display = 'block';
+
+            const data = _informeLojaClassified;
+            const totalRevenue = data.reduce((s, d) => s + d.vendaMedia, 0);
+            const rows = [];
+
+            data.forEach(d => {
+                const sd = rawStoreData.find(s => s.sku === d.sku);
+                const stockLoja = sd ? (sd[storeName] || 0) : 0;
+                const hasMatrizStock = d.estoqueMatriz > 0;
+                const minIdeal = hasMatrizStock ? (d.curva === 'A' ? 2 : 1) : 0;
+                const diff = stockLoja - minIdeal;
+                const share = totalRevenue > 0 ? ((d.vendaMedia / totalRevenue) * 100) : 0;
+
+                let estado, accion;
+                if (minIdeal === 0 && stockLoja === 0) return;
+                if (minIdeal === 0 && stockLoja > 0) {
+                    estado = 'EXCESO'; accion = 'Devolver a matriz';
+                } else if (diff > 0) {
+                    estado = 'EXCESO'; accion = 'Devolver ' + diff + ' pzs';
+                } else if (diff < 0) {
+                    estado = 'FALTANTE'; accion = 'Enviar ' + Math.abs(diff) + ' pzs';
+                } else {
+                    estado = 'OK'; accion = 'Mantener';
+                }
+
+                rows.push({ ...d, stockLoja, minIdeal, diff, share, estado, accion });
+            });
+
+            const estadoOrder = { 'FALTANTE': 0, 'EXCESO': 1, 'OK': 2 };
+            const curvaOrder = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+            rows.sort((a, b) => {
+                if (estadoOrder[a.estado] !== estadoOrder[b.estado]) return estadoOrder[a.estado] - estadoOrder[b.estado];
+                return (curvaOrder[a.curva] ?? 9) - (curvaOrder[b.curva] ?? 9);
+            });
+
+            const totalSKUs = rows.filter(r => r.stockLoja > 0).length;
+            const totalPcs = rows.reduce((s, r) => s + r.stockLoja, 0);
+            const okCount = rows.filter(r => r.estado === 'OK').length;
+            const faltantes = rows.filter(r => r.estado === 'FALTANTE').length;
+            const excesos = rows.filter(r => r.estado === 'EXCESO').length;
+
+            document.getElementById('ilTotalSKUs').textContent = totalSKUs;
+            document.getElementById('ilTotalPcs').textContent = totalPcs;
+            document.getElementById('ilOKCount').textContent = okCount;
+            document.getElementById('ilFaltantes').textContent = faltantes;
+            document.getElementById('ilExcesos').textContent = excesos;
+
+            tbody.innerHTML = '';
+            if (rows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Sin datos para esta tienda</td></tr>';
+                return;
+            }
+
+            rows.forEach(row => {
+                const tr = document.createElement('tr');
+                const estadoColor = row.estado === 'OK' ? '#10b981' : row.estado === 'FALTANTE' ? '#ef4444' : '#f59e0b';
+                const estadoBg = row.estado === 'OK' ? 'rgba(16,185,129,0.1)' : row.estado === 'FALTANTE' ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)';
+                const diffText = row.diff > 0 ? '+' + row.diff : row.diff < 0 ? String(row.diff) : '0';
+                const diffColor = row.diff > 0 ? '#f59e0b' : row.diff < 0 ? '#ef4444' : '#10b981';
+                const classe = row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol';
+
+                tr.innerHTML = `
+                    <td><span style="padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;color:${estadoColor};background:${estadoBg};">${row.estado}</span></td>
+                    <td><span class="badge badge-${(row.curva||'d').toLowerCase()}">${row.curva || 'D'}</span></td>
+                    <td>${row.sku}</td>
+                    <td>${row.nome_produto}</td>
+                    <td>${classe}</td>
+                    <td>${row.share.toFixed(1)}%</td>
+                    <td>${Math.round(row.vendaMedia || 0)}</td>
+                    <td style="font-weight:600;">${row.stockLoja}</td>
+                    <td>${row.minIdeal}</td>
+                    <td style="font-weight:600;color:${diffColor}">${diffText}</td>
+                    <td style="font-size:11px;">${row.accion}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function downloadInformeLojaExcel() {
+            const storeName = document.getElementById('informeLojaSelect').value;
+            if (!storeName) { alert('Selecciona una tienda primero.'); return; }
+
+            const data = _informeLojaClassified;
+            const totalRevenue = data.reduce((s, d) => s + d.vendaMedia, 0);
+            const rows = [];
+
+            data.forEach(d => {
+                const sd = rawStoreData.find(s => s.sku === d.sku);
+                const stockLoja = sd ? (sd[storeName] || 0) : 0;
+                const hasMatrizStock = d.estoqueMatriz > 0;
+                const minIdeal = hasMatrizStock ? (d.curva === 'A' ? 2 : 1) : 0;
+                const diff = stockLoja - minIdeal;
+                const share = totalRevenue > 0 ? ((d.vendaMedia / totalRevenue) * 100) : 0;
+
+                let estado, accion;
+                if (minIdeal === 0 && stockLoja === 0) return;
+                if (minIdeal === 0 && stockLoja > 0) {
+                    estado = 'EXCESO'; accion = 'Devolver a matriz';
+                } else if (diff > 0) {
+                    estado = 'EXCESO'; accion = 'Devolver ' + diff + ' pzs';
+                } else if (diff < 0) {
+                    estado = 'FALTANTE'; accion = 'Enviar ' + Math.abs(diff) + ' pzs';
+                } else {
+                    estado = 'OK'; accion = 'Mantener';
+                }
+                rows.push({ ...d, stockLoja, minIdeal, diff, share, estado, accion });
+            });
+
+            const estadoOrder = { 'FALTANTE': 0, 'EXCESO': 1, 'OK': 2 };
+            const curvaOrder = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+            rows.sort((a, b) => {
+                if (estadoOrder[a.estado] !== estadoOrder[b.estado]) return estadoOrder[a.estado] - estadoOrder[b.estado];
+                return (curvaOrder[a.curva] ?? 9) - (curvaOrder[b.curva] ?? 9);
+            });
+
+            const displayName = storeName.replace(/_/g, ' ').toUpperCase();
+            let csv = '\uFEFF';
+            csv += 'INFORME DE STOCK - ' + displayName + '\n';
+            csv += 'Generado: ' + new Date().toLocaleDateString('pt-BR') + '\n';
+            csv += 'Regla: Curva A = min 2 piezas | Curva B/C/D = min 1 pieza\n';
+            csv += '\n';
+            csv += 'RESUMEN\n';
+            csv += 'SKUs en tienda,' + rows.filter(r => r.stockLoja > 0).length + '\n';
+            csv += 'Total piezas,' + rows.reduce((s,r) => s + r.stockLoja, 0) + '\n';
+            csv += 'Faltantes,' + rows.filter(r => r.estado === 'FALTANTE').length + '\n';
+            csv += 'Excesos,' + rows.filter(r => r.estado === 'EXCESO').length + '\n';
+            csv += 'OK,' + rows.filter(r => r.estado === 'OK').length + '\n';
+            csv += '\n';
+            csv += 'DETALLE\n';
+            csv += 'Estado,Curva,SKU,Producto,Clase,Share %,Venda Mensal,Stock,Minimo,Diferencia,Accion\n';
+
+            rows.forEach(r => {
+                const classe = r.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol';
+                const nome = (r.nome_produto || '').replace(/,/g, ' ');
+                const diffText = r.diff > 0 ? '+' + r.diff : r.diff;
+                csv += `${r.estado},${r.curva || 'D'},${r.sku},"${nome}",${classe},${r.share.toFixed(1)},${Math.round(r.vendaMedia || 0)},${r.stockLoja},${r.minIdeal},${diffText},"${r.accion}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'informe_' + storeName + '_' + new Date().toISOString().slice(0,10) + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function renderImportacoes() {
+            const tbody = document.getElementById('importacoesTableBody');
+            tbody.innerHTML = '';
+
+            if (!_sharedData.logistica || _sharedData.logistica.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Sin datos de importación</td></tr>';
+                return;
+            }
+
+            const active = _sharedData.logistica.filter(o =>
+                o.status && o.status !== 'Entregado' && o.status !== 'Entregue a Terceiro'
+            );
+
+            if (active.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Sin importaciones activas</td></tr>';
+                return;
+            }
+
+            active.forEach(order => {
+                const tr = document.createElement('tr');
+                const embarque = order.embarque ? new Date(order.embarque).toLocaleDateString('pt-BR') : '—';
+                const entrega = order.entrega ? new Date(order.entrega).toLocaleDateString('pt-BR') : '—';
+
+                tr.innerHTML = `
+                    <td>${order.fornecedor || '—'}</td>
+                    <td>${order.proforma || '—'}</td>
+                    <td>${order.produtos || '—'}</td>
+                    <td>${order.via || '—'}</td>
+                    <td>${order.status || '—'}</td>
+                    <td>${embarque}</td>
+                    <td>${entrega}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function loadSharedData() {
+            fetch('data.json?v=' + Date.now())
+                .then(resp => {
+                    if (!resp.ok) throw new Error('data.json not found');
+                    return resp.json();
+                })
+                .then(data => {
+                    if (data.logistica) {
+                        _sharedData.logistica = data.logistica;
+                        const classified = classifySKUsByABC(processedData);
+                        renderImportacoes();
+                    }
+                })
+                .catch(err => {
+                    console.log('[data.json] Not found, using defaults');
+                });
+        }
+
+        // ==================== UI FUNCTIONS ====================
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const titles = {
+                'painel-geral': 'Painel Geral',
+                'performance-sku': 'Performance SKU',
+                'productos-matar': 'Productos a Matar',
+                'informe-loja': 'Informe por Tienda',
+                'importacoes': 'Importaciones Activas'
+            };
+            document.getElementById('pageTitle').textContent = titles[sectionId] || 'Panel';
+        }
+
+        function showLoadingSpinner(show) {
+            const spinner = document.getElementById('loadingSpinner');
+            if (show) {
+                spinner.classList.add('visible');
+            } else {
+                spinner.classList.remove('visible');
+            }
+        }
+
+        function updateLastUpdate() {
+            const now = new Date();
+            document.getElementById('updateIndicator').textContent = 'Actualizado: ' + now.toLocaleTimeString('pt-BR');
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>
