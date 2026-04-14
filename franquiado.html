@@ -698,14 +698,6 @@
     </div>
 
     <script>
-        // Metabase configuration
-        const METABASE_CONFIG = {
-            proxyPath: '/api/metabase',
-            apiKey: 'mb_ezQmg2Ho6e9TCtITMK0wfPjWVcGccErTVn+cEmJ1GN0=',
-            salesQuestionId: '9377',
-            storeStockQuestionId: '9309'
-        };
-
         // Franchisee stores
         const FRANCHISEE_STORES = ['moema', 'eldorado', 'el_dorado', 'analia', 'jardim_sul'];
         const CLOSED_STORES = ['balneario', 'itaim', 'plaza_sul'];
@@ -742,17 +734,19 @@
             return sku.curva === 'A' ? 2 : 1;
         }
 
-        // ==================== DATA LOADING ====================
+        // ==================== DATA LOADING (Static JSON) ====================
         async function loadData() {
             showLoadingSpinner(true);
             try {
-                const [salesData, storeData] = await Promise.all([
-                    fetchMetabaseQuery(METABASE_CONFIG.salesQuestionId),
-                    fetchMetabaseQuery(METABASE_CONFIG.storeStockQuestionId)
+                const [salesResp, stockResp, metaResp] = await Promise.all([
+                    fetch('data/sales-data.json?v=' + Date.now()),
+                    fetch('data/store-stock-data.json?v=' + Date.now()),
+                    fetch('data/meta.json?v=' + Date.now())
                 ]);
 
-                rawSalesData = salesData || [];
-                rawStoreData = storeData || [];
+                rawSalesData = salesResp.ok ? await salesResp.json() : [];
+                rawStoreData = stockResp.ok ? await stockResp.json() : [];
+                const meta = metaResp.ok ? await metaResp.json() : null;
 
                 // Detect store columns and identify franchisee stores
                 if (rawStoreData.length > 0) {
@@ -772,48 +766,19 @@
 
                 processedData = processSalesData(rawSalesData);
                 renderAllSections();
-                updateLastUpdate();
+
+                // Show last update from meta.json
+                if (meta && meta.lastUpdate) {
+                    const d = new Date(meta.lastUpdate);
+                    document.getElementById('updateIndicator').textContent =
+                        'Dados atualizados em: ' + d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                }
             } catch (error) {
                 console.error('Error loading data:', error);
-                alert('Erro ao carregar dados. Verifique a conexão com Metabase.');
+                document.getElementById('updateIndicator').textContent = 'Erro ao carregar dados.';
             } finally {
                 showLoadingSpinner(false);
             }
-        }
-
-        async function fetchMetabaseQuery(questionId, retries = 3) {
-            const url = `${METABASE_CONFIG.proxyPath}/card/${questionId}/query/json`;
-            for (let attempt = 1; attempt <= retries; attempt++) {
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'x-api-key': METABASE_CONFIG.apiKey,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({})
-                    });
-
-                    if (!response.ok) {
-                        if (response.status >= 500 && attempt < retries) {
-                            console.warn(`Query ${questionId} attempt ${attempt}/${retries}: HTTP ${response.status}, retrying...`);
-                            await new Promise(r => setTimeout(r, 2000 * attempt));
-                            continue;
-                        }
-                        throw new Error(`HTTP ${response.status}`);
-                    }
-                    return await response.json();
-                } catch (error) {
-                    if (attempt < retries) {
-                        console.warn(`Query ${questionId} attempt ${attempt}/${retries}: ${error.message}, retrying...`);
-                        await new Promise(r => setTimeout(r, 2000 * attempt));
-                        continue;
-                    }
-                    console.error(`Error fetching query ${questionId} after ${retries} attempts:`, error);
-                    return [];
-                }
-            }
-            return [];
         }
 
         // ==================== DATA PROCESSING ====================
@@ -1428,11 +1393,6 @@
             } else {
                 spinner.classList.remove('visible');
             }
-        }
-
-        function updateLastUpdate() {
-            const now = new Date();
-            document.getElementById('updateIndicator').textContent = 'Atualizado: ' + now.toLocaleTimeString('pt-BR');
         }
 
         // Initialize on page load

@@ -1,0 +1,32 @@
+name: Refresh Metabase Data
+
+on:
+  schedule:
+    # Runs at midnight BRT (03:00 UTC) every day
+    - cron: '0 3 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  fetch-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch Metabase data
+        env:
+          METABASE_URL: ${{ secrets.METABASE_URL }}
+          METABASE_API_KEY: ${{ secrets.METABASE_API_KEY }}
+        run: node scripts/fetch-metabase.js
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/sales-data.json data/store-stock-data.json data/meta.json
+          git diff --staged --quiet || (git commit -m "chore: refresh metabase data $(date -u +%Y-%m-%d)" && git push)
