@@ -413,19 +413,19 @@
                 <div class="sidebar-section-title">Navegación</div>
                 <ul class="sidebar-nav">
                     <li class="nav-item">
-                        <button class="nav-link active" onclick="showSection('painel-geral')">Painel Geral</button>
+                        <button class="nav-link active" onclick="showSection('painel-geral', this)">Painel Geral</button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" onclick="showSection('performance-sku')">Performance SKU</button>
+                        <button class="nav-link" onclick="showSection('performance-sku', this)">Performance SKU</button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" onclick="showSection('produtos-matar')">Produtos a Matar</button>
+                        <button class="nav-link" onclick="showSection('produtos-matar', this)">Produtos a Matar</button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" onclick="showSection('informe-loja')">Informe por Tienda</button>
+                        <button class="nav-link" onclick="showSection('informe-loja', this)">Informe por Tienda</button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" onclick="showSection('importacoes')">Importaciones Activas</button>
+                        <button class="nav-link" onclick="showSection('importacoes', this)">Importaciones Activas</button>
                     </li>
                 </ul>
             </div>
@@ -1136,17 +1136,17 @@
         }
 
         // ==================== UI FUNCTIONS ====================
-        function showSection(sectionId) {
+        function showSection(sectionId, btn) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
 
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-            event.target.classList.add('active');
+            if (btn) btn.classList.add('active');
 
             const titles = {
                 'painel-geral': 'Painel Geral',
                 'performance-sku': 'Performance SKU',
-                'productos-matar': 'Productos a Matar',
+                'produtos-matar': 'Produtos a Matar',
                 'informe-loja': 'Informe por Tienda',
                 'importacoes': 'Importaciones Activas'
             };
