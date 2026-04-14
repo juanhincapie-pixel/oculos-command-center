@@ -2300,24 +2300,39 @@
             }
         }
 
-        async function fetchMetabaseQuery(questionId) {
+        async function fetchMetabaseQuery(questionId, retries = 3) {
             const url = `${METABASE_CONFIG.proxyPath}/card/${questionId}/query/json`;
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'x-api-key': METABASE_CONFIG.apiKey,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({})
-                });
+            for (let attempt = 1; attempt <= retries; attempt++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'x-api-key': METABASE_CONFIG.apiKey,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({})
+                    });
 
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return await response.json();
-            } catch (error) {
-                console.error(`Error fetching query ${questionId}:`, error);
-                return [];
+                    if (!response.ok) {
+                        if (response.status >= 500 && attempt < retries) {
+                            console.warn(`Query ${questionId} attempt ${attempt}/${retries}: HTTP ${response.status}, retrying...`);
+                            await new Promise(r => setTimeout(r, 2000 * attempt));
+                            continue;
+                        }
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    if (attempt < retries) {
+                        console.warn(`Query ${questionId} attempt ${attempt}/${retries}: ${error.message}, retrying...`);
+                        await new Promise(r => setTimeout(r, 2000 * attempt));
+                        continue;
+                    }
+                    console.error(`Error fetching query ${questionId} after ${retries} attempts:`, error);
+                    return [];
+                }
             }
+            return [];
         }
 
         // ==================== DATA PROCESSING ====================
