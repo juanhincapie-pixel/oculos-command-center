@@ -748,6 +748,7 @@
         let storeColumns = [];
         let franchiseeStores = [];
         let _perfStockData = [];
+        let _deadItems = [];
         let _sharedData = { logistica: [] };
 
         // Chart instances
@@ -835,7 +836,7 @@
         function processSalesData(data) {
             if (!data || data.length === 0) return [];
 
-            return data.map(row => {
+            const all = data.map(row => {
                 const monthlyValues = [
                     row.vendas_m00 || 0, row.vendas_m01 || 0, row.vendas_m02 || 0, row.vendas_m03 || 0,
                     row.vendas_m04 || 0, row.vendas_m05 || 0, row.vendas_m06 || 0, row.vendas_m07 || 0,
@@ -873,7 +874,11 @@
                     isActive,
                     isDead
                 };
-            }).filter(item => !item.isDead);
+            });
+
+            // Save dead items for Produtos a Matar before filtering
+            _deadItems = all.filter(item => item.isDead);
+            return all.filter(item => !item.isDead);
         }
 
         function classifySKUsByABC(skus) {
@@ -907,7 +912,7 @@
             const classified = classifySKUsByABC(processedData);
             renderPainelGeral(classified);
             initPerformanceStock(classified);
-            renderProdutosMatar(classified);
+            renderProdutosMatar();
             renderImportacoes();
         }
 
@@ -1304,11 +1309,10 @@
             }
         }
 
-        function renderProdutosMatar(data) {
+        function renderProdutosMatar() {
             // SKUs where: last6MonthsSales === 0 AND estoqueMatriz === 0 AND importacoesPendentes === 0 (MATRIZ notification)
-            const candidates = data.filter(d => {
-                return d.last6MonthsSales === 0 && d.estoqueMatriz === 0 && d.importacoesPendentes === 0;
-            });
+            // These come from _deadItems which were saved before filtering in processSalesData
+            const candidates = _deadItems;
 
             const tbody = document.getElementById('mataTableBody');
             tbody.innerHTML = '';

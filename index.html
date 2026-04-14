@@ -1149,6 +1149,36 @@
     </style>
 </head>
 <body>
+    <!-- Password Gate -->
+    <div id="passwordGate" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#1a1a2e;display:flex;align-items:center;justify-content:center;z-index:99999;">
+        <div style="text-align:center;color:#fff;font-family:'Inter',sans-serif;">
+            <div style="font-size:32px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px;">ÓCULOS</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:40px;">Command Center</div>
+            <input id="pwdInput" type="password" placeholder="Contraseña" autofocus
+                style="padding:12px 20px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;border-radius:8px;font-size:16px;width:240px;text-align:center;font-family:'Inter',sans-serif;outline:none;"
+                onkeydown="if(event.key==='Enter')checkPwd()">
+            <br>
+            <button onclick="checkPwd()"
+                style="margin-top:16px;padding:10px 32px;background:#3b82f6;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Entrar</button>
+            <div id="pwdError" style="margin-top:12px;color:#ef4444;font-size:13px;display:none;">Contraseña incorrecta</div>
+        </div>
+    </div>
+    <script>
+        function checkPwd(){
+            if(document.getElementById('pwdInput').value==='1508'){
+                document.getElementById('passwordGate').style.display='none';
+                sessionStorage.setItem('oc_auth','1');
+            } else {
+                document.getElementById('pwdError').style.display='block';
+                document.getElementById('pwdInput').value='';
+                document.getElementById('pwdInput').focus();
+            }
+        }
+        if(sessionStorage.getItem('oc_auth')==='1'){
+            document.getElementById('passwordGate').style.display='none';
+        }
+    </script>
+
     <div class="container">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
