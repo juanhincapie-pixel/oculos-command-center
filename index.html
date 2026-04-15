@@ -1764,6 +1764,13 @@
             <section class="section" id="produtos-matar">
                 <h2 class="section-title">Produtos a Matar</h2>
 
+                <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-bottom:12px;">
+                    <span id="killExcelInfo" style="font-size:12px;color:var(--text-secondary);"></span>
+                    <button onclick="downloadProdutosMatarExcel()" style="padding:10px 20px;background:var(--accent-red);color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;font-weight:600;display:flex;align-items:center;gap:6px;">
+                        &#8681; Baixar Excel — Produtos a Matar
+                    </button>
+                </div>
+
                 <div class="alert-box">
                     Produtos Curva C e D com estoque. Candidatos para liquidação e liberação de espaço.
                 </div>
@@ -2953,12 +2960,22 @@
                 }).join('');
         }
 
+        let _produtosMatarData = []; // cached for Excel export
+
         function renderProdutosMatar(data) {
             const cdSKUs = data.filter(d => (d.curva === 'C' || d.curva === 'D') && d.estoqueMatriz > 0)
                 .sort((a, b) => b.estoqueMatriz - a.estoqueMatriz);
 
+            _produtosMatarData = cdSKUs;
+
             const tbody = document.getElementById('killProductsBody');
             tbody.innerHTML = '';
+
+            const infoEl = document.getElementById('killExcelInfo');
+            if (infoEl) {
+                const totalEstoque = cdSKUs.reduce((s, d) => s + d.estoqueMatriz, 0);
+                infoEl.textContent = cdSKUs.length + ' SKUs · ' + totalEstoque + ' unidades em estoque';
+            }
 
             if (cdSKUs.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Nenhum produto a matar no momento</td></tr>';
@@ -2982,6 +2999,48 @@
                 `;
                 tbody.appendChild(tr);
             });
+        }
+
+        function downloadProdutosMatarExcel() {
+            if (!_produtosMatarData || _produtosMatarData.length === 0) {
+                alert('Sem dados para exportar. Aguarde o carregamento dos dados.');
+                return;
+            }
+
+            const items = _produtosMatarData;
+            const totalEstoque = items.reduce((s, d) => s + d.estoqueMatriz, 0);
+            const curvaC = items.filter(d => d.curva === 'C');
+            const curvaD = items.filter(d => d.curva === 'D');
+
+            // CSV compatible with Excel (BOM for UTF-8)
+            let csv = '\uFEFF';
+            csv += 'PRODUTOS A MATAR - ÓCULOS COMMAND CENTER\n';
+            csv += 'Gerado: ' + new Date().toLocaleDateString('pt-BR') + '\n';
+            csv += '\n';
+            csv += 'RESUMO\n';
+            csv += 'Curva,SKUs,Estoque Total\n';
+            csv += 'C,' + curvaC.length + ',' + curvaC.reduce((s,d) => s+d.estoqueMatriz, 0) + '\n';
+            csv += 'D,' + curvaD.length + ',' + curvaD.reduce((s,d) => s+d.estoqueMatriz, 0) + '\n';
+            csv += 'TOTAL,' + items.length + ',' + totalEstoque + '\n';
+            csv += '\n';
+            csv += 'DETALHE POR SKU\n';
+            csv += 'SKU,Produto,Família,Classe,Curva,Estoque Matriz,Venda Média Mensal,Tendência,Meses sem Venda\n';
+
+            items.forEach(d => {
+                const classe = d.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol';
+                const nome = (d.nome_produto || '').replace(/,/g, ' ').replace(/"/g, "'");
+                const familia = (d.familia || '').replace(/,/g, ' ');
+                const trend = d.trend || '—';
+                csv += `${d.sku},"${nome}","${familia}",${classe},${d.curva},${d.estoqueMatriz},${Math.round(d.vendaMedia)},${trend},${d.monthsSinceLastSale}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'produtos_a_matar_' + new Date().toISOString().slice(0,10) + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
         }
 
         function renderEstoqueLojas(data) {
