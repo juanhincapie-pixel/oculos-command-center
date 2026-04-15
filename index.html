@@ -12,6 +12,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
+    <!-- SheetJS with styles (xlsx export with formatting) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+
     <style>
         :root {
             --dark-sidebar: #1a1a2e;
@@ -1766,7 +1769,7 @@
 
                 <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-bottom:12px;">
                     <span id="killExcelInfo" style="font-size:12px;color:var(--text-secondary);"></span>
-                    <button onclick="downloadProdutosMatarExcel()" style="padding:10px 20px;background:var(--accent-red);color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;font-weight:600;display:flex;align-items:center;gap:6px;">
+                    <button onclick="downloadProdutosMatarExcel()" style="padding:10px 20px;background:#217346;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;font-weight:600;display:flex;align-items:center;gap:6px;">
                         &#8681; Baixar Excel — Produtos a Matar
                     </button>
                 </div>
@@ -3006,41 +3009,100 @@
                 alert('Sem dados para exportar. Aguarde o carregamento dos dados.');
                 return;
             }
+            if (typeof XLSX === 'undefined') {
+                alert('Biblioteca XLSX não carregada. Recarregue a página.');
+                return;
+            }
 
             const items = _produtosMatarData;
             const totalEstoque = items.reduce((s, d) => s + d.estoqueMatriz, 0);
             const curvaC = items.filter(d => d.curva === 'C');
             const curvaD = items.filter(d => d.curva === 'D');
+            const hoje = new Date().toLocaleDateString('pt-BR');
 
-            // CSV compatible with Excel (BOM for UTF-8)
-            let csv = '\uFEFF';
-            csv += 'PRODUTOS A MATAR - ÓCULOS COMMAND CENTER\n';
-            csv += 'Gerado: ' + new Date().toLocaleDateString('pt-BR') + '\n';
-            csv += '\n';
-            csv += 'RESUMO\n';
-            csv += 'Curva,SKUs,Estoque Total\n';
-            csv += 'C,' + curvaC.length + ',' + curvaC.reduce((s,d) => s+d.estoqueMatriz, 0) + '\n';
-            csv += 'D,' + curvaD.length + ',' + curvaD.reduce((s,d) => s+d.estoqueMatriz, 0) + '\n';
-            csv += 'TOTAL,' + items.length + ',' + totalEstoque + '\n';
-            csv += '\n';
-            csv += 'DETALHE POR SKU\n';
-            csv += 'SKU,Produto,Família,Classe,Curva,Estoque Matriz,Venda Média Mensal,Tendência,Meses sem Venda\n';
+            // Helper: format trend as clean text (no HTML, no badge)
+            const formatTrend = (trend) => {
+                if (trend === null || trend === undefined || isNaN(trend)) return '—';
+                const val = Number(trend).toFixed(0);
+                if (trend > 5) return 'Subindo (+' + val + '%)';
+                if (trend < -5) return 'Caindo (' + val + '%)';
+                return 'Estável (' + val + '%)';
+            };
 
-            items.forEach(d => {
-                const classe = d.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol';
-                const nome = (d.nome_produto || '').replace(/,/g, ' ').replace(/"/g, "'");
-                const familia = (d.familia || '').replace(/,/g, ' ');
-                const trend = d.trend || '—';
-                csv += `${d.sku},"${nome}","${familia}",${classe},${d.curva},${d.estoqueMatriz},${Math.round(d.vendaMedia)},${trend},${d.monthsSinceLastSale}\n`;
-            });
+            // ==== Sheet 1: Resumo ====
+            const resumoAOA = [
+                ['PRODUTOS A MATAR — ÓCULOS COMMAND CENTER'],
+                ['Gerado em: ' + hoje],
+                [],
+                ['Curva', 'SKUs', 'Estoque Total'],
+                ['C', curvaC.length, curvaC.reduce((s,d) => s+d.estoqueMatriz, 0)],
+                ['D', curvaD.length, curvaD.reduce((s,d) => s+d.estoqueMatriz, 0)],
+                ['TOTAL', items.length, totalEstoque]
+            ];
+            const wsResumo = XLSX.utils.aoa_to_sheet(resumoAOA);
+            wsResumo['!cols'] = [{ wch: 14 }, { wch: 10 }, { wch: 16 }];
+            wsResumo['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }];
 
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'produtos_a_matar_' + new Date().toISOString().slice(0,10) + '.csv';
-            a.click();
-            URL.revokeObjectURL(url);
+            // Styling title + headers (SheetJS community supports basic cell styles)
+            if (wsResumo['A1']) wsResumo['A1'].s = { font: { bold: true, sz: 14, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '217346' } }, alignment: { horizontal: 'center' } };
+            if (wsResumo['A2']) wsResumo['A2'].s = { font: { italic: true, color: { rgb: '666666' } } };
+            ['A4','B4','C4'].forEach(c => { if (wsResumo[c]) wsResumo[c].s = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '1A1A2E' } }, alignment: { horizontal: 'center' } }; });
+            ['A7','B7','C7'].forEach(c => { if (wsResumo[c]) wsResumo[c].s = { font: { bold: true }, fill: { fgColor: { rgb: 'E8E8E8' } } }; });
+
+            // ==== Sheet 2: Detalhe ====
+            const header = ['SKU', 'Produto', 'Família', 'Classe', 'Curva', 'Estoque Matriz', 'Venda Média Mensal', 'Tendência', 'Meses sem Venda'];
+            const rows = items.map(d => [
+                d.sku,
+                d.nome_produto || '',
+                d.familia || '',
+                d.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol',
+                d.curva,
+                d.estoqueMatriz,
+                Math.round(d.vendaMedia),
+                formatTrend(d.trend),
+                d.monthsSinceLastSale
+            ]);
+            const detalheAOA = [header, ...rows];
+            const wsDetalhe = XLSX.utils.aoa_to_sheet(detalheAOA);
+            wsDetalhe['!cols'] = [
+                { wch: 12 }, { wch: 40 }, { wch: 18 }, { wch: 8 }, { wch: 8 },
+                { wch: 16 }, { wch: 20 }, { wch: 22 }, { wch: 18 }
+            ];
+            // Freeze header row
+            wsDetalhe['!freeze'] = { xSplit: 0, ySplit: 1 };
+            wsDetalhe['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: rows.length, c: header.length - 1 } }) };
+
+            // Style header
+            for (let c = 0; c < header.length; c++) {
+                const ref = XLSX.utils.encode_cell({ r: 0, c });
+                if (wsDetalhe[ref]) wsDetalhe[ref].s = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '217346' } }, alignment: { horizontal: 'center' } };
+            }
+
+            // Color curva badges + tendencia
+            for (let r = 1; r <= rows.length; r++) {
+                const curva = rows[r-1][4];
+                const curvaCell = XLSX.utils.encode_cell({ r, c: 4 });
+                if (wsDetalhe[curvaCell]) {
+                    const color = curva === 'C' ? 'EAB308' : 'EF4444';
+                    wsDetalhe[curvaCell].s = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: color } }, alignment: { horizontal: 'center' } };
+                }
+                const trendText = rows[r-1][7];
+                const trendCell = XLSX.utils.encode_cell({ r, c: 7 });
+                if (wsDetalhe[trendCell] && typeof trendText === 'string') {
+                    let tColor = '666666';
+                    if (trendText.startsWith('Subindo')) tColor = '10B981';
+                    else if (trendText.startsWith('Caindo')) tColor = 'EF4444';
+                    wsDetalhe[trendCell].s = { font: { color: { rgb: tColor }, bold: true } };
+                }
+            }
+
+            // Build workbook
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo');
+            XLSX.utils.book_append_sheet(wb, wsDetalhe, 'Detalhe SKU');
+
+            const fileName = 'produtos_a_matar_' + new Date().toISOString().slice(0,10) + '.xlsx';
+            XLSX.writeFile(wb, fileName);
         }
 
         function renderEstoqueLojas(data) {
