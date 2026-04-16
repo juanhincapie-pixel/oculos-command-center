@@ -1778,6 +1778,68 @@
                     Produtos Curva C e D com estoque. Candidatos para liquidação e liberação de espaço.
                 </div>
 
+                <!-- KPIs -->
+                <div class="kpi-grid" style="margin-bottom:24px;">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total SKUs a Matar</div>
+                        <div class="kpi-value" id="kmTotalSKUs">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Unidades em Estoque</div>
+                        <div class="kpi-value" id="kmTotalUnidades">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Famílias Afetadas</div>
+                        <div class="kpi-value" id="kmTotalFamilias">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Média Meses sem Venda</div>
+                        <div class="kpi-value" id="kmMediaMesesSemVenda">0</div>
+                    </div>
+                </div>
+
+                <!-- Charts row -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
+                    <div class="card" style="padding:20px;">
+                        <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">SKUs por Família</h3>
+                        <canvas id="kmChartFamiliaSKUs" height="280"></canvas>
+                    </div>
+                    <div class="card" style="padding:20px;">
+                        <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Unidades por Família</h3>
+                        <canvas id="kmChartFamiliaUnidades" height="280"></canvas>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
+                    <div class="card" style="padding:20px;">
+                        <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Distribuição por Curva</h3>
+                        <canvas id="kmChartCurva" height="250"></canvas>
+                    </div>
+                    <div class="card" style="padding:20px;">
+                        <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Distribuição por Classe (Sol vs Grau)</h3>
+                        <canvas id="kmChartClasse" height="250"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top families table -->
+                <div class="card" style="padding:20px;margin-bottom:24px;">
+                    <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Resumo por Família</h3>
+                    <div class="table-container" style="max-height:300px;overflow-y:auto;">
+                        <table id="kmFamiliaTable">
+                            <thead style="position:sticky;top:0;z-index:2;">
+                                <tr>
+                                    <th>Família</th>
+                                    <th>SKUs</th>
+                                    <th>Unidades</th>
+                                    <th>% do Total</th>
+                                    <th>Média Meses sem Venda</th>
+                                    <th>Curvas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="kmFamiliaBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div class="table-container" style="max-height:500px;overflow-y:auto;">
                     <table id="killProductsTable">
                         <thead>
@@ -2964,6 +3026,27 @@
         }
 
         let _produtosMatarData = []; // cached for Excel export
+        let _produtosMatarFamilias = []; // cached for Excel
+        let _kmCharts = {}; // track chart instances for cleanup
+
+        function buildFamiliaStats(items) {
+            const totalEstoque = items.reduce((s, d) => s + d.estoqueMatriz, 0);
+            const familiaMap = {};
+            items.forEach(d => {
+                const f = d.familia || 'Sem Família';
+                if (!familiaMap[f]) familiaMap[f] = { familia: f, skus: 0, unidades: 0, mesesSemVenda: [], curvas: {} };
+                familiaMap[f].skus++;
+                familiaMap[f].unidades += d.estoqueMatriz;
+                familiaMap[f].mesesSemVenda.push(d.monthsSinceLastSale || 0);
+                familiaMap[f].curvas[d.curva] = (familiaMap[f].curvas[d.curva] || 0) + 1;
+            });
+            return Object.values(familiaMap).map(f => ({
+                ...f,
+                pctTotal: totalEstoque > 0 ? (f.unidades / totalEstoque * 100) : 0,
+                mediaMeses: f.mesesSemVenda.length > 0 ? f.mesesSemVenda.reduce((a,b)=>a+b,0) / f.mesesSemVenda.length : 0,
+                curvasText: Object.entries(f.curvas).map(([k,v]) => k + ':' + v).join(' | ')
+            })).sort((a, b) => b.unidades - a.unidades);
+        }
 
         function renderProdutosMatar(data) {
             const cdSKUs = data.filter(d => (d.curva === 'C' || d.curva === 'D') && d.estoqueMatriz > 0)
@@ -2971,14 +3054,89 @@
 
             _produtosMatarData = cdSKUs;
 
-            const tbody = document.getElementById('killProductsBody');
-            tbody.innerHTML = '';
+            const totalEstoque = cdSKUs.reduce((s, d) => s + d.estoqueMatriz, 0);
+            const familias = buildFamiliaStats(cdSKUs);
+            _produtosMatarFamilias = familias;
+
+            // KPIs
+            document.getElementById('kmTotalSKUs').textContent = cdSKUs.length;
+            document.getElementById('kmTotalUnidades').textContent = totalEstoque.toLocaleString('pt-BR');
+            document.getElementById('kmTotalFamilias').textContent = familias.length;
+            const avgMeses = cdSKUs.length > 0 ? cdSKUs.reduce((s,d) => s + (d.monthsSinceLastSale||0), 0) / cdSKUs.length : 0;
+            document.getElementById('kmMediaMesesSemVenda').textContent = avgMeses.toFixed(1);
 
             const infoEl = document.getElementById('killExcelInfo');
-            if (infoEl) {
-                const totalEstoque = cdSKUs.reduce((s, d) => s + d.estoqueMatriz, 0);
-                infoEl.textContent = cdSKUs.length + ' SKUs · ' + totalEstoque + ' unidades em estoque';
-            }
+            if (infoEl) infoEl.textContent = cdSKUs.length + ' SKUs · ' + totalEstoque + ' unidades em estoque';
+
+            // --- Charts ---
+            // Destroy previous instances
+            Object.values(_kmCharts).forEach(c => { if (c) c.destroy(); });
+            _kmCharts = {};
+
+            const palette = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316','#6366f1','#14b8a6','#e11d48','#84cc16','#a855f7','#0ea5e9','#d946ef'];
+            const topFamilias = familias.slice(0, 12);
+            const outrasSkus = familias.slice(12).reduce((s,f) => s + f.skus, 0);
+            const outrasUni = familias.slice(12).reduce((s,f) => s + f.unidades, 0);
+
+            const famLabels = topFamilias.map(f => f.familia);
+            const famSkus = topFamilias.map(f => f.skus);
+            const famUnidades = topFamilias.map(f => f.unidades);
+            if (familias.length > 12) { famLabels.push('Outras'); famSkus.push(outrasSkus); famUnidades.push(outrasUni); }
+
+            // Chart: SKUs por Familia (horizontal bar)
+            _kmCharts.famSKUs = new Chart(document.getElementById('kmChartFamiliaSKUs'), {
+                type: 'bar',
+                data: { labels: famLabels, datasets: [{ data: famSkus, backgroundColor: palette.slice(0, famLabels.length), borderRadius: 4 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'right', font: { weight: 'bold', size: 11 }, color: '#333' } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false } } } }
+            });
+
+            // Chart: Unidades por Familia (horizontal bar)
+            _kmCharts.famUni = new Chart(document.getElementById('kmChartFamiliaUnidades'), {
+                type: 'bar',
+                data: { labels: famLabels, datasets: [{ data: famUnidades, backgroundColor: palette.slice(0, famLabels.length), borderRadius: 4 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'right', font: { weight: 'bold', size: 11 }, color: '#333' } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false } } } }
+            });
+
+            // Chart: Curva C vs D (doughnut)
+            const curvaC = cdSKUs.filter(d => d.curva === 'C');
+            const curvaD = cdSKUs.filter(d => d.curva === 'D');
+            _kmCharts.curva = new Chart(document.getElementById('kmChartCurva'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Curva C (' + curvaC.length + ' SKUs)', 'Curva D (' + curvaD.length + ' SKUs)'],
+                    datasets: [{ data: [curvaC.reduce((s,d)=>s+d.estoqueMatriz,0), curvaD.reduce((s,d)=>s+d.estoqueMatriz,0)], backgroundColor: ['#eab308','#ef4444'], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, datalabels: { formatter: (v, ctx) => { const total = ctx.dataset.data.reduce((a,b)=>a+b,0); return (v/total*100).toFixed(1) + '%'; }, font: { weight: 'bold', size: 14 }, color: '#fff' } } }
+            });
+
+            // Chart: Sol vs Grau (doughnut)
+            const sol = cdSKUs.filter(d => d.descricao_classe !== 'Óculos de Grau');
+            const grau = cdSKUs.filter(d => d.descricao_classe === 'Óculos de Grau');
+            _kmCharts.classe = new Chart(document.getElementById('kmChartClasse'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Sol (' + sol.length + ' SKUs)', 'Grau (' + grau.length + ' SKUs)'],
+                    datasets: [{ data: [sol.reduce((s,d)=>s+d.estoqueMatriz,0), grau.reduce((s,d)=>s+d.estoqueMatriz,0)], backgroundColor: ['#f59e0b','#3b82f6'], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, datalabels: { formatter: (v, ctx) => { const total = ctx.dataset.data.reduce((a,b)=>a+b,0); return (v/total*100).toFixed(1) + '%'; }, font: { weight: 'bold', size: 14 }, color: '#fff' } } }
+            });
+
+            // Tabla de familias
+            const famBody = document.getElementById('kmFamiliaBody');
+            famBody.innerHTML = familias.map(f => `
+                <tr>
+                    <td style="font-weight:600;">${f.familia}</td>
+                    <td>${f.skus}</td>
+                    <td>${f.unidades.toLocaleString('pt-BR')}</td>
+                    <td>${f.pctTotal.toFixed(1)}%</td>
+                    <td>${f.mediaMeses.toFixed(1)}</td>
+                    <td>${f.curvasText}</td>
+                </tr>
+            `).join('');
+
+            // Tabla de detalle (existente)
+            const tbody = document.getElementById('killProductsBody');
+            tbody.innerHTML = '';
 
             if (cdSKUs.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Nenhum produto a matar no momento</td></tr>';
@@ -3096,9 +3254,58 @@
                 }
             }
 
+            // ==== Sheet 3: Análise por Família ====
+            const famStats = _produtosMatarFamilias;
+            const famHeader = ['Família', 'SKUs', 'Unidades', '% do Total', 'Média Meses sem Venda', 'Curva C (SKUs)', 'Curva D (SKUs)'];
+            const famRows = famStats.map(f => [
+                f.familia,
+                f.skus,
+                f.unidades,
+                parseFloat(f.pctTotal.toFixed(1)),
+                parseFloat(f.mediaMeses.toFixed(1)),
+                f.curvas['C'] || 0,
+                f.curvas['D'] || 0
+            ]);
+            const famAOA = [famHeader, ...famRows];
+            const wsFamilias = XLSX.utils.aoa_to_sheet(famAOA);
+            wsFamilias['!cols'] = [
+                { wch: 22 }, { wch: 8 }, { wch: 12 }, { wch: 12 }, { wch: 24 }, { wch: 14 }, { wch: 14 }
+            ];
+            wsFamilias['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: famRows.length, c: famHeader.length - 1 } }) };
+
+            // Style header
+            for (let c = 0; c < famHeader.length; c++) {
+                const ref = XLSX.utils.encode_cell({ r: 0, c });
+                if (wsFamilias[ref]) wsFamilias[ref].s = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '217346' } }, alignment: { horizontal: 'center' } };
+            }
+            // % column format
+            for (let r = 1; r <= famRows.length; r++) {
+                const ref = XLSX.utils.encode_cell({ r, c: 3 });
+                if (wsFamilias[ref]) wsFamilias[ref].z = '0.0"%"';
+            }
+
+            // ==== Sheet 4: Resumo Classe ====
+            const sol = items.filter(d => d.descricao_classe !== 'Óculos de Grau');
+            const grau = items.filter(d => d.descricao_classe === 'Óculos de Grau');
+            const classeAOA = [
+                ['ANÁLISE POR CLASSE'],
+                [],
+                ['Classe', 'SKUs', 'Unidades', '% SKUs', '% Unidades'],
+                ['Sol', sol.length, sol.reduce((s,d)=>s+d.estoqueMatriz,0), parseFloat((sol.length/items.length*100).toFixed(1)), parseFloat((sol.reduce((s,d)=>s+d.estoqueMatriz,0)/totalEstoque*100).toFixed(1))],
+                ['Grau', grau.length, grau.reduce((s,d)=>s+d.estoqueMatriz,0), parseFloat((grau.length/items.length*100).toFixed(1)), parseFloat((grau.reduce((s,d)=>s+d.estoqueMatriz,0)/totalEstoque*100).toFixed(1))],
+                ['TOTAL', items.length, totalEstoque, 100, 100]
+            ];
+            const wsClasse = XLSX.utils.aoa_to_sheet(classeAOA);
+            wsClasse['!cols'] = [{ wch: 10 }, { wch: 8 }, { wch: 12 }, { wch: 10 }, { wch: 14 }];
+            wsClasse['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 4 } }];
+            if (wsClasse['A1']) wsClasse['A1'].s = { font: { bold: true, sz: 13, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '217346' } }, alignment: { horizontal: 'center' } };
+            ['A3','B3','C3','D3','E3'].forEach(c => { if (wsClasse[c]) wsClasse[c].s = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '1A1A2E' } }, alignment: { horizontal: 'center' } }; });
+
             // Build workbook
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo');
+            XLSX.utils.book_append_sheet(wb, wsFamilias, 'Análise Famílias');
+            XLSX.utils.book_append_sheet(wb, wsClasse, 'Sol vs Grau');
             XLSX.utils.book_append_sheet(wb, wsDetalhe, 'Detalhe SKU');
 
             const fileName = 'produtos_a_matar_' + new Date().toISOString().slice(0,10) + '.xlsx';
