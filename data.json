@@ -1,6 +1,6 @@
 {
-  "_version": "1775861549701",
-  "_exportedAt": "2026-04-10T22:52:29.701Z",
+  "_version": "1776373974239",
+  "_exportedAt": "2026-04-16T21:12:54.239Z",
   "logistica": [
     {
       "id": "2",
@@ -452,7 +452,7 @@
         "dataPaid70": "2026-05-11",
         "amount70": 2349,
         "mesAno": "05-26",
-        "status30": "Pendente",
+        "status30": "Pago",
         "status70": "Pendente"
       }
     ],
@@ -515,7 +515,7 @@
         "dataPaid": "2026-04-02",
         "amount": 2220,
         "mesAno": "04-26",
-        "status": "Pendente"
+        "status": "Pago"
       },
       {
         "oQue": "Order Estojos Hardcase (novas cores) 8.000",
