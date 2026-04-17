@@ -1,6 +1,6 @@
 {
-  "_version": "1776373974239",
-  "_exportedAt": "2026-04-16T21:12:54.239Z",
+  "_version": "1776449181489",
+  "_exportedAt": "2026-04-17T18:06:21.489Z",
   "logistica": [
     {
       "id": "2",
@@ -453,6 +453,19 @@
         "amount70": 2349,
         "mesAno": "05-26",
         "status30": "Pago",
+        "status70": "Pendente"
+      },
+      {
+        "oQue": "Boxes estojos de VP para Linsgh ",
+        "invoice": "25PX116",
+        "total": 3100.8,
+        "dataPaid30": "2026-04-17",
+        "amount30": 0,
+        "blDate": "2026-04-17",
+        "dataPaid70": "2026-04-17",
+        "amount70": 3100.8,
+        "mesAno": "04-26",
+        "status30": "-",
         "status70": "Pendente"
       }
     ],
