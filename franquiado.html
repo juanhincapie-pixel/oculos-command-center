@@ -734,19 +734,19 @@
             return sku.curva === 'A' ? 2 : 1;
         }
 
-        // ==================== DATA LOADING (Static JSON) ====================
+        // ==================== DATA LOADING (Google Sheets Web App) ====================
+        const SHEETS_API = 'https://script.google.com/macros/s/AKfycbzo_3vQG2aWNHyAdTV6MxFagP-0u3gyK-_fnkoOVKbT8cqk-omt63V5qdgOIFlCWUdN/exec';
+
         async function loadData() {
             showLoadingSpinner(true);
             try {
-                const [salesResp, stockResp, metaResp] = await Promise.all([
-                    fetch('data/sales-data.json?v=' + Date.now()),
-                    fetch('data/store-stock-data.json?v=' + Date.now()),
-                    fetch('data/meta.json?v=' + Date.now())
-                ]);
+                const resp = await fetch(SHEETS_API + '?sheet=all');
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const payload = await resp.json();
 
-                rawSalesData = salesResp.ok ? await salesResp.json() : [];
-                rawStoreData = stockResp.ok ? await stockResp.json() : [];
-                const meta = metaResp.ok ? await metaResp.json() : null;
+                rawSalesData = payload.salesData || [];
+                rawStoreData = payload.storeStockData || [];
+                const meta = payload.meta || null;
 
                 // Detect store columns and identify franchisee stores
                 if (rawStoreData.length > 0) {
@@ -767,11 +767,14 @@
                 processedData = processSalesData(rawSalesData);
                 renderAllSections();
 
-                // Show last update from meta.json
+                // Show last update from meta
                 if (meta && meta.lastUpdate) {
                     const d = new Date(meta.lastUpdate);
                     document.getElementById('updateIndicator').textContent =
                         'Dados atualizados em: ' + d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                } else if (meta && meta.lastUpdateBRT) {
+                    document.getElementById('updateIndicator').textContent =
+                        'Dados atualizados em: ' + meta.lastUpdateBRT;
                 }
             } catch (error) {
                 console.error('Error loading data:', error);

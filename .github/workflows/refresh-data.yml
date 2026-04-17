@@ -1,10 +1,14 @@
-name: Refresh Metabase Data
+name: Refresh Metabase Data (DESACTIVADO — migrado a Google Apps Script)
+
+# DESACTIVADO: los datos ahora se cargan via Google Apps Script → Google Sheets
+# Mantener como respaldo. Para reactivar, descomentar las líneas de abajo.
+# on:
+#   schedule:
+#     - cron: '0 3 * * *'
+#   workflow_dispatch:
 
 on:
-  schedule:
-    # Runs at midnight BRT (03:00 UTC) every day
-    - cron: '0 3 * * *'
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch: # Solo manual como respaldo
 
 permissions:
   contents: write
