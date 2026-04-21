@@ -1263,41 +1263,125 @@
             <section class="section active" id="painel-geral">
                 <h2 class="section-title">Painel Geral</h2>
 
-                <div class="kpi-grid">
+                <!-- Row 1: Vendas & Crescimento -->
+                <div style="margin-bottom:8px;font-size:12px;font-weight:600;text-transform:uppercase;color:var(--text-secondary);letter-spacing:0.5px;">Vendas</div>
+                <div class="kpi-grid" style="margin-bottom:24px;">
                     <div class="kpi-card">
-                        <div class="kpi-label">SKUs Ativos</div>
-                        <div class="kpi-value" id="kpiActiveSKUs">0</div>
-                        <div class="kpi-subtitle" id="kpiActivosDesglose" style="font-size: 11px; color: var(--text-secondary);"></div>
+                        <div class="kpi-label">Vendas Último Mês</div>
+                        <div class="kpi-value" id="kpiSalesLastMonth">0</div>
+                        <div class="kpi-subtitle" id="kpiSalesLastMonthDelta" style="font-size:12px;"></div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label">Vendas Últimos 3M</div>
                         <div class="kpi-value" id="kpiSales3M">0</div>
+                        <div class="kpi-subtitle" id="kpiSales3MDelta" style="font-size:12px;"></div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-label">Venda Média Mensal</div>
+                        <div class="kpi-label">Crescimento Semestral</div>
+                        <div class="kpi-value" id="kpiGrowth6M">0%</div>
+                        <div class="kpi-subtitle" id="kpiGrowth6MDetail" style="font-size:11px;color:var(--text-secondary);"></div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Venda Média/SKU/Mês</div>
                         <div class="kpi-value" id="kpiAvgMonthlySales">0</div>
+                        <div class="kpi-subtitle" id="kpiAvgMonthlyDetail" style="font-size:11px;color:var(--text-secondary);"></div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Saúde del Catálogo -->
+                <div style="margin-bottom:8px;font-size:12px;font-weight:600;text-transform:uppercase;color:var(--text-secondary);letter-spacing:0.5px;">Catálogo & Concentração</div>
+                <div class="kpi-grid" style="margin-bottom:24px;">
+                    <div class="kpi-card">
+                        <div class="kpi-label">SKUs no Portfólio</div>
+                        <div class="kpi-value" id="kpiActiveSKUs">0</div>
+                        <div class="kpi-subtitle" id="kpiActivosDesglose" style="font-size:11px;color:var(--text-secondary);"></div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-label">SKUs em Ruptura</div>
-                        <div class="kpi-value" id="kpiStockoutAB">0</div>
+                        <div class="kpi-label">SKUs Curva A+B</div>
+                        <div class="kpi-value" id="kpiABCount">0</div>
+                        <div class="kpi-subtitle" id="kpiABDetail" style="font-size:11px;color:var(--text-secondary);"></div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-label">Cobertura Média</div>
-                        <div class="kpi-value" id="kpiAvgCoverage">0</div>
-                        <div class="kpi-subtitle">meses</div>
+                        <div class="kpi-label">Eficiência do Catálogo</div>
+                        <div class="kpi-value" id="kpiCatalogEfficiency">0%</div>
+                        <div class="kpi-subtitle" style="font-size:11px;color:var(--text-secondary);">% de SKUs que venderam nos últimos 3M</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Concentração Top 10%</div>
+                        <div class="kpi-value" id="kpiConcentration">0%</div>
+                        <div class="kpi-subtitle" id="kpiConcentrationDetail" style="font-size:11px;color:var(--text-secondary);"></div>
+                    </div>
+                </div>
+
+                <!-- Row 3: Estoque & Risco -->
+                <div style="margin-bottom:8px;font-size:12px;font-weight:600;text-transform:uppercase;color:var(--text-secondary);letter-spacing:0.5px;">Estoque & Risco</div>
+                <div class="kpi-grid" style="margin-bottom:24px;">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Estoque Total Matriz</div>
+                        <div class="kpi-value" id="kpiTotalStock">0</div>
+                        <div class="kpi-subtitle" id="kpiTotalStockDetail" style="font-size:11px;color:var(--text-secondary);"></div>
+                    </div>
+                    <div class="kpi-card" style="border-left:3px solid #ef4444;">
+                        <div class="kpi-label">Rupturas Curva A+B</div>
+                        <div class="kpi-value" id="kpiStockoutAB" style="color:#ef4444;">0</div>
+                        <div class="kpi-subtitle" id="kpiStockoutABDetail" style="font-size:11px;color:var(--text-secondary);"></div>
+                    </div>
+                    <div class="kpi-card" style="border-left:3px solid #f59e0b;">
+                        <div class="kpi-label">Dead Stock</div>
+                        <div class="kpi-value" id="kpiDeadStockUnits" style="color:#f59e0b;">0</div>
+                        <div class="kpi-subtitle" id="kpiDeadStockPct" style="font-size:12px;"></div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Cobertura Curva A</div>
+                        <div class="kpi-value" id="kpiCoverageA">0</div>
+                        <div class="kpi-subtitle" id="kpiCoverageADetail" style="font-size:11px;color:var(--text-secondary);"></div>
+                    </div>
+                </div>
+
+                <!-- Row 4: Perfil de SKU -->
+                <div style="margin-bottom:8px;font-size:12px;font-weight:600;text-transform:uppercase;color:var(--text-secondary);letter-spacing:0.5px;">Perfil de SKU</div>
+                <div class="kpi-grid" style="margin-bottom:12px;">
+                    <div class="kpi-card">
+                        <div class="kpi-label">SKUs Registrados</div>
+                        <div class="kpi-value" id="kpiRegistered">0</div>
+                        <div class="kpi-subtitle" id="kpiRegisteredDetail" style="font-size:11px;color:var(--text-secondary);"></div>
+                    </div>
+                    <div class="kpi-card" style="border-left:3px solid #ef4444;">
+                        <div class="kpi-label">Produtos a Matar</div>
+                        <div class="kpi-value" id="kpiToKill" style="color:#ef4444;">0</div>
+                        <div class="kpi-subtitle" id="kpiToKillDetail" style="font-size:11px;color:var(--text-secondary);"></div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Famílias no Catálogo</div>
+                        <div class="kpi-value" id="kpiFamilies">0</div>
+                        <div class="kpi-subtitle" id="kpiFamiliesDetail" style="font-size:11px;color:var(--text-secondary);"></div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">SKUs Novos (Últimos 3M)</div>
+                        <div class="kpi-value" id="kpiNewSKUs">0</div>
+                        <div class="kpi-subtitle" id="kpiNewSKUsDetail" style="font-size:11px;color:var(--text-secondary);"></div>
+                    </div>
+                </div>
+                <div class="kpi-grid" style="margin-bottom:24px;">
+                    <div class="kpi-card" style="border-left:3px solid #f59e0b;">
+                        <div class="kpi-label">Sem Venda há 6+ Meses</div>
+                        <div class="kpi-value" id="kpiNoSale6M" style="color:#f59e0b;">0</div>
+                        <div class="kpi-subtitle" id="kpiNoSale6MDetail" style="font-size:11px;color:var(--text-secondary);"></div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label">Rotação Média</div>
-                        <div class="kpi-value" id="kpiAvgRotation">0.00</div>
+                        <div class="kpi-value" id="kpiAvgRotation">0</div>
+                        <div class="kpi-subtitle" style="font-size:11px;color:var(--text-secondary);">Vendas 12M / Estoque atual (ideal: 3-6x)</div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-label">Dead Stock</div>
-                        <div class="kpi-value" id="kpiDeadStockUnits">0</div>
-                        <div class="kpi-subtitle">unidades</div>
+                        <div class="kpi-label">Cobertura Geral</div>
+                        <div class="kpi-value" id="kpiAvgCoverage">0</div>
+                        <div class="kpi-subtitle" id="kpiAvgCoverageDetail" style="font-size:11px;color:var(--text-secondary);"></div>
                     </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">SKUs Curva A</div>
-                        <div class="kpi-value" id="kpiClassACount">0</div>
+                    <div class="kpi-card" style="border-left:3px solid #3b82f6;">
+                        <div class="kpi-label">SKUs Sobreestoque (&gt;12M)</div>
+                        <div class="kpi-value" id="kpiOverstock" style="color:#3b82f6;">0</div>
+                        <div class="kpi-subtitle" id="kpiOverstockDetail" style="font-size:11px;color:var(--text-secondary);"></div>
                     </div>
                 </div>
 
@@ -2501,38 +2585,161 @@
         }
 
         function renderPainelGeral(data) {
-            const activeSKUs = data.filter(d => d.isActive).length;
-            const sales3M = data.reduce((sum, d) => sum + d.sales3M, 0);
-            const avgMonthlySales = data.filter(d => d.vendaMedia > 0).length > 0
-                ? data.reduce((sum, d) => sum + d.vendaMedia, 0) / data.filter(d => d.vendaMedia > 0).length
-                : 0;
-            const stockoutAB = data.filter(d => d.curva === 'A' || d.curva === 'B').filter(d => d.estoqueMatriz === 0).length;
-            const withStock = data.filter(d => d.estoqueMatriz > 0);
-            const avgCoverage = withStock.length > 0
-                ? withStock.reduce((sum, d) => sum + (d.coberturaMeses === Infinity ? 0 : d.coberturaMeses), 0) / withStock.length
-                : 0;
-            const avgRotation = withStock.length > 0
-                ? withStock.reduce((sum, d) => sum + d.rotacao, 0) / withStock.length
-                : 0;
-            const deadStock = data.filter(d => d.estoqueMatriz > 0 && d.sales3M === 0).reduce((sum, d) => sum + d.estoqueMatriz, 0);
-            const classACount = data.filter(d => d.curva === 'A').length;
+            // === Helper: format delta arrow ===
+            const deltaArrow = (current, previous) => {
+                if (!previous || previous === 0) return '';
+                const pct = ((current - previous) / previous * 100).toFixed(1);
+                const color = pct >= 0 ? '#10b981' : '#ef4444';
+                const arrow = pct >= 0 ? '▲' : '▼';
+                return `<span style="color:${color};font-weight:600;">${arrow} ${pct > 0 ? '+' : ''}${pct}%</span>`;
+            };
 
-            document.getElementById('kpiActiveSKUs').textContent = activeSKUs;
+            // === VENDAS ===
+            const salesLastMonth = data.reduce((s, d) => s + (d.vendas_m00 || 0), 0);
+            const salesPrevMonth = data.reduce((s, d) => s + (d.vendas_m01 || 0), 0);
+            const sales3M = data.reduce((s, d) => s + (d.vendas_m00||0) + (d.vendas_m01||0) + (d.vendas_m02||0), 0);
+            const salesPrev3M = data.reduce((s, d) => s + (d.vendas_m03||0) + (d.vendas_m04||0) + (d.vendas_m05||0), 0);
+            const totalLast6 = data.reduce((s, d) => s + (d.vendas_m00||0)+(d.vendas_m01||0)+(d.vendas_m02||0)+(d.vendas_m03||0)+(d.vendas_m04||0)+(d.vendas_m05||0), 0);
+            const totalPrev6 = data.reduce((s, d) => s + (d.vendas_m06||0)+(d.vendas_m07||0)+(d.vendas_m08||0)+(d.vendas_m09||0)+(d.vendas_m10||0)+(d.vendas_m11||0), 0);
+            const growth6M = totalPrev6 > 0 ? ((totalLast6 - totalPrev6) / totalPrev6 * 100) : 0;
+
+            const skusWithSales = data.filter(d => d.vendaMedia > 0);
+            const avgMonthlySales = skusWithSales.length > 0
+                ? skusWithSales.reduce((s, d) => s + d.vendaMedia, 0) / skusWithSales.length : 0;
+            const medianSales = skusWithSales.length > 0
+                ? skusWithSales.map(d => d.vendaMedia).sort((a,b) => a-b)[Math.floor(skusWithSales.length/2)] : 0;
+
+            document.getElementById('kpiSalesLastMonth').textContent = salesLastMonth.toLocaleString('pt-BR');
+            document.getElementById('kpiSalesLastMonthDelta').innerHTML = deltaArrow(salesLastMonth, salesPrevMonth) + ' <span style="color:var(--text-secondary);font-size:11px;">vs mês anterior</span>';
+            document.getElementById('kpiSales3M').textContent = sales3M.toLocaleString('pt-BR');
+            document.getElementById('kpiSales3MDelta').innerHTML = deltaArrow(sales3M, salesPrev3M) + ' <span style="color:var(--text-secondary);font-size:11px;">vs 3M anteriores</span>';
+            const growthColor = growth6M >= 0 ? '#10b981' : '#ef4444';
+            document.getElementById('kpiGrowth6M').innerHTML = `<span style="color:${growthColor}">${growth6M >= 0 ? '+' : ''}${growth6M.toFixed(1)}%</span>`;
+            document.getElementById('kpiGrowth6MDetail').textContent = totalLast6.toLocaleString('pt-BR') + ' vs ' + totalPrev6.toLocaleString('pt-BR') + ' un.';
+            document.getElementById('kpiAvgMonthlySales').textContent = avgMonthlySales.toFixed(1);
+            document.getElementById('kpiAvgMonthlyDetail').textContent = 'Mediana: ' + medianSales.toFixed(1) + ' | ' + skusWithSales.length + ' SKUs com vendas';
+
+            // === CATÁLOGO ===
+            const activeSKUs = data.filter(d => d.isActive).length;
             const aCount = data.filter(d => d.curva === 'A').length;
             const bCount = data.filter(d => d.curva === 'B').length;
             const cCount = data.filter(d => d.curva === 'C').length;
             const dCount = data.filter(d => d.curva === 'D').length;
             const dWithStock = data.filter(d => d.curva === 'D' && d.estoqueMatriz > 0).length;
+            const abCount = aCount + bCount;
+            const skusWith3MSales = data.filter(d => d.sales3M > 0).length;
+            const catalogEfficiency = activeSKUs > 0 ? (skusWith3MSales / activeSKUs * 100) : 0;
+
+            // Concentración: top 10% de SKUs genera qué % de ventas
+            const sorted = [...data].filter(d => d.vendaMedia > 0).sort((a,b) => b.vendaMedia - a.vendaMedia);
+            const top10pctCount = Math.max(1, Math.ceil(sorted.length * 0.10));
+            const top10pctSales = sorted.slice(0, top10pctCount).reduce((s,d) => s + d.vendaMedia, 0);
+            const totalMonthlySales = sorted.reduce((s,d) => s + d.vendaMedia, 0);
+            const concentration = totalMonthlySales > 0 ? (top10pctSales / totalMonthlySales * 100) : 0;
+
+            document.getElementById('kpiActiveSKUs').textContent = activeSKUs;
             document.getElementById('kpiActivosDesglose').innerHTML =
                 `A: ${aCount} | B: ${bCount} | C: ${cCount} | D: ${dCount} (${dWithStock} com estoque)`;
+            document.getElementById('kpiABCount').textContent = abCount;
+            document.getElementById('kpiABDetail').textContent = ((abCount/activeSKUs*100).toFixed(0)) + '% do catálogo gera 50% das vendas';
+            document.getElementById('kpiCatalogEfficiency').textContent = catalogEfficiency.toFixed(0) + '%';
+            document.getElementById('kpiConcentration').textContent = concentration.toFixed(0) + '%';
+            document.getElementById('kpiConcentrationDetail').textContent = top10pctCount + ' SKUs geram ' + concentration.toFixed(0) + '% da receita';
 
-            document.getElementById('kpiSales3M').textContent = sales3M.toLocaleString('pt-BR');
-            document.getElementById('kpiAvgMonthlySales').textContent = Math.round(avgMonthlySales);
+            // === ESTOQUE & RISCO ===
+            const totalStockUnits = data.reduce((s, d) => s + d.estoqueMatriz, 0);
+            const stockoutAB = data.filter(d => (d.curva === 'A' || d.curva === 'B') && d.estoqueMatriz === 0 && d.vendaMedia > 0).length;
+            const stockoutA = data.filter(d => d.curva === 'A' && d.estoqueMatriz === 0 && d.vendaMedia > 0).length;
+            const deadStockSKUs = data.filter(d => d.estoqueMatriz > 0 && d.sales3M === 0);
+            const deadStockUnits = deadStockSKUs.reduce((s, d) => s + d.estoqueMatriz, 0);
+            const deadPct = totalStockUnits > 0 ? (deadStockUnits / totalStockUnits * 100) : 0;
+
+            const curvaAData = data.filter(d => d.curva === 'A' && d.estoqueMatriz > 0 && d.vendaMedia > 0);
+            const avgCoverageA = curvaAData.length > 0
+                ? curvaAData.reduce((s,d) => s + (d.coberturaMeses === Infinity ? 0 : d.coberturaMeses), 0) / curvaAData.length : 0;
+            const curvaABData = data.filter(d => (d.curva==='A'||d.curva==='B') && d.estoqueMatriz > 0 && d.vendaMedia > 0);
+            const avgCoverageAB = curvaABData.length > 0
+                ? curvaABData.reduce((s,d) => s + (d.coberturaMeses === Infinity ? 0 : d.coberturaMeses), 0) / curvaABData.length : 0;
+
+            const withStock = data.filter(d => d.estoqueMatriz > 0);
+            const avgCoverage = withStock.length > 0
+                ? withStock.reduce((s, d) => s + (d.coberturaMeses === Infinity ? 0 : d.coberturaMeses), 0) / withStock.length : 0;
+            const avgRotation = withStock.length > 0
+                ? withStock.reduce((s, d) => s + d.rotacao, 0) / withStock.length : 0;
+            const classACount = aCount;
+
+            document.getElementById('kpiTotalStock').textContent = totalStockUnits.toLocaleString('pt-BR');
+            const stockAB = data.filter(d => d.curva==='A'||d.curva==='B').reduce((s,d)=>s+d.estoqueMatriz,0);
+            const stockCD = data.filter(d => d.curva==='C'||d.curva==='D').reduce((s,d)=>s+d.estoqueMatriz,0);
+            document.getElementById('kpiTotalStockDetail').textContent = 'A+B: ' + stockAB.toLocaleString('pt-BR') + ' | C+D: ' + stockCD.toLocaleString('pt-BR');
+
             document.getElementById('kpiStockoutAB').textContent = stockoutAB;
-            document.getElementById('kpiAvgCoverage').textContent = avgCoverage.toFixed(1);
+            document.getElementById('kpiStockoutABDetail').innerHTML = stockoutA > 0
+                ? `<span style="color:#ef4444;font-weight:600;">${stockoutA} são Curva A</span> — perda de receita direta`
+                : 'Nenhuma ruptura Curva A';
+
+            document.getElementById('kpiDeadStockUnits').textContent = deadStockUnits.toLocaleString('pt-BR');
+            document.getElementById('kpiDeadStockPct').innerHTML = `<span style="color:#f59e0b;font-weight:600;">${deadPct.toFixed(1)}%</span> <span style="color:var(--text-secondary);font-size:11px;">do estoque total (${deadStockSKUs.length} SKUs)</span>`;
+
+            document.getElementById('kpiCoverageA').textContent = avgCoverageA.toFixed(1) + 'M';
+            const coverageAColor = avgCoverageA < 4 ? '#ef4444' : avgCoverageA < 6 ? '#f59e0b' : '#10b981';
+            document.getElementById('kpiCoverageADetail').innerHTML = `<span style="color:${coverageAColor};">${avgCoverageA < 4 ? 'Abaixo do ideal (meta: 6-8M)' : avgCoverageA < 6 ? 'Vigiar — meta: 6-8M' : 'Dentro da meta'}</span> | A+B: ${avgCoverageAB.toFixed(1)}M`;
+
+            // === PERFIL DE SKU ===
+            const totalRegistered = data.length;
+            const activeCount = data.filter(d => d.sales3M > 0).length;
+            const inactiveCount = totalRegistered - activeCount;
+
+            document.getElementById('kpiRegistered').textContent = totalRegistered;
+            document.getElementById('kpiRegisteredDetail').textContent = activeCount + ' ativos (venderam em 3M) | ' + inactiveCount + ' inativos';
+
+            // Produtos a Matar: C+D con estoque y sin ventas en 6M
+            const toKill = data.filter(d => (d.curva === 'C' || d.curva === 'D') && d.estoqueMatriz > 0 && d.last6MonthsSales === 0);
+            const toKillUnits = toKill.reduce((s,d) => s + d.estoqueMatriz, 0);
+            document.getElementById('kpiToKill').textContent = toKill.length;
+            document.getElementById('kpiToKillDetail').textContent = toKillUnits.toLocaleString('pt-BR') + ' un. paradas — liberar espaço e capital';
+
+            // Familias
+            const allFamilies = [...new Set(data.map(d => d.familia).filter(Boolean))];
+            const famSales = allFamilies.map(f => ({
+                name: f,
+                sales: data.filter(d => d.familia === f).reduce((s,d) => s + d.vendaMedia, 0)
+            })).sort((a,b) => b.sales - a.sales);
+            const top3Fam = famSales.slice(0,3).map(f => f.name).join(', ');
+            document.getElementById('kpiFamilies').textContent = allFamilies.length;
+            document.getElementById('kpiFamiliesDetail').textContent = 'Top 3: ' + top3Fam;
+
+            // SKUs Novos (activeMonths <= 3)
+            const newSKUs = data.filter(d => d.activeMonths > 0 && d.activeMonths <= 3);
+            const newWithSales = newSKUs.filter(d => d.sales3M > 0);
+            const newPerformance = newSKUs.length > 0 ? (newWithSales.length / newSKUs.length * 100) : 0;
+            document.getElementById('kpiNewSKUs').textContent = newSKUs.length;
+            const newColor = newPerformance >= 70 ? '#10b981' : newPerformance >= 40 ? '#f59e0b' : '#ef4444';
+            const newLabel = newPerformance >= 70 ? 'Bom' : newPerformance >= 40 ? 'Regular' : 'Fraco';
+            document.getElementById('kpiNewSKUsDetail').innerHTML = newSKUs.length > 0
+                ? `<span style="color:${newColor};font-weight:600;">${newLabel}</span> — ${newWithSales.length}/${newSKUs.length} já venderam (${newPerformance.toFixed(0)}%)`
+                : 'Nenhum SKU novo no período';
+
+            // Sem venda 6+ meses
+            const noSale6M = data.filter(d => d.last6MonthsSales === 0 && d.estoqueMatriz > 0);
+            const noSale6MPct = totalRegistered > 0 ? (noSale6M.length / totalRegistered * 100) : 0;
+            document.getElementById('kpiNoSale6M').textContent = noSale6M.length;
+            document.getElementById('kpiNoSale6MDetail').textContent = noSale6MPct.toFixed(0) + '% do catálogo — revisar necessidade';
+
+            // Rotação
             document.getElementById('kpiAvgRotation').textContent = avgRotation.toFixed(2);
-            document.getElementById('kpiDeadStockUnits').textContent = deadStock;
-            document.getElementById('kpiClassACount').textContent = classACount;
+
+            // Cobertura geral
+            document.getElementById('kpiAvgCoverage').textContent = avgCoverage.toFixed(1) + 'M';
+            document.getElementById('kpiAvgCoverageDetail').innerHTML = avgCoverage > 12
+                ? '<span style="color:#f59e0b;">Inflado por dead stock</span> — A+B: ' + avgCoverageAB.toFixed(1) + 'M (referência real)'
+                : 'A+B: ' + avgCoverageAB.toFixed(1) + 'M';
+
+            // Sobreestoque
+            const overstock = data.filter(d => d.estoqueMatriz > 0 && d.coberturaMeses > 12 && d.coberturaMeses !== Infinity);
+            const overstockUnits = overstock.reduce((s,d) => s + d.estoqueMatriz, 0);
+            document.getElementById('kpiOverstock').textContent = overstock.length;
+            document.getElementById('kpiOverstockDetail').textContent = overstockUnits.toLocaleString('pt-BR') + ' un. com cobertura acima de 12 meses';
 
             // Charts
             renderTrendChart(data);
@@ -2546,26 +2753,12 @@
             const abSKUs = data.filter(d => d.curva === 'A' || d.curva === 'B');
             const cSKUs = data.filter(d => d.curva === 'C');
             const dSKUs = data.filter(d => d.curva === 'D');
-            const deadStockSKUs = data.filter(d => d.estoqueMatriz > 0 && d.sales3M === 0);
             // Cobertura efetiva inclui importações pendentes
             const _cobEf = (d) => d.vendaMedia > 0 ? (d.estoqueMatriz + (d.importacoesPendentes || 0)) / d.vendaMedia : Infinity;
             const abNeedReorder = abSKUs.filter(d => _cobEf(d) < 4 && _cobEf(d) !== Infinity);
             const abCritical = abSKUs.filter(d => _cobEf(d) < 2 && _cobEf(d) !== Infinity);
             const excessSKUs = data.filter(d => d.estoqueMatriz > 0 && d.coberturaMeses > 12);
             const cdWithStock = data.filter(d => (d.curva === 'C' || d.curva === 'D') && d.estoqueMatriz > 0);
-            const totalStockUnits = data.reduce((sum, d) => sum + d.estoqueMatriz, 0);
-            const deadStockUnits = deadStockSKUs.reduce((sum, d) => sum + d.estoqueMatriz, 0);
-            const deadPct = totalStockUnits > 0 ? ((deadStockUnits / totalStockUnits) * 100).toFixed(1) : 0;
-
-            // Sales trend
-            const totalLast6 = data.reduce((sum, d) => {
-                const vals = [d.vendas_m00||0, d.vendas_m01||0, d.vendas_m02||0, d.vendas_m03||0, d.vendas_m04||0, d.vendas_m05||0];
-                return sum + vals.reduce((a,b)=>a+b,0);
-            }, 0);
-            const totalPrev6 = data.reduce((sum, d) => {
-                const vals = [d.vendas_m06||0, d.vendas_m07||0, d.vendas_m08||0, d.vendas_m09||0, d.vendas_m10||0, d.vendas_m11||0];
-                return sum + vals.reduce((a,b)=>a+b,0);
-            }, 0);
             const salesTrend = totalPrev6 > 0 ? ((totalLast6 - totalPrev6) / totalPrev6 * 100).toFixed(1) : 0;
 
             // Top sellers at risk (A/B with effective coverage < 4 months, considering imports)
@@ -2579,7 +2772,7 @@
             // Saúde do Estoque
             document.getElementById('execSaudeEstoque').innerHTML = `
                 <div><strong>${activeSKUs}</strong> SKUs ativos no portfólio. Cobertura média: <strong>${avgCoverage.toFixed(1)} meses</strong>.</div>
-                <div><strong>${deadStockSKUs.length}</strong> SKUs com estoque parado (sem vendas nos últimos 3 meses), representando <strong>${deadStockUnits.toLocaleString('pt-BR')}</strong> unidades (<strong>${deadPct}%</strong> do estoque total).</div>
+                <div><strong>${deadStockSKUs.length}</strong> SKUs com estoque parado (sem vendas nos últimos 3 meses), representando <strong>${deadStockUnits.toLocaleString('pt-BR')}</strong> unidades (<strong>${deadPct.toFixed(1)}%</strong> do estoque total).</div>
                 <div><strong>${excessSKUs.length}</strong> SKUs com cobertura acima de 12 meses (sobreestoque).</div>
                 <div>Rotação média: <strong>${avgRotation.toFixed(2)}</strong> (vendas 12M / estoque).</div>
             `;
