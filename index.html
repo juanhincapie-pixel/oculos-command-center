@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÓCULOS — Command Center</title>
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts — Poppins (Livo Brandbook) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Chart.js + Datalabels Plugin -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
@@ -17,24 +17,31 @@
 
     <style>
         :root {
-            --dark-sidebar: #1a1a2e;
+            /* Livo Brandbook */
+            --livo-blue: #0000E1;
+            --livo-blue-light: #0096FA;
+            --livo-green: #DEFF00;
+            --livo-red: #FC4F00;
+            /* Layout */
+            --dark-sidebar: #0000E1;
             --sidebar-text: #ffffff;
-            --content-bg: #f5f5f5;
+            --content-bg: #F5F5F7;
             --card-bg: #ffffff;
             --border-color: #e0e0e0;
-            --text-primary: #1a1a1a;
-            --text-secondary: #666666;
+            --text-primary: #1A1A2E;
+            --text-secondary: #6B7280;
+            /* Functional accents (status/curva) */
             --accent-green: #10b981;
-            --accent-blue: #3b82f6;
+            --accent-blue: #0000E1;
             --accent-red: #ef4444;
             --accent-orange: #f59e0b;
             --accent-yellow: #eab308;
-            --color-a: #3b82f6;
+            --color-a: #0000E1;
             --color-b: #10b981;
             --color-c: #eab308;
             --color-d: #ef4444;
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
             --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
             --transition: all 0.3s ease;
         }
@@ -46,7 +53,7 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: 'Poppins', Arial, Helvetica, sans-serif;
             background-color: var(--content-bg);
             color: var(--text-primary);
             line-height: 1.6;
@@ -162,7 +169,7 @@
             background-color: rgba(255,255,255,0.05);
             color: rgba(255,255,255,0.9);
             font-size: 13px;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             appearance: none;
             cursor: pointer;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -716,7 +723,7 @@
             transition: var(--transition);
             background: none;
             border-top: none; border-left: none; border-right: none;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
         .forn-tab:hover { color: var(--text-primary); }
         .forn-tab.active {
@@ -779,7 +786,7 @@
             border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 13px;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             color: var(--text-primary);
             background: #fafafa;
             transition: var(--transition);
@@ -822,7 +829,7 @@
             border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 12px;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             color: var(--text-primary);
             background: #fafafa;
             min-height: 100px;
@@ -908,7 +915,7 @@
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             transition: var(--transition);
         }
         .forn-btn-primary {
@@ -1023,7 +1030,7 @@
             border: 1px solid var(--border-color);
             border-radius: 4px;
             font-size: 12px;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             background: #fafafa;
             color: var(--text-primary);
             width: 100%;
@@ -1077,7 +1084,7 @@
             opacity: 0;
             transform: translateY(20px);
             transition: all 0.3s ease;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
         .forn-save-notice.visible {
             opacity: 1;
@@ -1088,7 +1095,7 @@
             background: #f5f5f5;
             color: var(--text-secondary);
             cursor: pointer;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             font-weight: 600;
             transition: var(--transition);
         }
@@ -1154,15 +1161,15 @@
 <body>
     <!-- Password Gate -->
     <div id="passwordGate" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#1a1a2e;display:flex;align-items:center;justify-content:center;z-index:99999;">
-        <div style="text-align:center;color:#fff;font-family:'Inter',sans-serif;">
+        <div style="text-align:center;color:#fff;font-family:'Poppins',sans-serif;">
             <div style="font-size:32px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px;">ÓCULOS</div>
             <div style="font-size:12px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:40px;">Command Center</div>
             <input id="pwdInput" type="password" placeholder="Contraseña" autofocus
-                style="padding:12px 20px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;border-radius:8px;font-size:16px;width:240px;text-align:center;font-family:'Inter',sans-serif;outline:none;"
+                style="padding:12px 20px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);color:#fff;border-radius:8px;font-size:16px;width:240px;text-align:center;font-family:'Poppins',sans-serif;outline:none;"
                 onkeydown="if(event.key==='Enter')checkPwd()">
             <br>
             <button onclick="checkPwd()"
-                style="margin-top:16px;padding:10px 32px;background:#3b82f6;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Entrar</button>
+                style="margin-top:16px;padding:10px 32px;background:#0000E1;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;">Entrar</button>
             <div id="pwdError" style="margin-top:12px;color:#ef4444;font-size:13px;display:none;">Contraseña incorrecta</div>
         </div>
     </div>
@@ -1193,58 +1200,15 @@
             <nav class="sidebar-section">
                 <ul class="sidebar-nav">
                     <li class="nav-item"><a class="nav-link active" data-section="painel-geral">Painel Geral</a></li>
-                    <li class="nav-item"><a class="nav-link" data-section="desempenho-sku">Desempenho SKU</a></li>
-                    <li class="nav-item"><a class="nav-link" data-section="inteligencia-estoque">Inteligência de Estoque</a></li>
+                    <li class="nav-item"><a class="nav-link" data-section="performance-sku">Performance SKU</a></li>
+                    <li class="nav-item"><a class="nav-link" data-section="status-importacoes">Status Importações</a></li>
                     <li class="nav-item"><a class="nav-link" data-section="reposicao">Reposição</a></li>
-                    <li class="nav-item"><a class="nav-link" data-section="stock-ideal">Stock Ideal</a></li>
-                    <li class="nav-item"><a class="nav-link" data-section="importacoes">Importações Ativas</a></li>
-                    <li class="nav-item"><a class="nav-link" data-section="produtos-matar">Produtos a Matar</a></li>
-                    <li class="nav-item"><a class="nav-link" data-section="estoque-lojas">Estoque Lojas</a></li>
-                    <li class="nav-item"><a class="nav-link" data-section="informe-loja">Informe por Loja</a></li>
-                    <li class="nav-item"><a class="nav-link" data-section="ideias">Ideias & Sugestões</a></li>
-                    <li class="nav-item" style="margin-top:16px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.1);">
-                        <a class="nav-link" data-section="fornecedores">Fornecedores</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link" data-section="lojas">Lojas</a></li>
+                    <li class="nav-item" style="margin-top:16px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.1);"><a class="nav-link" data-section="fornecedores">Importaciones China</a></li>
                 </ul>
             </nav>
 
-            <div class="sidebar-filters">
-                <div class="sidebar-section">
-                    <p class="sidebar-section-title">Filtros</p>
 
-                    <label class="filter-label">Classe</label>
-                    <select id="filterClasse">
-                        <option value="">Todas as Classes</option>
-                        <option value="Óculos de Grau">Óculos de Grau</option>
-                        <option value="Óculos de Sol">Óculos de Sol</option>
-                    </select>
-
-                    <label class="filter-label">Gênero</label>
-                    <select id="filterGenero">
-                        <option value="">Todos os Gêneros</option>
-                    </select>
-
-                    <label class="filter-label">Formato</label>
-                    <select id="filterFormato">
-                        <option value="">Todos os Formatos</option>
-                    </select>
-
-                    <label class="filter-label">Família</label>
-                    <select id="filterFamilia">
-                        <option value="">Todas as Famílias</option>
-                    </select>
-                </div>
-            </div>
-
-            <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);">
-                <p class="sidebar-section-title">Dados Compartilhados</p>
-                <button onclick="exportSharedData()" style="width:100%;padding:10px 14px;background:rgba(59,130,246,0.2);color:#93c5fd;border:1px solid rgba(59,130,246,0.3);border-radius:6px;cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;font-weight:500;transition:all 0.2s;">
-                    &#8681; Exportar data.json
-                </button>
-                <p style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:6px;line-height:1.4;">
-                    Exporte os dados atuais e substitua o arquivo <code style="background:rgba(255,255,255,0.1);padding:1px 4px;border-radius:3px;">data.json</code> na pasta command-center. Depois faça redeploy.
-                </p>
-            </div>
         </aside>
 
         <!-- Main Content -->
@@ -1454,159 +1418,230 @@
                         </div>
                     </div>
                 </div>
+
+                <div style="margin-top: 32px; padding-top: 20px; border-top: 2px solid var(--border-color);">
+                    <h3 class="section-title" style="margin-top: 0;">Ideias & Sugestões</h3>
+
+                    <div class="insights-grid">
+                        <div class="insight-card" style="border-left-color: #8b5cf6;">
+                            <div class="insight-title">Conversão Grau ↔ Sol (Mesma Família)</div>
+                            <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">
+                                Famílias onde uma versão (Grau ou Sol) tem estoque alto e venda baixa, mas a outra versão vende bem. Converter armações entre versões para desbloquear vendas.
+                            </div>
+                            <div class="insight-list" id="insightConversao">
+                                <div class="insight-item">Analisando...</div>
+                            </div>
+                        </div>
+
+                        <div class="insight-card" style="border-left-color: #ec4899;">
+                            <div class="insight-title">Novas Lentes de Cor (Rotação de Stock)</div>
+                            <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">
+                                SKUs com estoque alto e venda estagnada podem ganhar nova vida com lentes de cores diferentes. Ideal para armações bonitas que não estão girando.
+                            </div>
+                            <div class="insight-list" id="insightNovasLentes">
+                                <div class="insight-item">Analisando...</div>
+                            </div>
+                        </div>
+
+                        <div class="insight-card" style="border-left-color: #14b8a6; grid-column: span 2;">
+                            <div class="insight-title">Análise por Família — Portfólio Ideal (3-4 modelos por família)</div>
+                            <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">
+                                O ideal é manter 3-4 modelos ativos por família. Famílias com mais de 4 devem considerar descontinuar os piores. Famílias com menos de 3 e boa performance podem expandir.
+                            </div>
+                            <div class="insight-list" id="insightFamilyPortfolio" style="max-height: 400px; overflow-y: auto;"></div>
+                        </div>
+
+                        <div class="insight-card">
+                            <div class="insight-title">Análise Dead Stock</div>
+                            <div class="insight-list" id="insightDeadStock">
+                                <div class="insight-item">Analisando...</div>
+                            </div>
+                        </div>
+
+                        <div class="insight-card">
+                            <div class="insight-title">Índice de Rotação por Família</div>
+                            <div class="insight-list" id="insightRotation">
+                                <div class="insight-item">Analisando...</div>
+                            </div>
+                        </div>
+
+                        <div class="insight-card">
+                            <div class="insight-title">Padrões Sazonais</div>
+                            <div class="insight-list" id="insightSeasonal">
+                                <div class="insight-item">Analisando...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="section-title" style="margin-top: 32px;">Health Score (Saúde do Produto)</h3>
+
+                    <div class="health-score-box">
+                        <div class="health-score-title">Como funciona o Health Score</div>
+                        <div class="health-score-formula">
+                            <strong>Score (0-100):</strong> Combinação de três fatores:<br><br>
+                            <strong>1) Velocidade de Venda (40%):</strong> Venda média mensal do SKU comparada com a maior venda média (normalizada).<br><br>
+                            <strong>2) Tendência (30%):</strong> Comparação vendas últimos 6 meses vs. 6 meses anteriores. Crescimento = pontuação alta, declínio = baixa.<br><br>
+                            <strong>3) Adequação de Cobertura (30%):</strong> Penalização se cobertura &lt;4 meses ou &gt;12 meses. Ideal: 6-8 meses. <span class="score-bar"></span>
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">Top 10 Produtos com Melhor Health Score</h3>
+                    <div class="table-container">
+                        <table id="healthScoreTopTable">
+                            <thead>
+                                <tr>
+                                    <th>Posição</th>
+                                    <th data-sort="sku">SKU</th>
+                                    <th data-sort="nome_produto">Produto</th>
+                                    <th>Classe</th>
+                                    <th data-sort="healthScore">Health Score</th>
+                                    <th>Velocidade</th>
+                                    <th>Tendência</th>
+                                    <th>Cobertura</th>
+                                </tr>
+                            </thead>
+                            <tbody id="healthScoreTopBody">
+                                <tr><td colspan="8" class="empty-state">Carregando dados...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 class="section-title">Bottom 10 Produtos com Pior Health Score</h3>
+                    <div class="table-container">
+                        <table id="healthScoreBottomTable">
+                            <thead>
+                                <tr>
+                                    <th>Posição</th>
+                                    <th data-sort="sku">SKU</th>
+                                    <th data-sort="nome_produto">Produto</th>
+                                    <th>Classe</th>
+                                    <th data-sort="healthScore">Health Score</th>
+                                    <th>Velocidade</th>
+                                    <th>Tendência</th>
+                                    <th>Cobertura</th>
+                                </tr>
+                            </thead>
+                            <tbody id="healthScoreBottomBody">
+                                <tr><td colspan="8" class="empty-state">Carregando dados...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </section>
 
-            <!-- Desempenho SKU Section -->
-            <section class="section" id="desempenho-sku">
-                <h2 class="section-title">Desempenho SKU</h2>
 
-                <div class="legend-card">
-                    <div class="legend-title">Legenda de Classificação ABC</div>
-                    <div class="legend-explanation">
-                        A classificação é baseada no <strong>share acumulado de receita (venda média mensal)</strong>. Os SKUs são ordenados do maior ao menor por venda média mensal, e o share de cada um é somado progressivamente. A venda média é calculada apenas a partir do primeiro mês com venda, para não penalizar produtos novos (ex: um SKU que chegou há 2 meses e esgotou é avaliado pela média desses 2 meses, não por 12).
-                    </div>
-                    <div class="legend-grid">
-                        <div class="legend-item">
-                            <div class="legend-badge legend-badge-a">A</div>
-                            <div class="legend-description">0-25% do share acumulado — poucos SKUs, alta concentração de receita. Proteger e repor sempre</div>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-badge legend-badge-b">B</div>
-                            <div class="legend-description">25-50% do share acumulado — bom desempenho, manter estoque ativo</div>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-badge legend-badge-c">C</div>
-                            <div class="legend-description">50-75% do share acumulado — baixo desempenho, revisar. Se tem estoque, manter mas não repor</div>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-badge legend-badge-d">D</div>
-                            <div class="legend-description">75-100% do share acumulado — cauda longa, candidatos a liquidação ou descontinuação</div>
-                        </div>
-                    </div>
+            <!-- Performance SKU Section -->
+            <section class="section" id="performance-sku">
+                <h2 class="section-title">Performance SKU</h2>
+                <div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">
+                    Todos os SKUs ordenados por share de venda média/mês (maior a menor). Vista única com stock matriz, lojas, importações e cobertura.
                 </div>
-
-                <!-- Leyenda de campos -->
-                <div class="filter-controls" style="margin-bottom: 16px;">
-                    <div class="filter-controls-title">Legenda dos Campos</div>
-                    <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
-                        <strong>Venda Média Mensal:</strong> Total vendido dividido pelo número de meses desde a primeira venda (não penaliza produtos novos). &nbsp;
-                        <strong>Meses Ativos:</strong> Quantos meses desde a primeira venda do SKU. &nbsp;
-                        <strong>Cobertura:</strong> Estoque atual / venda média mensal = quantos meses de estoque restam. &nbsp;
-                        <strong>Tendência:</strong> Comparação vendas últimos 6 meses vs 6 meses anteriores. Positiva = crescendo, negativa = caindo. &nbsp;
-                        <strong>Status:</strong> 🔴 Crítico (&lt;2M) | 🟠 Repor (2-4M) | 🟡 Vigiar (4-6M) | 🟢 OK (6-12M) | 🔵 Excesso (&gt;12M)
-                    </div>
-                </div>
-
-                <!-- Buscador de SKU -->
+                
                 <div style="margin-bottom: 12px;">
-                    <input type="text" id="skuSearchInput" placeholder="Buscar por SKU, produto ou família..."
+                    <input type="text" id="perfSearchInput" placeholder="Buscar por SKU, produto ou família..."
                         style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; font-family: inherit; outline: none;"
-                        oninput="filterDesempenhoTable()">
+                        oninput="filterPerformanceTable()">
                 </div>
-
+                
                 <div class="table-container" style="max-height: 700px; overflow-y: auto;">
-                    <table id="desempenhoTable">
+                    <table id="performanceTable">
                         <thead style="position: sticky; top: 0; z-index: 10; background: #f9fafb;">
                             <tr>
+                                <th>#</th>
                                 <th data-sort="sku">SKU</th>
                                 <th data-sort="nome_produto">Produto</th>
-                                <th data-sort="descricao_classe">Classe</th>
                                 <th data-sort="familia">Família</th>
+                                <th data-sort="descricao_classe">Classe</th>
                                 <th data-sort="curva">Curva</th>
-                                <th data-sort="vendaMedia">Venda Média Mensal</th>
-                                <th data-sort="mesesAtivos">Meses Ativos</th>
-                                <th data-sort="estoque_total">Estoque Matriz</th>
+                                <th data-sort="vendaMedia">Venda/Mês</th>
+                                <th>Share</th>
+                                <th>Acum.</th>
+                                <th data-sort="estoqueMatriz">Est. Matriz</th>
+                                <th>Est. Lojas</th>
                                 <th>Import.</th>
-                                <th data-sort="cobertura">Cobertura (Meses)</th>
-                                <th>Tendência</th>
+                                <th data-sort="coberturaMeses">Cob. Atual</th>
+                                <th>Cob. c/Imp</th>
+                                <th>Min. Ideal</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody id="desempenhoTableBody">
-                            <tr><td colspan="12" class="empty-state">Carregando dados...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <h3 class="section-title" style="margin-top: 32px;">Top 20 Mais Vendidos</h3>
-                <div class="table-container">
-                    <table id="topSellersTable">
-                        <thead>
-                            <tr>
-                                <th>Posição</th>
-                                <th>SKU</th>
-                                <th>Produto</th>
-                                <th>Classe</th>
-                                <th>Família</th>
-                                <th>Curva</th>
-                                <th>Venda Média Mensal</th>
-                                <th>Vendas Últimos 3M</th>
-                                <th>Estoque</th>
-                            </tr>
-                        </thead>
-                        <tbody id="topSellersBody">
-                            <tr><td colspan="9" class="empty-state">Carregando dados...</td></tr>
+                        <tbody id="performanceBody">
+                            <tr><td colspan="16" class="empty-state">Carregando dados...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- Inteligência de Estoque Section -->
-            <section class="section" id="inteligencia-estoque">
-                <h2 class="section-title">Inteligência de Estoque</h2>
-
-                <div class="kpi-grid">
+            <!-- Status Importações Section -->
+            <section class="section" id="status-importacoes">
+                <h2 class="section-title">Status Importações</h2>
+                <div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">
+                    Avaliação das importações ativas e oportunidades perdidas. O que importamos bem, o que importamos mal, e o que deveríamos importar.
+                </div>
+                
+                <div class="kpi-grid" style="margin-bottom:24px;">
                     <div class="kpi-card">
-                        <div class="kpi-label">Total SKUs com Estoque</div>
-                        <div class="kpi-value" id="siTotalSKUsWithStock">0</div>
+                        <div class="kpi-label">Importações Ativas</div>
+                        <div class="kpi-value" id="impTotalCount2">0</div>
+                        <div class="kpi-subtitle">SKUs com import. pendente</div>
                     </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Estoque Total</div>
-                        <div class="kpi-value" id="siTotalStockUnits">0</div>
-                        <div class="kpi-subtitle">unidades</div>
+                    <div class="kpi-card" style="border-left:3px solid #10b981;">
+                        <div class="kpi-label">Bem Feitas</div>
+                        <div class="kpi-value" id="impBemFeitas2" style="color:#10b981;">0</div>
+                        <div class="kpi-subtitle" style="color:#10b981;">Curva A/B, cobertura &lt;6M</div>
                     </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Dead Stock SKUs</div>
-                        <div class="kpi-value" id="siDeadStockSKUs">0</div>
+                    <div class="kpi-card" style="border-left:3px solid #ef4444;">
+                        <div class="kpi-label">Questionáveis</div>
+                        <div class="kpi-value" id="impQuestionaveis2" style="color:#ef4444;">0</div>
+                        <div class="kpi-subtitle" style="color:#ef4444;">Curva D ou cobertura alta</div>
                     </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">SKUs Cobertura &lt;4M</div>
-                        <div class="kpi-value" id="siLowCoverageSKUs">0</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">SKUs Excesso &gt;12M</div>
-                        <div class="kpi-value" id="siExcessCoverageSKUs">0</div>
+                    <div class="kpi-card" style="border-left:3px solid #8b5cf6;">
+                        <div class="kpi-label">Oportunidades Perdidas</div>
+                        <div class="kpi-value" id="impOportunidades2" style="color:#8b5cf6;">0</div>
+                        <div class="kpi-subtitle" style="color:#8b5cf6;">A/B sem import., cob. &lt;4M</div>
                     </div>
                 </div>
-
-                <div class="table-container" style="max-height: 700px; overflow-y: auto;">
-                    <table id="stockIntelligenceTable">
-                        <thead style="position: sticky; top: 0; z-index: 10; background: #f9fafb;">
-                            <tr>
-                                <th data-sort="sku">SKU</th>
-                                <th data-sort="nome_produto">Produto</th>
-                                <th data-sort="descricao_classe">Classe</th>
-                                <th data-sort="curva">Curva</th>
-                                <th data-sort="estoque_total">Estoque Matriz</th>
-                                <th>Import.</th>
-                                <th data-sort="vendaMedia">Venda Média Mensal</th>
-                                <th data-sort="cobertura">Cobertura (Meses)</th>
-                                <th>Estado</th>
-                                <th>Tendência</th>
-                            </tr>
-                        </thead>
-                        <tbody id="stockIntelligenceBody">
-                            <tr><td colspan="10" class="empty-state">Carregando dados...</td></tr>
-                        </tbody>
-                    </table>
+                
+                <!-- Bem Feitas -->
+                <div style="margin-bottom:20px;">
+                    <h3 class="section-title" style="color:#10b981;">Importações Bem Feitas</h3>
+                    <div class="table-container" style="max-height:400px;overflow-y:auto;">
+                        <table><thead style="position:sticky;top:0;z-index:10;background:#f9fafb;"><tr>
+                            <th>SKU</th><th>Produto</th><th>Curva</th><th>Qtd Import.</th><th>Venda/Mês</th><th>Cob. Atual</th><th>Cob. c/Imp</th>
+                        </tr></thead><tbody id="imp2BemFeitasBody"></tbody></table>
+                    </div>
                 </div>
-
-                <div class="action-summary">
-                    <div class="action-summary-title">Resumo de Ação</div>
-                    <div class="action-summary-list">
-                        <div class="action-summary-item">SKUs A+B com cobertura &lt;4 meses (reorder urgente): <strong id="siUrgentReorder">0</strong></div>
-                        <div class="action-summary-item">SKUs com excesso de estoque (&gt;12 meses): <strong id="siExcessStock">0</strong></div>
-                        <div class="action-summary-item">Dead stock (sem vendas últimos 3 meses): <strong id="siDeadStockCount">0</strong></div>
+                
+                <!-- Questionáveis -->
+                <div style="margin-bottom:20px;">
+                    <h3 class="section-title" style="color:#ef4444;">Importações Questionáveis</h3>
+                    <div class="alert-box danger">SKUs com importação ativa mas são Curva D ou já possuem cobertura alta (&gt;8 meses). Avaliar cancelamento.</div>
+                    <div class="table-container" style="max-height:400px;overflow-y:auto;">
+                        <table><thead style="position:sticky;top:0;z-index:10;background:#f9fafb;"><tr>
+                            <th>Problema</th><th>SKU</th><th>Produto</th><th>Curva</th><th>Qtd Import.</th><th>Cob. Atual</th><th>Cob. c/Imp</th>
+                        </tr></thead><tbody id="imp2QuestionaveisBody"></tbody></table>
+                    </div>
+                </div>
+                
+                <!-- Oportunidades Perdidas -->
+                <div style="margin-bottom:20px;">
+                    <h3 class="section-title" style="color:#8b5cf6;">Oportunidades Perdidas — A/B sem Importação</h3>
+                    <div class="alert-box">SKUs Curva A e B com cobertura &lt;4 meses e SEM importação ativa. Risco de ruptura.</div>
+                    <div class="table-container" style="max-height:400px;overflow-y:auto;">
+                        <table><thead style="position:sticky;top:0;z-index:10;background:#f9fafb;"><tr>
+                            <th>Urgência</th><th>SKU</th><th>Produto</th><th>Curva</th><th>Venda/Mês</th><th>Cob. Atual</th>
+                        </tr></thead><tbody id="imp2OportunidadesBody"></tbody></table>
+                    </div>
+                </div>
+                
+                <!-- Vigilar -->
+                <div>
+                    <h3 class="section-title" style="color:#f59e0b;">Vigilar para Próxima Reposição</h3>
+                    <div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px;">SKUs OK hoje mas que podem precisar reposição no próximo ciclo (1-2 meses).</div>
+                    <div class="table-container" style="max-height:400px;overflow-y:auto;">
+                        <table><thead style="position:sticky;top:0;z-index:10;background:#f9fafb;"><tr>
+                            <th>SKU</th><th>Produto</th><th>Curva</th><th>Venda/Mês</th><th>Cob. Atual</th><th>Cob. c/Imp</th><th>Nota</th>
+                        </tr></thead><tbody id="imp2VigilarBody"></tbody></table>
                     </div>
                 </div>
             </section>
@@ -1614,43 +1649,89 @@
             <!-- Reposição Section -->
             <section class="section" id="reposicao">
                 <h2 class="section-title">Reposição</h2>
-
-                <div class="alert-box">
-                    SKUs Curva A, B e C são considerados para reposição. Lead time China: 4 meses. Cobertura alvo: 8 meses. Quantidade sugerida = (8 - cobertura atual) × venda média mensal.
-                </div>
-
-                <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-label">Portfólio Ativo</div>
-                        <div class="kpi-value" id="repPortfolioActive">0</div>
-                        <div class="kpi-subtitle">A+B+C SKUs</div>
+                
+                <!-- Rules banner -->
+                <div style="background:var(--dark-sidebar);border-radius:10px;padding:20px;color:white;margin-bottom:20px;">
+                    <div style="font-size:15px;font-weight:700;margin-bottom:12px;">Regras de Reposição</div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;font-size:12px;">
+                        <div>
+                            <div style="color:#93c5fd;font-weight:600;margin-bottom:4px;">Presupuesto Mensal</div>
+                            <div style="font-size:20px;font-weight:700;">900 peças/mês</div>
+                            <div style="color:rgba(255,255,255,0.5);">Distribuídas entre famílias</div>
+                        </div>
+                        <div>
+                            <div style="color:#93c5fd;font-weight:600;margin-bottom:4px;">MOQ por Família</div>
+                            <div style="font-size:20px;font-weight:700;">300 peças</div>
+                            <div style="color:rgba(255,255,255,0.5);">Pode ser dividido por cor + classe</div>
+                        </div>
+                        <div>
+                            <div style="color:#93c5fd;font-weight:600;margin-bottom:4px;">Lead Time China</div>
+                            <div style="font-size:20px;font-weight:700;">4 meses</div>
+                            <div style="color:rgba(255,255,255,0.5);">Meta cobertura: 8 meses</div>
+                        </div>
                     </div>
+                </div>
+                
+                <!-- Conversions -->
+                <div style="margin-bottom:20px;">
+                    <h3 class="section-title" style="color:#8b5cf6;">Conversões Sugeridas (antes de importar)</h3>
+                    <div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px;">SKUs onde há excesso numa versão (Sol/Grau) mas falta na outra. Converter evita importar e libera stock parado.</div>
+                    <div class="table-container" style="max-height:400px;overflow-y:auto;">
+                        <table id="conversionTable">
+                            <thead style="position:sticky;top:0;z-index:10;background:#f9fafb;">
+                                <tr>
+                                    <th>Família</th><th>SKU Origem (excesso)</th><th>Classe</th><th>Stock Exc.</th>
+                                    <th style="text-align:center;">→</th>
+                                    <th>SKU Destino (falta)</th><th>Classe</th><th>Qtd Sugerida</th><th>Impacto</th>
+                                </tr>
+                            </thead>
+                            <tbody id="conversionBody">
+                                <tr><td colspan="9" class="empty-state">Analisando conversões...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="conversionSummary" style="margin-top:12px;background:#f0fdf4;border-radius:6px;padding:12px;font-size:12px;color:#166534;display:none;"></div>
+                </div>
+                
+                <!-- Purchase Suggestion -->
+                <div style="margin-bottom:20px;">
+                    <h3 class="section-title" style="color:#3b82f6;">Sugestão de Compra — 900 peças</h3>
+                    <div style="font-size:11px;color:var(--text-secondary);margin-bottom:12px;">Distribuição sugerida por família considerando cobertura atual, tendência de venda e MOQ de 300 por família. Máximo 3 famílias por mês.</div>
+                    <div id="purchaseFamilyCards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
+                        <div class="empty-state" style="grid-column:span 3;">Calculando sugestão...</div>
+                    </div>
+                    
+                    <!-- Summary bar -->
+                    <div id="purchaseSummary" style="background:var(--dark-sidebar);border-radius:8px;padding:16px;display:none;grid-template-columns:repeat(4,1fr);gap:16px;color:white;">
+                    </div>
+                </div>
+                
+                <!-- Full reposition table -->
+                <h3 class="section-title">Todos os SKUs que Precisam Reposição</h3>
+                <div class="alert-box">SKUs Curva A, B e C com cobertura abaixo de 8 meses. Lead time China: 4 meses.</div>
+                <div class="kpi-grid" style="margin-bottom:16px;">
                     <div class="kpi-card">
+                        <div class="kpi-label">Portfólio A+B+C</div>
+                        <div class="kpi-value" id="repPortfolioActive">0</div>
+                    </div>
+                    <div class="kpi-card" style="border-left:3px solid #ef4444;">
                         <div class="kpi-label">SKUs Críticos</div>
-                        <div class="kpi-value" id="repCriticalCount">0</div>
+                        <div class="kpi-value" id="repCriticalCount" style="color:#ef4444;">0</div>
                         <div class="kpi-subtitle">&lt;2 meses</div>
                     </div>
-                    <div class="kpi-card">
+                    <div class="kpi-card" style="border-left:3px solid #f59e0b;">
                         <div class="kpi-label">SKUs Alerta</div>
-                        <div class="kpi-value" id="repAlertCount">0</div>
+                        <div class="kpi-value" id="repAlertCount" style="color:#f59e0b;">0</div>
                         <div class="kpi-subtitle">2-4 meses</div>
                     </div>
                 </div>
-
-                <div class="table-container">
+                <div class="table-container" style="max-height:500px;overflow-y:auto;">
                     <table id="reposicaoTable">
-                        <thead>
+                        <thead style="position:sticky;top:0;z-index:10;background:#f9fafb;">
                             <tr>
-                                <th>Estado</th>
-                                <th>Curva</th>
-                                <th data-sort="sku">SKU</th>
-                                <th data-sort="nome_produto">Produto</th>
-                                <th>Classe</th>
-                                <th data-sort="estoque_total">Estoque Matriz</th>
-                                <th>Import.</th>
-                                <th data-sort="vendaMedia">Venda Mensal</th>
-                                <th data-sort="cobertura">Cobertura (Meses)</th>
-                                <th>Qtd Sugerida</th>
+                                <th>Estado</th><th>Curva</th><th data-sort="sku">SKU</th><th data-sort="nome_produto">Produto</th>
+                                <th>Classe</th><th data-sort="estoqueMatriz">Estoque Matriz</th><th>Import.</th>
+                                <th data-sort="vendaMedia">Venda Mensal</th><th data-sort="coberturaMeses">Cobertura</th><th>Qtd Sugerida</th>
                             </tr>
                         </thead>
                         <tbody id="reposicaoBody">
@@ -1660,533 +1741,92 @@
                 </div>
             </section>
 
-            <!-- Stock Ideal Section -->
-            <section class="section" id="stock-ideal">
-                <h2 class="section-title">Stock Ideal — Mínimos por Tienda</h2>
-
-                <div class="alert-box">
-                    Stock mínimo ideal por tienda: Curva A = 2 piezas, Curva B/C/D (con stock) = 1 pieza. Solo se consideran SKUs que actualmente tienen stock en matriz. Usa este reporte para distribuir producto a tiendas.
+            <!-- Lojas Section -->
+            <section class="section" id="lojas">
+                <h2 class="section-title">Lojas</h2>
+                <div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">
+                    Visão por loja: stock, faltantes e excessos. Download de ordens de reposição para ERP.
                 </div>
-
-                <div class="kpi-grid">
+                
+                <div class="kpi-grid" style="margin-bottom:20px;">
                     <div class="kpi-card">
-                        <div class="kpi-label">SKUs para Distribuir</div>
-                        <div class="kpi-value" id="siTotalSKUs">0</div>
-                        <div class="kpi-subtitle">Con stock en matriz</div>
+                        <div class="kpi-label">Total Lojas</div>
+                        <div class="kpi-value" id="lojTotalStores">0</div>
+                        <div class="kpi-subtitle" id="lojPrioridade"></div>
                     </div>
-                    <div class="kpi-card" style="border-left: 4px solid var(--color-a);">
-                        <div class="kpi-label">Curva A</div>
-                        <div class="kpi-value" id="siCurvaA">0</div>
-                        <div class="kpi-subtitle" id="siCurvaAPcs">0 piezas (2/SKU)</div>
-                    </div>
-                    <div class="kpi-card" style="border-left: 4px solid var(--color-b);">
-                        <div class="kpi-label">Curva B</div>
-                        <div class="kpi-value" id="siCurvaB">0</div>
-                        <div class="kpi-subtitle" id="siCurvaBPcs">0 piezas (1/SKU)</div>
-                    </div>
-                    <div class="kpi-card" style="border-left: 4px solid var(--color-c);">
-                        <div class="kpi-label">Curva C</div>
-                        <div class="kpi-value" id="siCurvaC">0</div>
-                        <div class="kpi-subtitle" id="siCurvaCPcs">0 piezas (1/SKU)</div>
-                    </div>
-                    <div class="kpi-card" style="border-left: 4px solid var(--color-d);">
-                        <div class="kpi-label">Curva D</div>
-                        <div class="kpi-value" id="siCurvaD">0</div>
-                        <div class="kpi-subtitle" id="siCurvaDPcs">0 piezas (1/SKU)</div>
-                    </div>
-                    <div class="kpi-card" style="background: linear-gradient(135deg, #1a1a2e 0%, #2d2d5e 100%); color: white;">
-                        <div class="kpi-label" style="color: rgba(255,255,255,0.7);">Total Piezas</div>
-                        <div class="kpi-value" id="siTotalPcs" style="color: white;">0</div>
-                        <div class="kpi-subtitle" id="siTotalSKUsSub" style="color: rgba(255,255,255,0.6);">0 SKUs</div>
-                    </div>
-                </div>
-
-                <div style="margin: 16px 0; display: flex; gap: 12px; align-items: center;">
-                    <button onclick="downloadStockIdealExcel()" style="padding:10px 20px;background:var(--accent-green);color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;font-weight:600;display:flex;align-items:center;gap:6px;">
-                        &#8681; Descargar Excel — Stock Ideal
-                    </button>
-                    <span id="siExcelInfo" style="font-size:12px;color:var(--text-secondary);"></span>
-                </div>
-
-                <div class="table-container">
-                    <table id="stockIdealTable">
-                        <thead>
-                            <tr>
-                                <th>Curva</th>
-                                <th data-sort="sku">SKU</th>
-                                <th>Produto</th>
-                                <th>Classe</th>
-                                <th>Estoque Matriz</th>
-                                <th>Venda Mensal</th>
-                                <th>Mínimo/Tienda</th>
-                                <th>Cobertura (Meses)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="stockIdealBody">
-                            <tr><td colspan="8" class="empty-state">Carregando dados...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Importações Ativas Section -->
-            <section class="section" id="importacoes">
-                <h2 class="section-title">Importações Ativas — Análise</h2>
-
-                <div class="filter-controls" style="margin-bottom: 16px;">
-                    <div class="filter-controls-title">Como ler esta análise</div>
-                    <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.8;">
-                        Esta seção avalia se as importações em andamento estão bem direcionadas. Uma importação é <strong style="color:#10b981">BEM FEITA</strong> se o SKU é Curva A ou B e precisa de reposição (cobertura &lt;6 meses).
-                        É <strong style="color:#f59e0b">ACEITÁVEL</strong> se é Curva C com cobertura baixa.
-                        É <strong style="color:#ef4444">QUESTIONÁVEL</strong> se o SKU é Curva D, ou se já tem cobertura &gt;8 meses sem necessidade de reposição.
-                        SKUs Curva A ou B <strong>SEM</strong> importação ativa e com cobertura &lt;4 meses representam <strong>OPORTUNIDADES PERDIDAS</strong>.
-                    </div>
-                </div>
-
-                <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-label">Total Importações Ativas</div>
-                        <div class="kpi-value" id="impTotalCount">0</div>
-                        <div class="kpi-subtitle">SKUs com import. pendente</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Unidades em Trânsito</div>
-                        <div class="kpi-value" id="impTotalUnits">0</div>
-                    </div>
-                    <div class="kpi-card" style="border-left: 4px solid #10b981;">
-                        <div class="kpi-label">Importações Bem Feitas</div>
-                        <div class="kpi-value" id="impBemFeitas">0</div>
-                        <div class="kpi-subtitle" style="color: #10b981;">Curva A/B, cobertura &lt;6M</div>
-                    </div>
-                    <div class="kpi-card" style="border-left: 4px solid #f59e0b;">
-                        <div class="kpi-label">Importações Aceitáveis</div>
-                        <div class="kpi-value" id="impAceitaveis">0</div>
-                        <div class="kpi-subtitle" style="color: #f59e0b;">Curva C, cobertura baixa</div>
-                    </div>
-                    <div class="kpi-card" style="border-left: 4px solid #ef4444;">
-                        <div class="kpi-label">Importações Questionáveis</div>
-                        <div class="kpi-value" id="impQuestionaveis">0</div>
-                        <div class="kpi-subtitle" style="color: #ef4444;">Curva D ou cobertura alta</div>
-                    </div>
-                    <div class="kpi-card" style="border-left: 4px solid #8b5cf6;">
-                        <div class="kpi-label">Oportunidades Perdidas</div>
-                        <div class="kpi-value" id="impOportunidades">0</div>
-                        <div class="kpi-subtitle" style="color: #8b5cf6;">A/B sem import., cob. &lt;4M</div>
-                    </div>
-                </div>
-
-                <!-- Importacoes Bem Feitas -->
-                <h3 class="section-title" style="margin-top: 24px; color: #10b981;">Importações Bem Feitas</h3>
-                <div class="table-container" style="max-height: 500px; overflow-y: auto;">
-                    <table>
-                        <thead style="position: sticky; top: 0; z-index: 10; background: #f9fafb;">
-                            <tr>
-                                <th>Avaliação</th>
-                                <th>SKU</th>
-                                <th>Produto</th>
-                                <th>Classe</th>
-                                <th>Curva</th>
-                                <th>Estoque Matriz</th>
-                                <th>Import. Pendente</th>
-                                <th>Venda Média</th>
-                                <th>Cobertura Atual</th>
-                                <th>Cobertura c/ Import.</th>
-                            </tr>
-                        </thead>
-                        <tbody id="impBemFeitasBody"></tbody>
-                    </table>
-                </div>
-
-                <!-- Importacoes Questionáveis -->
-                <h3 class="section-title" style="margin-top: 24px; color: #ef4444;">Importações Questionáveis</h3>
-                <div class="alert-box danger">
-                    Estes SKUs têm importação ativa mas são Curva D (candidatos a descontinuar) ou já possuem cobertura alta (&gt;8 meses). Avaliar se é possível cancelar ou redirecionar essas importações.
-                </div>
-                <div class="table-container" style="max-height: 500px; overflow-y: auto;">
-                    <table>
-                        <thead style="position: sticky; top: 0; z-index: 10; background: #f9fafb;">
-                            <tr>
-                                <th>Problema</th>
-                                <th>SKU</th>
-                                <th>Produto</th>
-                                <th>Classe</th>
-                                <th>Curva</th>
-                                <th>Estoque Matriz</th>
-                                <th>Import. Pendente</th>
-                                <th>Venda Média</th>
-                                <th>Cobertura Atual</th>
-                                <th>Cobertura c/ Import.</th>
-                            </tr>
-                        </thead>
-                        <tbody id="impQuestionaveisBody"></tbody>
-                    </table>
-                </div>
-
-                <!-- Oportunidades Perdidas -->
-                <h3 class="section-title" style="margin-top: 24px; color: #8b5cf6;">Oportunidades Perdidas — A/B sem Importação</h3>
-                <div class="alert-box">
-                    SKUs Curva A e B com cobertura menor que 4 meses e SEM importação ativa. Estes produtos podem entrar em ruptura antes da próxima importação.
-                </div>
-                <div class="table-container" style="max-height: 500px; overflow-y: auto;">
-                    <table>
-                        <thead style="position: sticky; top: 0; z-index: 10; background: #f9fafb;">
-                            <tr>
-                                <th>Urgência</th>
-                                <th>SKU</th>
-                                <th>Produto</th>
-                                <th>Classe</th>
-                                <th>Curva</th>
-                                <th>Estoque Matriz</th>
-                                <th>Venda Média</th>
-                                <th>Cobertura Atual</th>
-                                <th>Meses até Ruptura</th>
-                            </tr>
-                        </thead>
-                        <tbody id="impOportunidadesBody"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Produtos a Matar Section -->
-            <section class="section" id="produtos-matar">
-                <h2 class="section-title">Produtos a Matar</h2>
-
-                <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-bottom:12px;">
-                    <span id="killExcelInfo" style="font-size:12px;color:var(--text-secondary);"></span>
-                    <button onclick="downloadProdutosMatarExcel()" style="padding:10px 20px;background:#217346;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;font-weight:600;display:flex;align-items:center;gap:6px;">
-                        &#8681; Baixar Excel — Produtos a Matar
-                    </button>
-                </div>
-
-                <div class="alert-box">
-                    Produtos Curva C e D com estoque. Candidatos para liquidação e liberação de espaço.
-                </div>
-
-                <!-- KPIs -->
-                <div class="kpi-grid" style="margin-bottom:24px;">
-                    <div class="kpi-card">
-                        <div class="kpi-label">Total SKUs a Matar</div>
-                        <div class="kpi-value" id="kmTotalSKUs">0</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Unidades em Estoque</div>
-                        <div class="kpi-value" id="kmTotalUnidades">0</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Famílias Afetadas</div>
-                        <div class="kpi-value" id="kmTotalFamilias">0</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Média Meses sem Venda</div>
-                        <div class="kpi-value" id="kmMediaMesesSemVenda">0</div>
-                    </div>
-                </div>
-
-                <!-- Charts row -->
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
-                    <div class="card" style="padding:20px;">
-                        <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">SKUs por Família</h3>
-                        <canvas id="kmChartFamiliaSKUs" height="280"></canvas>
-                    </div>
-                    <div class="card" style="padding:20px;">
-                        <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Unidades por Família</h3>
-                        <canvas id="kmChartFamiliaUnidades" height="280"></canvas>
-                    </div>
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
-                    <div class="card" style="padding:20px;">
-                        <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Distribuição por Curva</h3>
-                        <canvas id="kmChartCurva" height="250"></canvas>
-                    </div>
-                    <div class="card" style="padding:20px;">
-                        <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Distribuição por Classe (Sol vs Grau)</h3>
-                        <canvas id="kmChartClasse" height="250"></canvas>
-                    </div>
-                </div>
-
-                <!-- Top families table -->
-                <div class="card" style="padding:20px;margin-bottom:24px;">
-                    <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Resumo por Família</h3>
-                    <div class="table-container" style="max-height:300px;overflow-y:auto;">
-                        <table id="kmFamiliaTable">
-                            <thead style="position:sticky;top:0;z-index:2;">
-                                <tr>
-                                    <th>Família</th>
-                                    <th>SKUs</th>
-                                    <th>Unidades</th>
-                                    <th>% do Total</th>
-                                    <th>Média Meses sem Venda</th>
-                                    <th>Curvas</th>
-                                </tr>
-                            </thead>
-                            <tbody id="kmFamiliaBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="table-container" style="max-height:500px;overflow-y:auto;">
-                    <table id="killProductsTable">
-                        <thead>
-                            <tr>
-                                <th data-sort="sku">SKU</th>
-                                <th data-sort="nome_produto">Produto</th>
-                                <th data-sort="familia">Família</th>
-                                <th data-sort="descricao_classe">Classe</th>
-                                <th data-sort="curva">Curva</th>
-                                <th data-sort="estoque_total">Estoque</th>
-                                <th data-sort="vendaMedia">Venda Média Mensal</th>
-                                <th>Tendência</th>
-                                <th>Meses sem Venda</th>
-                            </tr>
-                        </thead>
-                        <tbody id="killProductsBody">
-                            <tr><td colspan="9" class="empty-state">Carregando dados...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Estoque Lojas Section -->
-            <section class="section" id="estoque-lojas">
-                <h2 class="section-title">Estoque Lojas</h2>
-
-                <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-label">Total Lojas Monitoradas</div>
-                        <div class="kpi-value" id="slTotalStores">0</div>
-                    </div>
-                    <div class="kpi-card">
+                    <div class="kpi-card" style="border-left:3px solid #ef4444;">
                         <div class="kpi-label">SKUs Abaixo do Mínimo</div>
-                        <div class="kpi-value" id="slStockoutInStores">0</div>
+                        <div class="kpi-value" id="lojFaltantes" style="color:#ef4444;">0</div>
                     </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Unidades Faltantes (Total)</div>
-                        <div class="kpi-value" id="slDistributionOpp">0</div>
+                    <div class="kpi-card" style="border-left:3px solid #ef4444;">
+                        <div class="kpi-label">Unidades Faltantes</div>
+                        <div class="kpi-value" id="lojFaltantesUn" style="color:#ef4444;">0</div>
+                    </div>
+                    <div class="kpi-card" style="border-left:3px solid #3b82f6;">
+                        <div class="kpi-label">Excessos em Lojas</div>
+                        <div class="kpi-value" id="lojExcessos" style="color:#3b82f6;">0</div>
                     </div>
                 </div>
-
-                <h3 class="section-title">Rupturas em Lojas (Abaixo do Mínimo)</h3>
-                <div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px;">Regra: Curva A = mín. 2 por loja | Demais curvas = mín. 1 por loja (somente se há estoque na matriz)</div>
-                <div class="table-container">
-                    <table id="storeStockoutTable">
-                        <thead>
-                            <tr>
-                                <th data-sort="sku">SKU</th>
-                                <th data-sort="nome_produto">Produto</th>
-                                <th data-sort="curva">Curva</th>
-                                <th data-sort="estoque_total">Estoque Matriz</th>
-                                <th>Lojas sem Estoque</th>
-                            </tr>
-                        </thead>
-                        <tbody id="storeStockoutBody">
-                            <tr><td colspan="5" class="empty-state">Carregando dados...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <h3 class="section-title">Distribuição por Loja</h3>
-                <div id="storeDistributionCards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
-                </div>
-
-                <h3 class="section-title">Sobreestoque em Lojas</h3>
-                <div class="table-container">
-                    <table id="storeOverstockTable">
-                        <thead>
-                            <tr>
-                                <th data-sort="sku">SKU</th>
-                                <th data-sort="nome_produto">Produto</th>
-                                <th>Loja</th>
-                                <th>Estoque Loja</th>
-                                <th>% do Total Matriz+Importação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="storeOverstockBody">
-                            <tr><td colspan="5" class="empty-state">Carregando dados...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Informe por Loja Section -->
-            <section class="section" id="informe-loja">
-                <h2 class="section-title">Informe por Loja — Excesos & Faltantes</h2>
-
-                <div class="alert-box">
-                    Selecciona una tienda para ver el detalle de cada SKU: stock actual vs mínimo ideal (Curva A = 2 piezas, B/C/D = 1 pieza). Puedes descargar el Excel para enviar directamente a la tienda con instrucciones de devolución o solicitud de producto.
-                </div>
-
-                <div style="margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-                    <label style="font-size:13px;font-weight:600;">Seleccionar Loja:</label>
-                    <select id="informeLojaSelect" onchange="renderInformeLoja()" style="padding:8px 14px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;min-width:200px;">
-                        <option value="">-- Seleccionar --</option>
-                    </select>
-                    <button onclick="downloadInformeLojaExcel()" id="btnInformeExcel" style="padding:10px 20px;background:var(--accent-green);color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;font-weight:600;display:none;align-items:center;gap:6px;">
-                        &#8681; Descargar Excel para esta Loja
+                
+                <!-- Excel buttons -->
+                <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap;">
+                    <button onclick="downloadOrdenesReposicion()" style="padding:10px 20px;background:#217346;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:'Poppins',sans-serif;font-weight:600;">
+                        &#8681; Descargar Ordens de Reposição (Excel)
                     </button>
+                    <button onclick="downloadFaltantesExcessosExcel()" style="padding:10px 20px;background:#0000E1;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:'Poppins',sans-serif;font-weight:600;">
+                        &#8681; Descargar Faltantes e Excessos por Loja (Excel)
+                    </button>
+                    <span style="font-size:11px;color:var(--text-secondary);">Ordens: formato REPOF2604211400M para ERP. Prioridade: Oscar Freire → Higienópolis → Pinheiros → Iguatemi → Cidade SP</span>
                 </div>
-
-                <div id="informeLojaKPIs" style="display:none;">
-                    <div class="kpi-grid">
+                
+                <!-- Store Cards -->
+                <div id="lojaCards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:20px;"></div>
+                
+                <!-- Alerts -->
+                <div id="lojaAlerts" style="margin-bottom:20px;"></div>
+                
+                <!-- Informe por Loja -->
+                <h3 class="section-title" style="margin-top:24px;">Detalhe por Loja</h3>
+                <div style="margin-bottom:16px;display:flex;gap:12px;align-items:center;">
+                    <label style="font-size:13px;font-weight:600;">Selecionar Loja:</label>
+                    <select id="lojaDetailSelect" onchange="renderLojaDetail()" style="padding:8px 14px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;font-family:'Poppins',sans-serif;min-width:200px;">
+                        <option value="">-- Selecionar --</option>
+                    </select>
+                </div>
+                <div id="lojaDetailKPIs" style="display:none;">
+                    <div class="kpi-grid" style="margin-bottom:16px;">
                         <div class="kpi-card">
-                            <div class="kpi-label">Total SKUs en Loja</div>
-                            <div class="kpi-value" id="ilTotalSKUs">0</div>
+                            <div class="kpi-label">Total SKUs na Loja</div>
+                            <div class="kpi-value" id="ldTotalSKUs">0</div>
                         </div>
                         <div class="kpi-card">
-                            <div class="kpi-label">Total Piezas</div>
-                            <div class="kpi-value" id="ilTotalPcs">0</div>
+                            <div class="kpi-label">Total Peças</div>
+                            <div class="kpi-value" id="ldTotalPcs">0</div>
                         </div>
-                        <div class="kpi-card" style="border-left: 4px solid var(--accent-green);">
+                        <div class="kpi-card" style="border-left:3px solid #10b981;">
                             <div class="kpi-label">SKUs OK</div>
-                            <div class="kpi-value" id="ilOKCount">0</div>
-                            <div class="kpi-subtitle" style="color:var(--accent-green);">Stock = mínimo ideal</div>
+                            <div class="kpi-value" id="ldOK" style="color:#10b981;">0</div>
                         </div>
-                        <div class="kpi-card" style="border-left: 4px solid var(--accent-red);">
+                        <div class="kpi-card" style="border-left:3px solid #ef4444;">
                             <div class="kpi-label">Faltantes</div>
-                            <div class="kpi-value" id="ilFaltantes">0</div>
-                            <div class="kpi-subtitle" style="color:var(--accent-red);">Necesitan reposición</div>
+                            <div class="kpi-value" id="ldFaltantes" style="color:#ef4444;">0</div>
                         </div>
-                        <div class="kpi-card" style="border-left: 4px solid var(--accent-orange);">
-                            <div class="kpi-label">Excesos</div>
-                            <div class="kpi-value" id="ilExcesos">0</div>
-                            <div class="kpi-subtitle" style="color:var(--accent-orange);">Posible devolución/troca</div>
-                        </div>
-                        <div class="kpi-card" style="border-left: 4px solid var(--accent-blue);">
-                            <div class="kpi-label">SKUs sin Stock Ideal</div>
-                            <div class="kpi-value" id="ilSinIdeal">0</div>
-                            <div class="kpi-subtitle" style="color:var(--accent-blue);">Curva D sin stock matriz</div>
+                        <div class="kpi-card" style="border-left:3px solid #3b82f6;">
+                            <div class="kpi-label">Excessos</div>
+                            <div class="kpi-value" id="ldExcessos" style="color:#3b82f6;">0</div>
                         </div>
                     </div>
                 </div>
-
-                <div class="table-container">
-                    <table id="informeLojaTable">
-                        <thead>
+                <div class="table-container" style="max-height:600px;overflow-y:auto;">
+                    <table id="lojaDetailTable">
+                        <thead style="position:sticky;top:0;z-index:10;background:#f9fafb;">
                             <tr>
-                                <th>Estado</th>
-                                <th>Curva</th>
-                                <th data-sort="sku">SKU</th>
-                                <th>Produto</th>
-                                <th>Classe</th>
-                                <th>Share Vendas</th>
-                                <th>Venda Mensal</th>
-                                <th>Stock Loja</th>
-                                <th>Mínimo Ideal</th>
-                                <th>Diferencia</th>
-                                <th>Acción</th>
+                                <th>Estado</th><th>Curva</th><th>SKU</th><th>Produto</th><th>Classe</th>
+                                <th>Stock Loja</th><th>Mínimo Ideal</th><th>Diferença</th><th>Ação</th>
                             </tr>
                         </thead>
-                        <tbody id="informeLojaBody">
-                            <tr><td colspan="11" class="empty-state">Selecciona una loja para ver el informe</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Ideias & Sugestões Section -->
-            <section class="section" id="ideias">
-                <h2 class="section-title">Ideias & Sugestões</h2>
-
-                <div class="insights-grid">
-                    <div class="insight-card" style="border-left-color: #8b5cf6;">
-                        <div class="insight-title">Conversão Grau ↔ Sol (Mesma Família)</div>
-                        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">
-                            Famílias onde uma versão (Grau ou Sol) tem estoque alto e venda baixa, mas a outra versão vende bem. Converter armações entre versões para desbloquear vendas.
-                        </div>
-                        <div class="insight-list" id="insightConversao">
-                            <div class="insight-item">Analisando...</div>
-                        </div>
-                    </div>
-
-                    <div class="insight-card" style="border-left-color: #ec4899;">
-                        <div class="insight-title">Novas Lentes de Cor (Rotação de Stock)</div>
-                        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">
-                            SKUs com estoque alto e venda estagnada podem ganhar nova vida com lentes de cores diferentes. Ideal para armações bonitas que não estão girando.
-                        </div>
-                        <div class="insight-list" id="insightNovasLentes">
-                            <div class="insight-item">Analisando...</div>
-                        </div>
-                    </div>
-
-                    <div class="insight-card" style="border-left-color: #14b8a6; grid-column: span 2;">
-                        <div class="insight-title">Análise por Família — Portfólio Ideal (3-4 modelos por família)</div>
-                        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">
-                            O ideal é manter 3-4 modelos ativos por família. Famílias com mais de 4 devem considerar descontinuar os piores. Famílias com menos de 3 e boa performance podem expandir.
-                        </div>
-                        <div class="insight-list" id="insightFamilyPortfolio" style="max-height: 400px; overflow-y: auto;"></div>
-                    </div>
-
-                    <div class="insight-card">
-                        <div class="insight-title">Análise Dead Stock</div>
-                        <div class="insight-list" id="insightDeadStock">
-                            <div class="insight-item">Analisando...</div>
-                        </div>
-                    </div>
-
-                    <div class="insight-card">
-                        <div class="insight-title">Índice de Rotação por Família</div>
-                        <div class="insight-list" id="insightRotation">
-                            <div class="insight-item">Analisando...</div>
-                        </div>
-                    </div>
-
-                    <div class="insight-card">
-                        <div class="insight-title">Padrões Sazonais</div>
-                        <div class="insight-list" id="insightSeasonal">
-                            <div class="insight-item">Analisando...</div>
-                        </div>
-                    </div>
-                </div>
-
-                <h3 class="section-title" style="margin-top: 32px;">Health Score (Saúde do Produto)</h3>
-
-                <div class="health-score-box">
-                    <div class="health-score-title">Como funciona o Health Score</div>
-                    <div class="health-score-formula">
-                        <strong>Score (0-100):</strong> Combinação de três fatores:<br><br>
-                        <strong>1) Velocidade de Venda (40%):</strong> Venda média mensal do SKU comparada com a maior venda média (normalizada).<br><br>
-                        <strong>2) Tendência (30%):</strong> Comparação vendas últimos 6 meses vs. 6 meses anteriores. Crescimento = pontuação alta, declínio = baixa.<br><br>
-                        <strong>3) Adequação de Cobertura (30%):</strong> Penalização se cobertura &lt;4 meses ou &gt;12 meses. Ideal: 6-8 meses. <span class="score-bar"></span>
-                    </div>
-                </div>
-
-                <h3 class="section-title">Top 10 Produtos com Melhor Health Score</h3>
-                <div class="table-container">
-                    <table id="healthScoreTopTable">
-                        <thead>
-                            <tr>
-                                <th>Posição</th>
-                                <th data-sort="sku">SKU</th>
-                                <th data-sort="nome_produto">Produto</th>
-                                <th>Classe</th>
-                                <th data-sort="healthScore">Health Score</th>
-                                <th>Velocidade</th>
-                                <th>Tendência</th>
-                                <th>Cobertura</th>
-                            </tr>
-                        </thead>
-                        <tbody id="healthScoreTopBody">
-                            <tr><td colspan="8" class="empty-state">Carregando dados...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <h3 class="section-title">Bottom 10 Produtos com Pior Health Score</h3>
-                <div class="table-container">
-                    <table id="healthScoreBottomTable">
-                        <thead>
-                            <tr>
-                                <th>Posição</th>
-                                <th data-sort="sku">SKU</th>
-                                <th data-sort="nome_produto">Produto</th>
-                                <th>Classe</th>
-                                <th data-sort="healthScore">Health Score</th>
-                                <th>Velocidade</th>
-                                <th>Tendência</th>
-                                <th>Cobertura</th>
-                            </tr>
-                        </thead>
-                        <tbody id="healthScoreBottomBody">
-                            <tr><td colspan="8" class="empty-state">Carregando dados...</td></tr>
+                        <tbody id="lojaDetailBody">
+                            <tr><td colspan="9" class="empty-state">Selecione uma loja</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -2194,7 +1834,16 @@
 
             <!-- ==================== FORNECEDORES ==================== -->
             <section class="section" id="fornecedores">
-                <h2 class="section-title">Acompanhamento de Fornecedores</h2>
+                <h2 class="section-title">Importaciones China</h2>
+
+                <div style="margin-bottom:20px;display:flex;gap:12px;align-items:center;">
+                    <button onclick="exportSharedData()" style="padding:10px 20px;background:#0000E1;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-family:'Poppins',sans-serif;font-weight:600;">
+                        &#8681; Exportar data.json
+                    </button>
+                    <span style="font-size:11px;color:var(--text-secondary);">
+                        Exporte os dados atuais e substitua o arquivo data.json na pasta command-center. Depois faça push no GitHub para que otros vejam as mudanças.
+                    </span>
+                </div>
 
                 <div class="forn-tabs">
                     <button class="forn-tab active" data-forn-tab="logistica">Logística de Importações</button>
@@ -2211,9 +1860,9 @@
                             <button class="forn-btn forn-filter-btn" id="filter-todas" onclick="setLogFilter('todas')" style="border-radius:0;border:none;border-left:1px solid var(--border-color);padding:7px 14px;font-size:11px;">Todas</button>
                         </div>
                         <input type="text" id="log-search-pi" placeholder="Buscar por PI / Proforma..." oninput="filterLogistica()"
-                               style="padding:7px 12px;border:1px solid var(--border-color);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;width:220px;background:#fafafa;color:var(--text-primary);">
+                               style="padding:7px 12px;border:1px solid var(--border-color);border-radius:6px;font-size:12px;font-family:'Poppins',sans-serif;width:220px;background:#fafafa;color:var(--text-primary);">
                         <select id="log-filter-fornecedor" onchange="filterLogistica()"
-                                style="padding:7px 12px;border:1px solid var(--border-color);border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;background:#fafafa;color:var(--text-primary);appearance:auto;">
+                                style="padding:7px 12px;border:1px solid var(--border-color);border-radius:6px;font-size:12px;font-family:'Poppins',sans-serif;background:#fafafa;color:var(--text-primary);appearance:auto;">
                             <option value="">Todos Fornecedores</option>
                             <option value="Lingshi">Lingshi</option>
                             <option value="Visual Packing">Visual Packing</option>
@@ -2361,7 +2010,7 @@
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
                             <span style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;">Preview do Relatório</span>
                             <div style="display:flex;gap:8px;">
-                                <button class="forn-btn forn-btn-sm" style="background:#3b82f6;color:white;" onclick="downloadReportHTML()">Baixar HTML</button>
+                                <button class="forn-btn forn-btn-sm" style="background:#0000E1;color:white;" onclick="downloadReportHTML()">Baixar HTML</button>
                                 <button class="forn-btn forn-btn-success forn-btn-sm" onclick="copyReportToClipboard()">Copiar HTML</button>
                             </div>
                         </div>
@@ -2403,12 +2052,6 @@
         let rawStoreData = [];
         let processedData = [];
         let storeColumns = [];
-        let filters = {
-            classe: '',
-            genero: '',
-            formato: '',
-            familia: ''
-        };
 
         // ==================== DATA LOADING (Google Sheets Web App) ====================
         const SHEETS_API = 'https://script.google.com/macros/s/AKfycbzo_3vQG2aWNHyAdTV6MxFagP-0u3gyK-_fnkoOVKbT8cqk-omt63V5qdgOIFlCWUdN/exec';
@@ -2437,7 +2080,6 @@
                 }
 
                 processedData = processSalesData(rawSalesData);
-                populateFilters();
                 renderAllSections();
 
                 // Show last update date from meta
@@ -2573,15 +2215,12 @@
         function renderAllSections() {
             const classified = classifySKUsByABC(processedData);
             renderPainelGeral(classified);
-            renderDesempenhoSKU(classified);
-            renderInteligenciaEstoque(classified);
-            renderReposicao(classified);
-            renderStockIdeal(classified);
-            renderImportacoes(classified);
-            renderProdutosMatar(classified);
-            renderEstoqueLojas(classified);
-            initInformeLoja(classified);
             renderIdeias(classified);
+            calculateAndRenderHealthScores(classified);
+            renderPerformanceSKU(classified);
+            renderStatusImportacoes(classified);
+            renderReposicao(classified);
+            renderLojas(classified);
         }
 
         function renderPainelGeral(data) {
@@ -2823,168 +2462,383 @@
             }
         }
 
-        // Search filter for Desempenho table
-        function filterDesempenhoTable() {
-            const query = document.getElementById('skuSearchInput').value.toLowerCase().trim();
-            const rows = document.querySelectorAll('#desempenhoTableBody tr');
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = query === '' || text.includes(query) ? '' : 'none';
-            });
+
+        // ==================== getCurvaBadge helper ====================
+        function getCurvaBadge(curva) {
+            const colors = { A: '#0000E1', B: '#10b981', C: '#eab308', D: '#ef4444' };
+            const color = colors[curva] || '#999';
+            return '<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;color:white;background:' + color + ';">' + (curva || '—') + '</span>';
         }
 
         function getStatusSemaphore(coberturaMeses) {
-            if (coberturaMeses === Infinity || coberturaMeses > 12) return '<span style="color:#3b82f6">🔵 Excesso</span>';
-            if (coberturaMeses >= 6) return '<span style="color:#10b981">🟢 OK</span>';
-            if (coberturaMeses >= 4) return '<span style="color:#f59e0b">🟡 Vigiar</span>';
-            if (coberturaMeses >= 2) return '<span style="color:#f97316">🟠 Repor</span>';
-            return '<span style="color:#ef4444">🔴 Crítico</span>';
+            if (coberturaMeses === Infinity || coberturaMeses > 12) return '<span style="color:#0000E1">\u{1F535} Excesso</span>';
+            if (coberturaMeses >= 6) return '<span style="color:#10b981">\u{1F7E2} OK</span>';
+            if (coberturaMeses >= 4) return '<span style="color:#f59e0b">\u{1F7E1} Vigiar</span>';
+            if (coberturaMeses >= 2) return '<span style="color:#f97316">\u{1F7E0} Repor</span>';
+            return '<span style="color:#ef4444">\u{1F534} Cr\u00edtico</span>';
         }
 
-        function renderDesempenhoSKU(data) {
-            const filtered = applyGlobalFilters(data);
-            const tbody = document.getElementById('desempenhoTableBody');
-            tbody.innerHTML = '';
+        // ==================== PERFORMANCE SKU ====================
+        function renderPerformanceSKU(data) {
+            const sorted = [...data].sort((a, b) => b.vendaMedia - a.vendaMedia);
+            const totalVenda = sorted.reduce((s, d) => s + d.vendaMedia, 0);
+            const numStores = storeColumns.length;
+            
+            let cumShare = 0;
+            const tbody = document.getElementById('performanceBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = sorted.map((item, idx) => {
+                const share = totalVenda > 0 ? (item.vendaMedia / totalVenda * 100) : 0;
+                cumShare += share;
+                
+                // Calculate store stock
+                let estLojas = 0;
+                if (rawStoreData.length > 0) {
+                    const storeRow = rawStoreData.find(r => r.sku === item.sku);
+                    if (storeRow) {
+                        storeColumns.forEach(col => { estLojas += (Number(storeRow[col]) || 0); });
+                    }
+                }
+                
+                // Coverage with imports
+                const cobComImp = item.vendaMedia > 0 ? (item.estoqueMatriz + item.importacoesPendentes) / item.vendaMedia : Infinity;
+                
+                // Min ideal
+                const minIdeal = item.estoqueMatriz > 0 ? (item.curva === 'A' ? 2 * numStores : 1 * numStores) : 0;
+                
+                // Status
+                const cob = item.coberturaMeses;
+                let status, statusClass;
+                if (cob === Infinity || item.vendaMedia === 0) { status = 'Excesso'; statusClass = 'status-excess'; }
+                else if (cob < 2) { status = 'Cr\u00edtico'; statusClass = 'status-critical'; }
+                else if (cob < 4) { status = 'Repor'; statusClass = 'status-reorder'; }
+                else if (cob < 6) { status = 'Vigiar'; statusClass = 'status-watch'; }
+                else if (cob <= 12) { status = 'OK'; statusClass = 'status-ok'; }
+                else { status = 'Excesso'; statusClass = 'status-excess'; }
+                
+                const statusIcons = { 'Cr\u00edtico': '\u{1F534}', 'Repor': '\u{1F7E0}', 'Vigiar': '\u{1F7E1}', 'OK': '\u{1F7E2}', 'Excesso': '\u{1F535}' };
+                
+                const rowBg = status === 'Cr\u00edtico' ? 'background:#fef2f2;' : status === 'Repor' ? 'background:#fff7ed;' : '';
+                
+                return `<tr style="${rowBg}" data-search="${(item.sku + ' ' + (item.nome_produto||'') + ' ' + (item.familia||'')).toLowerCase()}">
+                    <td style="color:#999;text-align:center;">${idx + 1}</td>
+                    <td><strong>${item.sku}</strong></td>
+                    <td>${item.nome_produto || ''}</td>
+                    <td>${item.familia || ''}</td>
+                    <td>${item.descricao_classe || ''}</td>
+                    <td>${getCurvaBadge(item.curva)}</td>
+                    <td style="text-align:right;font-weight:600;">${item.vendaMedia.toFixed(1)}</td>
+                    <td style="text-align:right;">${share.toFixed(1)}%</td>
+                    <td style="text-align:right;color:#888;">${cumShare.toFixed(1)}%</td>
+                    <td style="text-align:right;font-weight:600;">${item.estoqueMatriz.toLocaleString('pt-BR')}</td>
+                    <td style="text-align:right;">${estLojas}</td>
+                    <td style="text-align:right;color:${item.importacoesPendentes > 0 ? '#10b981' : '#ccc'};">${item.importacoesPendentes || '\u2014'}</td>
+                    <td style="text-align:center;font-weight:600;color:${cob < 4 ? '#ef4444' : '#333'};">${cob === Infinity ? '\u221e' : cob.toFixed(1) + 'M'}</td>
+                    <td style="text-align:center;color:${cobComImp < 4 ? '#ef4444' : '#10b981'};">${cobComImp === Infinity ? '\u221e' : cobComImp.toFixed(1) + 'M'}</td>
+                    <td style="text-align:center;">${minIdeal}</td>
+                    <td>${statusIcons[status] || ''} ${status}</td>
+                </tr>`;
+            }).join('');
+        }
 
-            if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="12" class="empty-state">Nenhum produto encontrado</td></tr>';
+        function filterPerformanceTable() {
+            const query = document.getElementById('perfSearchInput').value.toLowerCase();
+            document.querySelectorAll('#performanceBody tr').forEach(row => {
+                const search = row.getAttribute('data-search') || '';
+                row.style.display = search.includes(query) ? '' : 'none';
+            });
+        }
+
+        // ==================== STATUS IMPORTACOES ====================
+        function renderStatusImportacoes(data) {
+            const withImport = data.filter(d => d.importacoesPendentes > 0);
+            
+            // Classify imports
+            const bemFeitas = withImport.filter(d => (d.curva === 'A' || d.curva === 'B') && d.coberturaMeses < 6);
+            const aceitaveis = withImport.filter(d => d.curva === 'C' && d.coberturaMeses < 6);
+            const questionaveis = withImport.filter(d => d.curva === 'D' || d.coberturaMeses >= 8);
+            const oportunidades = data.filter(d => (d.curva === 'A' || d.curva === 'B') && d.importacoesPendentes === 0 && d.coberturaMeses < 4 && d.vendaMedia > 0);
+            const vigilar = data.filter(d => (d.curva === 'A' || d.curva === 'B') && d.coberturaMeses >= 4 && d.coberturaMeses < 6);
+            
+            // KPIs
+            const el = id => document.getElementById(id);
+            if (el('impTotalCount2')) el('impTotalCount2').textContent = withImport.length;
+            if (el('impBemFeitas2')) el('impBemFeitas2').textContent = bemFeitas.length + aceitaveis.length;
+            if (el('impQuestionaveis2')) el('impQuestionaveis2').textContent = questionaveis.length;
+            if (el('impOportunidades2')) el('impOportunidades2').textContent = oportunidades.length;
+            
+            // Bem feitas
+            const bfBody = document.getElementById('imp2BemFeitasBody');
+            if (bfBody) {
+                bfBody.innerHTML = [...bemFeitas, ...aceitaveis].map(d => {
+                    const cobComImp = d.vendaMedia > 0 ? ((d.estoqueMatriz + d.importacoesPendentes) / d.vendaMedia) : Infinity;
+                    return `<tr>
+                        <td><strong>${d.sku}</strong></td><td>${d.nome_produto || ''}</td>
+                        <td>${getCurvaBadge(d.curva)}</td>
+                        <td style="text-align:right;">${d.importacoesPendentes}</td>
+                        <td style="text-align:right;">${d.vendaMedia.toFixed(1)}</td>
+                        <td style="text-align:center;color:${d.coberturaMeses < 4 ? '#ef4444' : '#333'};">${d.coberturaMeses.toFixed(1)}M</td>
+                        <td style="text-align:center;color:#10b981;">${cobComImp === Infinity ? '\u221e' : cobComImp.toFixed(1) + 'M'}</td>
+                    </tr>`;
+                }).join('') || '<tr><td colspan="7" class="empty-state">Nenhuma importa\u00e7\u00e3o bem feita</td></tr>';
+            }
+            
+            // Questionaveis
+            const qBody = document.getElementById('imp2QuestionaveisBody');
+            if (qBody) {
+                qBody.innerHTML = questionaveis.map(d => {
+                    const cobComImp = d.vendaMedia > 0 ? ((d.estoqueMatriz + d.importacoesPendentes) / d.vendaMedia) : Infinity;
+                    const problema = d.curva === 'D' ? 'Curva D \u2014 candidato a descontinuar' : 'Cobertura j\u00e1 alta (' + d.coberturaMeses.toFixed(1) + 'M)';
+                    return `<tr style="background:#fef2f2;">
+                        <td style="color:#ef4444;font-weight:600;">${problema}</td>
+                        <td><strong>${d.sku}</strong></td><td>${d.nome_produto || ''}</td>
+                        <td>${getCurvaBadge(d.curva)}</td>
+                        <td style="text-align:right;">${d.importacoesPendentes}</td>
+                        <td style="text-align:center;">${d.coberturaMeses === Infinity ? '\u221e' : d.coberturaMeses.toFixed(1) + 'M'}</td>
+                        <td style="text-align:center;">${cobComImp === Infinity ? '\u221e' : cobComImp.toFixed(1) + 'M'}</td>
+                    </tr>`;
+                }).join('') || '<tr><td colspan="7" class="empty-state">Nenhuma importa\u00e7\u00e3o question\u00e1vel</td></tr>';
+            }
+            
+            // Oportunidades
+            const oBody = document.getElementById('imp2OportunidadesBody');
+            if (oBody) {
+                oBody.innerHTML = oportunidades.sort((a, b) => a.coberturaMeses - b.coberturaMeses).map(d => {
+                    const urgencia = d.coberturaMeses < 2 ? 'CR\u00cdTICO' : 'URGENTE';
+                    const urgColor = d.coberturaMeses < 2 ? '#ef4444' : '#f59e0b';
+                    return `<tr style="background:#fef2f2;">
+                        <td><span style="background:${urgColor};color:white;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;">${urgencia}</span></td>
+                        <td><strong>${d.sku}</strong></td><td>${d.nome_produto || ''}</td>
+                        <td>${getCurvaBadge(d.curva)}</td>
+                        <td style="text-align:right;font-weight:600;">${d.vendaMedia.toFixed(1)}</td>
+                        <td style="text-align:center;color:#ef4444;font-weight:600;">${d.coberturaMeses.toFixed(1)}M</td>
+                    </tr>`;
+                }).join('') || '<tr><td colspan="6" class="empty-state">Nenhuma oportunidade perdida</td></tr>';
+            }
+            
+            // Vigilar
+            const vBody = document.getElementById('imp2VigilarBody');
+            if (vBody) {
+                vBody.innerHTML = vigilar.map(d => {
+                    const cobComImp = d.vendaMedia > 0 ? ((d.estoqueMatriz + d.importacoesPendentes) / d.vendaMedia) : Infinity;
+                    const nota = d.importacoesPendentes > 0 ? 'Import. ativa cobre bem, monitorar venda' : 'Sem import. \u2014 ainda OK mas monitorar';
+                    return `<tr>
+                        <td><strong>${d.sku}</strong></td><td>${d.nome_produto || ''}</td>
+                        <td>${getCurvaBadge(d.curva)}</td>
+                        <td style="text-align:right;">${d.vendaMedia.toFixed(1)}</td>
+                        <td style="text-align:center;">${d.coberturaMeses.toFixed(1)}M</td>
+                        <td style="text-align:center;">${cobComImp === Infinity ? '\u221e' : cobComImp.toFixed(1) + 'M'}</td>
+                        <td style="color:#888;font-size:11px;">${nota}</td>
+                    </tr>`;
+                }).join('') || '<tr><td colspan="7" class="empty-state">Nenhum SKU para vigilar</td></tr>';
+            }
+        }
+
+        // ==================== CONVERSIONS ====================
+        function renderConversions(data) {
+            const families = {};
+            data.forEach(d => {
+                if (!d.familia) return;
+                if (!families[d.familia]) families[d.familia] = [];
+                families[d.familia].push(d);
+            });
+            
+            const conversions = [];
+            Object.entries(families).forEach(([fam, skus]) => {
+                const sol = skus.filter(s => (s.descricao_classe || '').toLowerCase().includes('sol'));
+                const grau = skus.filter(s => (s.descricao_classe || '').toLowerCase().includes('grau'));
+                
+                sol.forEach(s => {
+                    if (s.coberturaMeses > 12 && s.estoqueMatriz > 20) {
+                        const grauMatch = grau.find(g => g.coberturaMeses < 4 && g.vendaMedia > 0);
+                        if (grauMatch) {
+                            const qtd = Math.min(Math.floor(s.estoqueMatriz * 0.2), Math.ceil(grauMatch.vendaMedia * 3));
+                            if (qtd > 0) conversions.push({ familia: fam, origem: s, destino: grauMatch, qtd, fromClass: 'Sol', toClass: 'Grau' });
+                        }
+                    }
+                });
+                
+                grau.forEach(g => {
+                    if (g.coberturaMeses > 12 && g.estoqueMatriz > 20) {
+                        const solMatch = sol.find(s => s.coberturaMeses < 4 && s.vendaMedia > 0);
+                        if (solMatch) {
+                            const qtd = Math.min(Math.floor(g.estoqueMatriz * 0.2), Math.ceil(solMatch.vendaMedia * 3));
+                            if (qtd > 0) conversions.push({ familia: fam, origem: g, destino: solMatch, qtd, fromClass: 'Grau', toClass: 'Sol' });
+                        }
+                    }
+                });
+            });
+            
+            const tbody = document.getElementById('conversionBody');
+            if (!tbody) return conversions;
+            
+            if (conversions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Nenhuma convers\u00e3o sugerida \u2014 n\u00e3o h\u00e1 pares Sol/Grau com excesso+falta na mesma fam\u00edlia</td></tr>';
+                return conversions;
+            }
+            
+            tbody.innerHTML = conversions.map(c => `<tr>
+                <td><strong>${c.familia}</strong></td>
+                <td>${c.origem.nome_produto || c.origem.sku} <span style="background:#dbeafe;color:#1e40af;padding:1px 6px;border-radius:3px;font-size:10px;">${c.fromClass}</span></td>
+                <td>${c.fromClass}</td>
+                <td style="text-align:right;">${c.origem.estoqueMatriz} un. (cob: ${c.origem.coberturaMeses === Infinity ? '\u221e' : c.origem.coberturaMeses.toFixed(1) + 'M'})</td>
+                <td style="text-align:center;font-weight:700;color:#8b5cf6;">\u2192</td>
+                <td>${c.destino.nome_produto || c.destino.sku} <span style="background:#d1fae5;color:#065f46;padding:1px 6px;border-radius:3px;font-size:10px;">${c.toClass}</span></td>
+                <td>${c.toClass}</td>
+                <td style="text-align:right;font-weight:700;color:#8b5cf6;">${c.qtd} un.</td>
+                <td style="color:#10b981;">Evita importar ${c.qtd} un. ${c.toClass}</td>
+            </tr>`).join('');
+            
+            const totalConv = conversions.reduce((s, c) => s + c.qtd, 0);
+            const summary = document.getElementById('conversionSummary');
+            if (summary) {
+                summary.style.display = 'block';
+                summary.innerHTML = '<strong>Total convers\u00f5es:</strong> ' + totalConv + ' unidades. Isso reduz a necessidade de importa\u00e7\u00e3o e libera capital parado.';
+            }
+            
+            return conversions;
+        }
+
+        // ==================== PURCHASE SUGGESTION ====================
+        function renderPurchaseSuggestion(data) {
+            const families = {};
+            data.forEach(d => {
+                if (!d.familia || d.curva === 'D') return;
+                if (!families[d.familia]) families[d.familia] = { name: d.familia, skus: [], urgency: 0, totalNeed: 0 };
+                families[d.familia].skus.push(d);
+                if (d.coberturaMeses < 4 && d.vendaMedia > 0) {
+                    families[d.familia].urgency += (4 - d.coberturaMeses) * d.vendaMedia;
+                    families[d.familia].totalNeed += Math.ceil((8 - d.coberturaMeses) * d.vendaMedia);
+                }
+            });
+            
+            const sorted = Object.values(families).filter(f => f.urgency > 0).sort((a, b) => b.urgency - a.urgency).slice(0, 3);
+            
+            const container = document.getElementById('purchaseFamilyCards');
+            const summaryEl = document.getElementById('purchaseSummary');
+            if (!container) return;
+            
+            if (sorted.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="grid-column:span 3;">Nenhuma fam\u00edlia precisa de reposi\u00e7\u00e3o urgente</div>';
                 return;
             }
-
-            filtered.forEach(row => {
-                const tr = document.createElement('tr');
-                const trendBadge = getTrendBadge(row.trend);
-                const coverageText = row.coberturaMeses === Infinity ? '∞' : row.coberturaMeses.toFixed(1);
-                const status = row.estoqueMatriz === 0 ? '<span style="color:#ef4444">Sem estoque</span>' : getStatusSemaphore(row.coberturaMeses);
-                const importPending = row.importacoesPendentes > 0 ? row.importacoesPendentes : '—';
-
-                tr.innerHTML = `
-                    <td>${row.sku}</td>
-                    <td>${row.nome_produto}</td>
-                    <td>${row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol'}</td>
-                    <td>${row.familia}</td>
-                    <td><span class="badge badge-${row.curva.toLowerCase()}">${row.curva}</span></td>
-                    <td>${Math.round(row.vendaMedia)}</td>
-                    <td>${row.activeMonths}</td>
-                    <td>${row.estoqueMatriz}</td>
-                    <td>${importPending}</td>
-                    <td>${coverageText}</td>
-                    <td>${trendBadge}</td>
-                    <td>${status}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            // Top 20
-            const top20 = filtered.sort((a, b) => b.vendaMedia - a.vendaMedia).slice(0, 20);
-            const topBody = document.getElementById('topSellersBody');
-            topBody.innerHTML = '';
-            top20.forEach((row, idx) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${idx + 1}</td>
-                    <td>${row.sku}</td>
-                    <td>${row.nome_produto}</td>
-                    <td>${row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol'}</td>
-                    <td>${row.familia}</td>
-                    <td><span class="badge badge-${row.curva.toLowerCase()}">${row.curva}</span></td>
-                    <td>${Math.round(row.vendaMedia)}</td>
-                    <td>${row.sales3M}</td>
-                    <td>${row.estoqueMatriz}</td>
-                `;
-                topBody.appendChild(tr);
-            });
+            
+            const numFamilies = Math.min(sorted.length, 3);
+            const pcsPerFamily = 300;
+            
+            container.innerHTML = sorted.map(fam => {
+                const needsSKUs = fam.skus.filter(s => s.coberturaMeses < 8 && s.vendaMedia > 0).sort((a, b) => a.coberturaMeses - b.coberturaMeses);
+                let remaining = pcsPerFamily;
+                const allocation = [];
+                
+                needsSKUs.forEach(s => {
+                    if (remaining <= 0) return;
+                    const need = Math.ceil((8 - Math.max(0, s.coberturaMeses)) * s.vendaMedia);
+                    const alloc = Math.min(need, remaining);
+                    if (alloc > 0) {
+                        allocation.push({ sku: s, qtd: alloc });
+                        remaining -= alloc;
+                    }
+                });
+                
+                if (remaining > 0 && allocation.length > 0) {
+                    allocation[0].qtd += remaining;
+                }
+                
+                const mostUrgent = needsSKUs[0];
+                const urgLabel = mostUrgent && mostUrgent.coberturaMeses < 2 ? 'CR\u00cdTICO' : mostUrgent && mostUrgent.coberturaMeses < 4 ? 'URGENTE' : 'PREVENTIVA';
+                const urgColor = urgLabel === 'CR\u00cdTICO' ? '#ef4444' : urgLabel === 'URGENTE' ? '#f59e0b' : '#3b82f6';
+                
+                return `<div style="background:#f8fafc;border-radius:10px;padding:16px;border:1px solid #e2e8f0;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <div style="font-size:16px;font-weight:700;">${fam.name}</div>
+                        <span style="background:#0000E1;color:white;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:600;">${pcsPerFamily} pzs</span>
+                    </div>
+                    <div style="font-size:11px;color:${urgColor};font-weight:600;margin-bottom:12px;">${urgLabel} \u2014 ${mostUrgent ? (mostUrgent.nome_produto || mostUrgent.sku) + ' em ' + mostUrgent.coberturaMeses.toFixed(1) + 'M' : ''}</div>
+                    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+                        <thead><tr style="border-bottom:1px solid #e0e0e0;">
+                            <th style="padding:6px 4px;text-align:left;color:#888;font-weight:600;">Modelo</th>
+                            <th style="padding:6px 4px;text-align:right;color:#888;font-weight:600;">Qtd</th>
+                        </tr></thead>
+                        <tbody>${allocation.map(a => `<tr${a.sku.coberturaMeses < 2 ? ' style="background:#fef2f2;"' : ''}>
+                            <td style="padding:6px 4px;">${a.sku.nome_produto || a.sku.sku} <span style="background:${(a.sku.descricao_classe||'').toLowerCase().includes('sol') ? '#dbeafe' : '#d1fae5'};color:${(a.sku.descricao_classe||'').toLowerCase().includes('sol') ? '#1e40af' : '#065f46'};padding:1px 6px;border-radius:3px;font-size:10px;">${a.sku.descricao_classe || ''}</span></td>
+                            <td style="padding:6px 4px;text-align:right;font-weight:700;${a.sku.coberturaMeses < 2 ? 'color:#ef4444;' : ''}">${a.qtd}</td>
+                        </tr>`).join('')}</tbody>
+                    </table>
+                </div>`;
+            }).join('');
+            
+            if (summaryEl) {
+                summaryEl.style.display = 'grid';
+                summaryEl.innerHTML = `
+                    <div style="text-align:center;">
+                        <div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;">Total Compra</div>
+                        <div style="font-size:24px;font-weight:700;">${numFamilies * pcsPerFamily}</div>
+                        <div style="font-size:10px;color:rgba(255,255,255,0.4);">pe\u00e7as</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;">Fam\u00edlias</div>
+                        <div style="font-size:24px;font-weight:700;">${numFamilies}</div>
+                        <div style="font-size:10px;color:rgba(255,255,255,0.4);">${sorted.map(f => f.name).join(' + ')}</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;">Lead Time</div>
+                        <div style="font-size:24px;font-weight:700;">4M</div>
+                        <div style="font-size:10px;color:rgba(255,255,255,0.4);">chegada estimada</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;">Cobertura Objetivo</div>
+                        <div style="font-size:24px;font-weight:700;color:#10b981;">8M+</div>
+                        <div style="font-size:10px;color:rgba(255,255,255,0.4);">para SKUs A/B</div>
+                    </div>`;
+            }
         }
 
-        function renderInteligenciaEstoque(data) {
-            const withStock = data.filter(d => d.estoqueMatriz > 0);
-            const deadStockSKUs = data.filter(d => d.estoqueMatriz > 0 && d.sales3M === 0);
-            const lowCoverage = data.filter(d => (d.curva === 'A' || d.curva === 'B') && d.coberturaMeses < 4 && d.coberturaMeses !== Infinity);
-            const excessCoverage = data.filter(d => d.coberturaMeses > 12);
-
-            document.getElementById('siTotalSKUsWithStock').textContent = withStock.length;
-            document.getElementById('siTotalStockUnits').textContent = withStock.reduce((sum, d) => sum + d.estoqueMatriz, 0);
-            document.getElementById('siDeadStockSKUs').textContent = deadStockSKUs.length;
-            document.getElementById('siLowCoverageSKUs').textContent = lowCoverage.length;
-            document.getElementById('siExcessCoverageSKUs').textContent = excessCoverage.length;
-
-            // Table
-            const filtered = applyGlobalFilters(withStock);
-            const tbody = document.getElementById('stockIntelligenceBody');
-            tbody.innerHTML = '';
-
-            filtered.forEach(row => {
-                const tr = document.createElement('tr');
-                const estado = getEstadoSemaphore(row.coberturaMeses);
-                const trendBadge = getTrendBadge(row.trend);
-                const importPending = row.importacoes_pendentes ? row.importacoes_pendentes : '—';
-                const coverageText = row.coberturaMeses === Infinity ? '∞' : row.coberturaMeses.toFixed(1);
-
-                tr.innerHTML = `
-                    <td>${row.sku}</td>
-                    <td>${row.nome_produto}</td>
-                    <td>${row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol'}</td>
-                    <td><span class="badge badge-${row.curva.toLowerCase()}">${row.curva}</span></td>
-                    <td>${row.estoqueMatriz}</td>
-                    <td>${importPending}</td>
-                    <td>${Math.round(row.vendaMedia)}</td>
-                    <td>${coverageText}</td>
-                    <td>${estado}</td>
-                    <td>${trendBadge}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            // Action summary
-            const urgentReorder = data.filter(d => (d.curva === 'A' || d.curva === 'B') && d.coberturaMeses < 4 && d.coberturaMeses !== Infinity).length;
-            const excessStock = data.filter(d => d.coberturaMeses > 12).length;
-            const deadStockCount = deadStockSKUs.length;
-
-            document.getElementById('siUrgentReorder').textContent = urgentReorder;
-            document.getElementById('siExcessStock').textContent = excessStock;
-            document.getElementById('siDeadStockCount').textContent = deadStockCount;
-        }
-
+        // ==================== REPOSICAO (enhanced) ====================
         function renderReposicao(data) {
+            // NEW: render conversions and purchase suggestion
+            renderConversions(data);
+            renderPurchaseSuggestion(data);
+            
+            // Existing reposition table logic
             const abcSKUs = data.filter(d => d.curva === 'A' || d.curva === 'B' || d.curva === 'C');
-
-            // Cobertura efetiva = (estoque matriz + importações pendentes) / venda média
             const cobEfetiva = (d) => d.vendaMedia > 0 ? (d.estoqueMatriz + (d.importacoesPendentes || 0)) / d.vendaMedia : Infinity;
-
             const critical = abcSKUs.filter(d => cobEfetiva(d) < 2);
             const alert = abcSKUs.filter(d => cobEfetiva(d) >= 2 && cobEfetiva(d) < 4);
 
-            document.getElementById('repPortfolioActive').textContent = abcSKUs.length;
-            document.getElementById('repCriticalCount').textContent = critical.length;
-            document.getElementById('repAlertCount').textContent = alert.length;
+            const repEl = id => document.getElementById(id);
+            if (repEl('repPortfolioActive')) repEl('repPortfolioActive').textContent = abcSKUs.length;
+            if (repEl('repCriticalCount')) repEl('repCriticalCount').textContent = critical.length;
+            if (repEl('repAlertCount')) repEl('repAlertCount').textContent = alert.length;
 
-            // Only show A+B+C with EFFECTIVE coverage < 4 months (considers imports in transit)
-            const toReorder = data.filter(d => (d.curva === 'A' || d.curva === 'B' || d.curva === 'C') && cobEfetiva(d) < 4 && cobEfetiva(d) !== Infinity)
+            const toReorder = data.filter(d => (d.curva === 'A' || d.curva === 'B' || d.curva === 'C') && cobEfetiva(d) < 8 && cobEfetiva(d) !== Infinity)
                 .sort((a, b) => cobEfetiva(a) - cobEfetiva(b));
 
             const tbody = document.getElementById('reposicaoBody');
+            if (!tbody) return;
             tbody.innerHTML = '';
 
             if (toReorder.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" class="empty-state">Nenhum produto precisa de reposição no momento</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="empty-state">Nenhum produto precisa de reposi\u00e7\u00e3o no momento</td></tr>';
                 return;
             }
 
             toReorder.forEach(row => {
                 const tr = document.createElement('tr');
                 const efetiva = cobEfetiva(row);
-                const estado = getEstadoSemaphore(efetiva);
+                const estado = getStatusSemaphore(efetiva);
                 const targetCoverage = 8;
                 const suggestedQty = Math.max(0, (targetCoverage - efetiva) * row.vendaMedia);
-                const importPending = row.importacoesPendentes ? row.importacoesPendentes : '—';
-                const coverageText = efetiva === Infinity ? '∞' : efetiva.toFixed(1);
+                const importPending = row.importacoesPendentes ? row.importacoesPendentes : '\u2014';
+                const coverageText = efetiva === Infinity ? '\u221e' : efetiva.toFixed(1);
 
                 tr.innerHTML = `
                     <td>${estado}</td>
-                    <td><span class="badge badge-${row.curva.toLowerCase()}">${row.curva}</span></td>
+                    <td>${getCurvaBadge(row.curva)}</td>
                     <td>${row.sku}</td>
                     <td>${row.nome_produto}</td>
-                    <td>${row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol'}</td>
+                    <td>${row.descricao_classe === '\u00d3culos de Grau' ? 'Grau' : 'Sol'}</td>
                     <td>${row.estoqueMatriz}</td>
                     <td>${importPending}</td>
                     <td>${Math.round(row.vendaMedia)}</td>
@@ -2995,924 +2849,276 @@
             });
         }
 
-        // ==================== STOCK IDEAL ====================
-        let _stockIdealData = []; // cached for Excel export
-
-        function renderStockIdeal(data) {
-            // Only SKUs with stock in matriz
-            const withStock = data.filter(d => d.estoqueMatriz > 0);
-
-            // Calculate minimum per store by curve
-            const items = withStock.map(d => {
-                const minPerTienda = d.curva === 'A' ? 2 : 1;
-                return { ...d, minPerTienda };
-            }).sort((a, b) => {
-                const curvaOrder = {'A':0,'B':1,'C':2,'D':3};
-                return (curvaOrder[a.curva] ?? 9) - (curvaOrder[b.curva] ?? 9) || b.vendaMedia - a.vendaMedia;
+        // ==================== LOJAS ====================
+        function renderLojas(data) {
+            const numStores = storeColumns.length;
+            const STORE_PRIORITY = ['oscar_freire', 'higienopolis', 'pinheiros', 'iguatemi', 'cidade_sp'];
+            const sortedStores = [...storeColumns].sort((a, b) => {
+                const ai = STORE_PRIORITY.indexOf(a);
+                const bi = STORE_PRIORITY.indexOf(b);
+                if (ai >= 0 && bi >= 0) return ai - bi;
+                if (ai >= 0) return -1;
+                if (bi >= 0) return 1;
+                return a.localeCompare(b);
             });
-
-            _stockIdealData = items;
-
-            const curvaA = items.filter(d => d.curva === 'A');
-            const curvaB = items.filter(d => d.curva === 'B');
-            const curvaC = items.filter(d => d.curva === 'C');
-            const curvaD = items.filter(d => d.curva === 'D');
-
-            const pcsA = curvaA.reduce((s, d) => s + d.minPerTienda, 0);
-            const pcsB = curvaB.reduce((s, d) => s + d.minPerTienda, 0);
-            const pcsC = curvaC.reduce((s, d) => s + d.minPerTienda, 0);
-            const pcsD = curvaD.reduce((s, d) => s + d.minPerTienda, 0);
-            const totalPcs = pcsA + pcsB + pcsC + pcsD;
-            const totalSKUs = items.length;
-
-            // KPIs
-            document.getElementById('siTotalSKUs').textContent = totalSKUs;
-            document.getElementById('siCurvaA').textContent = curvaA.length;
-            document.getElementById('siCurvaAPcs').textContent = pcsA + ' piezas (2/SKU)';
-            document.getElementById('siCurvaB').textContent = curvaB.length;
-            document.getElementById('siCurvaBPcs').textContent = pcsB + ' piezas (1/SKU)';
-            document.getElementById('siCurvaC').textContent = curvaC.length;
-            document.getElementById('siCurvaCPcs').textContent = pcsC + ' piezas (1/SKU)';
-            document.getElementById('siCurvaD').textContent = curvaD.length;
-            document.getElementById('siCurvaDPcs').textContent = pcsD + ' piezas (1/SKU)';
-            document.getElementById('siTotalPcs').textContent = totalPcs;
-            document.getElementById('siTotalSKUsSub').textContent = totalSKUs + ' SKUs';
-            document.getElementById('siExcelInfo').textContent = totalSKUs + ' SKUs · ' + totalPcs + ' piezas totales por tienda';
-
-            // Table
-            const tbody = document.getElementById('stockIdealBody');
-            tbody.innerHTML = '';
-
-            if (items.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Nenhum SKU com estoque em matriz</td></tr>';
-                return;
-            }
-
-            items.forEach(row => {
-                const tr = document.createElement('tr');
-                const coverageText = row.coberturaMeses === Infinity ? '∞' : row.coberturaMeses.toFixed(1);
-                tr.innerHTML = `
-                    <td><span class="badge badge-${row.curva.toLowerCase()}">${row.curva}</span></td>
-                    <td>${row.sku}</td>
-                    <td>${row.nome_produto}</td>
-                    <td>${row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol'}</td>
-                    <td>${row.estoqueMatriz}</td>
-                    <td>${Math.round(row.vendaMedia)}</td>
-                    <td style="font-weight:600;color:${row.curva === 'A' ? 'var(--color-a)' : 'var(--text-primary)'}">${row.minPerTienda}</td>
-                    <td>${coverageText}</td>
-                `;
-                tbody.appendChild(tr);
+            
+            const storeStats = {};
+            let totalFaltantes = 0, totalFaltantesUn = 0, totalExcessos = 0;
+            
+            sortedStores.forEach(store => {
+                storeStats[store] = { name: store, totalSKUs: 0, totalPcs: 0, curvaA: 0, curvaB: 0, curvaC: 0, curvaD: 0, faltantes: 0, faltantesUn: 0, faltantesA: 0, excesos: 0, excesosUn: 0 };
             });
-        }
-
-        function downloadStockIdealExcel() {
-            if (_stockIdealData.length === 0) {
-                alert('Sem dados para exportar. Aguarde o carregamento dos dados.');
-                return;
-            }
-
-            const items = _stockIdealData;
-            const curvaA = items.filter(d => d.curva === 'A');
-            const curvaB = items.filter(d => d.curva === 'B');
-            const curvaC = items.filter(d => d.curva === 'C');
-            const curvaD = items.filter(d => d.curva === 'D');
-            const totalPcs = items.reduce((s, d) => s + d.minPerTienda, 0);
-
-            // Build CSV content (Excel-compatible with BOM for UTF-8)
-            let csv = '\uFEFF'; // BOM for Excel UTF-8
-            csv += 'STOCK IDEAL POR TIENDA - ÓCULOS COMMAND CENTER\n';
-            csv += 'Generado: ' + new Date().toLocaleDateString('pt-BR') + '\n';
-            csv += '\n';
-            csv += 'RESUMEN\n';
-            csv += 'Curva,SKUs,Piezas/Tienda,Min/SKU\n';
-            csv += 'A,' + curvaA.length + ',' + curvaA.reduce((s,d) => s+d.minPerTienda, 0) + ',2\n';
-            csv += 'B,' + curvaB.length + ',' + curvaB.reduce((s,d) => s+d.minPerTienda, 0) + ',1\n';
-            csv += 'C,' + curvaC.length + ',' + curvaC.reduce((s,d) => s+d.minPerTienda, 0) + ',1\n';
-            csv += 'D,' + curvaD.length + ',' + curvaD.reduce((s,d) => s+d.minPerTienda, 0) + ',1\n';
-            csv += 'TOTAL,' + items.length + ',' + totalPcs + ',—\n';
-            csv += '\n';
-            csv += 'DETALLE POR SKU\n';
-            csv += 'Curva,SKU,Produto,Classe,Estoque Matriz,Venda Mensal,Min/Tienda,Cobertura Meses\n';
-
-            items.forEach(d => {
-                const classe = d.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol';
-                const cob = d.coberturaMeses === Infinity ? '∞' : d.coberturaMeses.toFixed(1);
-                const nome = (d.nome_produto || '').replace(/,/g, ' ');
-                csv += `${d.curva},${d.sku},"${nome}",${classe},${d.estoqueMatriz},${Math.round(d.vendaMedia)},${d.minPerTienda},${cob}\n`;
-            });
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'stock_ideal_oculos_' + new Date().toISOString().slice(0,10) + '.csv';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function renderImportacoes(data) {
-            const withImport = data.filter(d => d.importacoesPendentes > 0);
-            const totalUnits = withImport.reduce((sum, d) => sum + d.importacoesPendentes, 0);
-
-            // Classify each import
-            const bemFeitas = []; // A/B with coverage < 6M
-            const aceitaveis = []; // C with low coverage
-            const questionaveis = []; // D or high coverage
-
-            withImport.forEach(d => {
-                const cobComImport = d.vendaMedia > 0 ? (d.estoqueMatriz + d.importacoesPendentes) / d.vendaMedia : Infinity;
-                const item = { ...d, coberturaComImport: cobComImport };
-
-                if ((d.curva === 'A' || d.curva === 'B') && d.coberturaMeses < 6) {
-                    bemFeitas.push(item);
-                } else if (d.curva === 'C' && d.coberturaMeses < 6) {
-                    aceitaveis.push(item);
-                } else {
-                    // D curve, or any curve with high coverage already
-                    questionaveis.push(item);
-                }
-            });
-
-            // Oportunidades perdidas: A/B without import and coverage < 4M
-            const oportunidades = data.filter(d =>
-                (d.curva === 'A' || d.curva === 'B') &&
-                d.importacoesPendentes === 0 &&
-                d.coberturaMeses < 4 &&
-                d.coberturaMeses !== Infinity &&
-                d.vendaMedia > 0
-            ).sort((a, b) => a.coberturaMeses - b.coberturaMeses);
-
-            // KPIs
-            document.getElementById('impTotalCount').textContent = withImport.length;
-            document.getElementById('impTotalUnits').textContent = totalUnits.toLocaleString('pt-BR');
-            document.getElementById('impBemFeitas').textContent = bemFeitas.length;
-            document.getElementById('impAceitaveis').textContent = aceitaveis.length;
-            document.getElementById('impQuestionaveis').textContent = questionaveis.length;
-            document.getElementById('impOportunidades').textContent = oportunidades.length;
-
-            // Table: Bem Feitas
-            const bemBody = document.getElementById('impBemFeitasBody');
-            bemBody.innerHTML = bemFeitas.length === 0
-                ? '<tr><td colspan="10" class="empty-state">Nenhuma importação nesta categoria</td></tr>'
-                : bemFeitas.map(d => `
-                    <tr>
-                        <td><span style="color:#10b981; font-weight:600;">✓ BEM FEITA</span></td>
-                        <td>${d.sku}</td>
-                        <td>${d.nome_produto}</td>
-                        <td>${d.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol'}</td>
-                        <td><span class="badge badge-${d.curva.toLowerCase()}">${d.curva}</span></td>
-                        <td>${d.estoqueMatriz}</td>
-                        <td><strong>${d.importacoesPendentes}</strong></td>
-                        <td>${Math.round(d.vendaMedia)}</td>
-                        <td>${d.coberturaMeses === Infinity ? '∞' : d.coberturaMeses.toFixed(1)}M</td>
-                        <td>${d.coberturaComImport === Infinity ? '∞' : d.coberturaComImport.toFixed(1)}M</td>
-                    </tr>
-                `).join('');
-
-            // Table: Questionáveis
-            const questBody = document.getElementById('impQuestionaveisBody');
-            questBody.innerHTML = questionaveis.length === 0
-                ? '<tr><td colspan="10" class="empty-state">Nenhuma importação questionável</td></tr>'
-                : questionaveis.map(d => {
-                    let problema = '';
-                    if (d.curva === 'D') problema = 'Curva D — descontinuar';
-                    else if (d.coberturaMeses >= 8) problema = 'Cobertura já alta (' + d.coberturaMeses.toFixed(1) + 'M)';
-                    else if (d.curva === 'C' && d.coberturaMeses >= 6) problema = 'Curva C com cobertura OK';
-                    else problema = 'Cobertura suficiente';
-
-                    return `
-                        <tr>
-                            <td><span style="color:#ef4444; font-weight:600;">${problema}</span></td>
-                            <td>${d.sku}</td>
-                            <td>${d.nome_produto}</td>
-                            <td>${d.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol'}</td>
-                            <td><span class="badge badge-${d.curva.toLowerCase()}">${d.curva}</span></td>
-                            <td>${d.estoqueMatriz}</td>
-                            <td><strong>${d.importacoesPendentes}</strong></td>
-                            <td>${Math.round(d.vendaMedia)}</td>
-                            <td>${d.coberturaMeses === Infinity ? '∞' : d.coberturaMeses.toFixed(1)}M</td>
-                            <td>${d.coberturaComImport === Infinity ? '∞' : d.coberturaComImport.toFixed(1)}M</td>
-                        </tr>
-                    `;
-                }).join('');
-
-            // Table: Oportunidades Perdidas
-            const oportBody = document.getElementById('impOportunidadesBody');
-            oportBody.innerHTML = oportunidades.length === 0
-                ? '<tr><td colspan="9" class="empty-state">Todos os A/B com cobertura baixa têm importação ativa</td></tr>'
-                : oportunidades.map(d => {
-                    const urgencia = d.coberturaMeses < 2
-                        ? '<span style="color:#ef4444; font-weight:600;">🔴 URGENTE</span>'
-                        : '<span style="color:#f97316; font-weight:600;">🟠 ATENÇÃO</span>';
-
-                    return `
-                        <tr>
-                            <td>${urgencia}</td>
-                            <td>${d.sku}</td>
-                            <td>${d.nome_produto}</td>
-                            <td>${d.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol'}</td>
-                            <td><span class="badge badge-${d.curva.toLowerCase()}">${d.curva}</span></td>
-                            <td>${d.estoqueMatriz}</td>
-                            <td>${Math.round(d.vendaMedia)}</td>
-                            <td>${d.coberturaMeses.toFixed(1)}M</td>
-                            <td>${d.coberturaMeses.toFixed(1)} meses</td>
-                        </tr>
-                    `;
-                }).join('');
-        }
-
-        let _produtosMatarData = []; // cached for Excel export
-        let _produtosMatarFamilias = []; // cached for Excel
-        let _kmCharts = {}; // track chart instances for cleanup
-
-        function buildFamiliaStats(items) {
-            const totalEstoque = items.reduce((s, d) => s + d.estoqueMatriz, 0);
-            const familiaMap = {};
-            items.forEach(d => {
-                const f = d.familia || 'Sem Família';
-                if (!familiaMap[f]) familiaMap[f] = { familia: f, skus: 0, unidades: 0, mesesSemVenda: [], curvas: {} };
-                familiaMap[f].skus++;
-                familiaMap[f].unidades += d.estoqueMatriz;
-                familiaMap[f].mesesSemVenda.push(d.monthsSinceLastSale || 0);
-                familiaMap[f].curvas[d.curva] = (familiaMap[f].curvas[d.curva] || 0) + 1;
-            });
-            return Object.values(familiaMap).map(f => ({
-                ...f,
-                pctTotal: totalEstoque > 0 ? (f.unidades / totalEstoque * 100) : 0,
-                mediaMeses: f.mesesSemVenda.length > 0 ? f.mesesSemVenda.reduce((a,b)=>a+b,0) / f.mesesSemVenda.length : 0,
-                curvasText: Object.entries(f.curvas).map(([k,v]) => k + ':' + v).join(' | ')
-            })).sort((a, b) => b.unidades - a.unidades);
-        }
-
-        function renderProdutosMatar(data) {
-            const cdSKUs = data.filter(d => (d.curva === 'C' || d.curva === 'D') && d.estoqueMatriz > 0)
-                .sort((a, b) => b.estoqueMatriz - a.estoqueMatriz);
-
-            _produtosMatarData = cdSKUs;
-
-            const totalEstoque = cdSKUs.reduce((s, d) => s + d.estoqueMatriz, 0);
-            const familias = buildFamiliaStats(cdSKUs);
-            _produtosMatarFamilias = familias;
-
-            // KPIs
-            document.getElementById('kmTotalSKUs').textContent = cdSKUs.length;
-            document.getElementById('kmTotalUnidades').textContent = totalEstoque.toLocaleString('pt-BR');
-            document.getElementById('kmTotalFamilias').textContent = familias.length;
-            const avgMeses = cdSKUs.length > 0 ? cdSKUs.reduce((s,d) => s + (d.monthsSinceLastSale||0), 0) / cdSKUs.length : 0;
-            document.getElementById('kmMediaMesesSemVenda').textContent = avgMeses.toFixed(1);
-
-            const infoEl = document.getElementById('killExcelInfo');
-            if (infoEl) infoEl.textContent = cdSKUs.length + ' SKUs · ' + totalEstoque + ' unidades em estoque';
-
-            // --- Charts ---
-            // Destroy previous instances
-            Object.values(_kmCharts).forEach(c => { if (c) c.destroy(); });
-            _kmCharts = {};
-
-            const palette = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316','#6366f1','#14b8a6','#e11d48','#84cc16','#a855f7','#0ea5e9','#d946ef'];
-            const topFamilias = familias.slice(0, 12);
-            const outrasSkus = familias.slice(12).reduce((s,f) => s + f.skus, 0);
-            const outrasUni = familias.slice(12).reduce((s,f) => s + f.unidades, 0);
-
-            const famLabels = topFamilias.map(f => f.familia);
-            const famSkus = topFamilias.map(f => f.skus);
-            const famUnidades = topFamilias.map(f => f.unidades);
-            if (familias.length > 12) { famLabels.push('Outras'); famSkus.push(outrasSkus); famUnidades.push(outrasUni); }
-
-            // Chart: SKUs por Familia (horizontal bar)
-            _kmCharts.famSKUs = new Chart(document.getElementById('kmChartFamiliaSKUs'), {
-                type: 'bar',
-                data: { labels: famLabels, datasets: [{ data: famSkus, backgroundColor: palette.slice(0, famLabels.length), borderRadius: 4 }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'right', font: { weight: 'bold', size: 11 }, color: '#333' } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false } } } }
-            });
-
-            // Chart: Unidades por Familia (horizontal bar)
-            _kmCharts.famUni = new Chart(document.getElementById('kmChartFamiliaUnidades'), {
-                type: 'bar',
-                data: { labels: famLabels, datasets: [{ data: famUnidades, backgroundColor: palette.slice(0, famLabels.length), borderRadius: 4 }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'right', font: { weight: 'bold', size: 11 }, color: '#333' } }, scales: { x: { grid: { display: false } }, y: { grid: { display: false } } } }
-            });
-
-            // Chart: Curva C vs D (doughnut)
-            const curvaC = cdSKUs.filter(d => d.curva === 'C');
-            const curvaD = cdSKUs.filter(d => d.curva === 'D');
-            _kmCharts.curva = new Chart(document.getElementById('kmChartCurva'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Curva C (' + curvaC.length + ' SKUs)', 'Curva D (' + curvaD.length + ' SKUs)'],
-                    datasets: [{ data: [curvaC.reduce((s,d)=>s+d.estoqueMatriz,0), curvaD.reduce((s,d)=>s+d.estoqueMatriz,0)], backgroundColor: ['#eab308','#ef4444'], borderWidth: 0 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, datalabels: { formatter: (v, ctx) => { const total = ctx.dataset.data.reduce((a,b)=>a+b,0); return (v/total*100).toFixed(1) + '%'; }, font: { weight: 'bold', size: 14 }, color: '#fff' } } }
-            });
-
-            // Chart: Sol vs Grau (doughnut)
-            const sol = cdSKUs.filter(d => d.descricao_classe !== 'Óculos de Grau');
-            const grau = cdSKUs.filter(d => d.descricao_classe === 'Óculos de Grau');
-            _kmCharts.classe = new Chart(document.getElementById('kmChartClasse'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Sol (' + sol.length + ' SKUs)', 'Grau (' + grau.length + ' SKUs)'],
-                    datasets: [{ data: [sol.reduce((s,d)=>s+d.estoqueMatriz,0), grau.reduce((s,d)=>s+d.estoqueMatriz,0)], backgroundColor: ['#f59e0b','#3b82f6'], borderWidth: 0 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, datalabels: { formatter: (v, ctx) => { const total = ctx.dataset.data.reduce((a,b)=>a+b,0); return (v/total*100).toFixed(1) + '%'; }, font: { weight: 'bold', size: 14 }, color: '#fff' } } }
-            });
-
-            // Tabla de familias
-            const famBody = document.getElementById('kmFamiliaBody');
-            famBody.innerHTML = familias.map(f => `
-                <tr>
-                    <td style="font-weight:600;">${f.familia}</td>
-                    <td>${f.skus}</td>
-                    <td>${f.unidades.toLocaleString('pt-BR')}</td>
-                    <td>${f.pctTotal.toFixed(1)}%</td>
-                    <td>${f.mediaMeses.toFixed(1)}</td>
-                    <td>${f.curvasText}</td>
-                </tr>
-            `).join('');
-
-            // Tabla de detalle (existente)
-            const tbody = document.getElementById('killProductsBody');
-            tbody.innerHTML = '';
-
-            if (cdSKUs.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Nenhum produto a matar no momento</td></tr>';
-                return;
-            }
-
-            cdSKUs.forEach(row => {
-                const tr = document.createElement('tr');
-                const trendBadge = getTrendBadge(row.trend);
-
-                tr.innerHTML = `
-                    <td>${row.sku}</td>
-                    <td>${row.nome_produto}</td>
-                    <td>${row.familia}</td>
-                    <td>${row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol'}</td>
-                    <td><span class="badge badge-${row.curva.toLowerCase()}">${row.curva}</span></td>
-                    <td>${row.estoqueMatriz}</td>
-                    <td>${Math.round(row.vendaMedia)}</td>
-                    <td>${trendBadge}</td>
-                    <td>${row.monthsSinceLastSale}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function downloadProdutosMatarExcel() {
-            if (!_produtosMatarData || _produtosMatarData.length === 0) {
-                alert('Sem dados para exportar. Aguarde o carregamento dos dados.');
-                return;
-            }
-            if (typeof XLSX === 'undefined') {
-                alert('Biblioteca XLSX não carregada. Recarregue a página.');
-                return;
-            }
-
-            const items = _produtosMatarData;
-            const totalEstoque = items.reduce((s, d) => s + d.estoqueMatriz, 0);
-            const curvaC = items.filter(d => d.curva === 'C');
-            const curvaD = items.filter(d => d.curva === 'D');
-            const hoje = new Date().toLocaleDateString('pt-BR');
-
-            // Helper: format trend as clean text (no HTML, no badge)
-            const formatTrend = (trend) => {
-                if (trend === null || trend === undefined || isNaN(trend)) return '—';
-                const val = Number(trend).toFixed(0);
-                if (trend > 5) return 'Subindo (+' + val + '%)';
-                if (trend < -5) return 'Caindo (' + val + '%)';
-                return 'Estável (' + val + '%)';
-            };
-
-            // ==== Sheet 1: Resumo ====
-            const resumoAOA = [
-                ['PRODUTOS A MATAR — ÓCULOS COMMAND CENTER'],
-                ['Gerado em: ' + hoje],
-                [],
-                ['Curva', 'SKUs', 'Estoque Total'],
-                ['C', curvaC.length, curvaC.reduce((s,d) => s+d.estoqueMatriz, 0)],
-                ['D', curvaD.length, curvaD.reduce((s,d) => s+d.estoqueMatriz, 0)],
-                ['TOTAL', items.length, totalEstoque]
-            ];
-            const wsResumo = XLSX.utils.aoa_to_sheet(resumoAOA);
-            wsResumo['!cols'] = [{ wch: 14 }, { wch: 10 }, { wch: 16 }];
-            wsResumo['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }];
-
-            // Styling title + headers (SheetJS community supports basic cell styles)
-            if (wsResumo['A1']) wsResumo['A1'].s = { font: { bold: true, sz: 14, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '217346' } }, alignment: { horizontal: 'center' } };
-            if (wsResumo['A2']) wsResumo['A2'].s = { font: { italic: true, color: { rgb: '666666' } } };
-            ['A4','B4','C4'].forEach(c => { if (wsResumo[c]) wsResumo[c].s = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '1A1A2E' } }, alignment: { horizontal: 'center' } }; });
-            ['A7','B7','C7'].forEach(c => { if (wsResumo[c]) wsResumo[c].s = { font: { bold: true }, fill: { fgColor: { rgb: 'E8E8E8' } } }; });
-
-            // ==== Sheet 2: Detalhe ====
-            const header = ['SKU', 'Produto', 'Família', 'Classe', 'Curva', 'Estoque Matriz', 'Venda Média Mensal', 'Tendência', 'Meses sem Venda'];
-            const rows = items.map(d => [
-                d.sku,
-                d.nome_produto || '',
-                d.familia || '',
-                d.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol',
-                d.curva,
-                d.estoqueMatriz,
-                Math.round(d.vendaMedia),
-                formatTrend(d.trend),
-                d.monthsSinceLastSale
-            ]);
-            const detalheAOA = [header, ...rows];
-            const wsDetalhe = XLSX.utils.aoa_to_sheet(detalheAOA);
-            wsDetalhe['!cols'] = [
-                { wch: 12 }, { wch: 40 }, { wch: 18 }, { wch: 8 }, { wch: 8 },
-                { wch: 16 }, { wch: 20 }, { wch: 22 }, { wch: 18 }
-            ];
-            // Freeze header row
-            wsDetalhe['!freeze'] = { xSplit: 0, ySplit: 1 };
-            wsDetalhe['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: rows.length, c: header.length - 1 } }) };
-
-            // Style header
-            for (let c = 0; c < header.length; c++) {
-                const ref = XLSX.utils.encode_cell({ r: 0, c });
-                if (wsDetalhe[ref]) wsDetalhe[ref].s = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '217346' } }, alignment: { horizontal: 'center' } };
-            }
-
-            // Color curva badges + tendencia
-            for (let r = 1; r <= rows.length; r++) {
-                const curva = rows[r-1][4];
-                const curvaCell = XLSX.utils.encode_cell({ r, c: 4 });
-                if (wsDetalhe[curvaCell]) {
-                    const color = curva === 'C' ? 'EAB308' : 'EF4444';
-                    wsDetalhe[curvaCell].s = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: color } }, alignment: { horizontal: 'center' } };
-                }
-                const trendText = rows[r-1][7];
-                const trendCell = XLSX.utils.encode_cell({ r, c: 7 });
-                if (wsDetalhe[trendCell] && typeof trendText === 'string') {
-                    let tColor = '666666';
-                    if (trendText.startsWith('Subindo')) tColor = '10B981';
-                    else if (trendText.startsWith('Caindo')) tColor = 'EF4444';
-                    wsDetalhe[trendCell].s = { font: { color: { rgb: tColor }, bold: true } };
-                }
-            }
-
-            // ==== Sheet 3: Análise por Família ====
-            const famStats = _produtosMatarFamilias;
-            const famHeader = ['Família', 'SKUs', 'Unidades', '% do Total', 'Média Meses sem Venda', 'Curva C (SKUs)', 'Curva D (SKUs)'];
-            const famRows = famStats.map(f => [
-                f.familia,
-                f.skus,
-                f.unidades,
-                parseFloat(f.pctTotal.toFixed(1)),
-                parseFloat(f.mediaMeses.toFixed(1)),
-                f.curvas['C'] || 0,
-                f.curvas['D'] || 0
-            ]);
-            const famAOA = [famHeader, ...famRows];
-            const wsFamilias = XLSX.utils.aoa_to_sheet(famAOA);
-            wsFamilias['!cols'] = [
-                { wch: 22 }, { wch: 8 }, { wch: 12 }, { wch: 12 }, { wch: 24 }, { wch: 14 }, { wch: 14 }
-            ];
-            wsFamilias['!autofilter'] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: famRows.length, c: famHeader.length - 1 } }) };
-
-            // Style header
-            for (let c = 0; c < famHeader.length; c++) {
-                const ref = XLSX.utils.encode_cell({ r: 0, c });
-                if (wsFamilias[ref]) wsFamilias[ref].s = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '217346' } }, alignment: { horizontal: 'center' } };
-            }
-            // % column format
-            for (let r = 1; r <= famRows.length; r++) {
-                const ref = XLSX.utils.encode_cell({ r, c: 3 });
-                if (wsFamilias[ref]) wsFamilias[ref].z = '0.0"%"';
-            }
-
-            // ==== Sheet 4: Resumo Classe ====
-            const sol = items.filter(d => d.descricao_classe !== 'Óculos de Grau');
-            const grau = items.filter(d => d.descricao_classe === 'Óculos de Grau');
-            const classeAOA = [
-                ['ANÁLISE POR CLASSE'],
-                [],
-                ['Classe', 'SKUs', 'Unidades', '% SKUs', '% Unidades'],
-                ['Sol', sol.length, sol.reduce((s,d)=>s+d.estoqueMatriz,0), parseFloat((sol.length/items.length*100).toFixed(1)), parseFloat((sol.reduce((s,d)=>s+d.estoqueMatriz,0)/totalEstoque*100).toFixed(1))],
-                ['Grau', grau.length, grau.reduce((s,d)=>s+d.estoqueMatriz,0), parseFloat((grau.length/items.length*100).toFixed(1)), parseFloat((grau.reduce((s,d)=>s+d.estoqueMatriz,0)/totalEstoque*100).toFixed(1))],
-                ['TOTAL', items.length, totalEstoque, 100, 100]
-            ];
-            const wsClasse = XLSX.utils.aoa_to_sheet(classeAOA);
-            wsClasse['!cols'] = [{ wch: 10 }, { wch: 8 }, { wch: 12 }, { wch: 10 }, { wch: 14 }];
-            wsClasse['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 4 } }];
-            if (wsClasse['A1']) wsClasse['A1'].s = { font: { bold: true, sz: 13, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '217346' } }, alignment: { horizontal: 'center' } };
-            ['A3','B3','C3','D3','E3'].forEach(c => { if (wsClasse[c]) wsClasse[c].s = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '1A1A2E' } }, alignment: { horizontal: 'center' } }; });
-
-            // Build workbook
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo');
-            XLSX.utils.book_append_sheet(wb, wsFamilias, 'Análise Famílias');
-            XLSX.utils.book_append_sheet(wb, wsClasse, 'Sol vs Grau');
-            XLSX.utils.book_append_sheet(wb, wsDetalhe, 'Detalhe SKU');
-
-            const fileName = 'produtos_a_matar_' + new Date().toISOString().slice(0,10) + '.xlsx';
-            XLSX.writeFile(wb, fileName);
-        }
-
-        function renderEstoqueLojas(data) {
-            if (!rawStoreData || rawStoreData.length === 0) {
-                document.getElementById('slTotalStores').textContent = '0';
-                return;
-            }
-
-            // KPIs
-            document.getElementById('slTotalStores').textContent = storeColumns.length;
-
-            // Find SKUs with stock in matriz but below minimum in stores
-            // Rule: Curva A = min 2 per store, all others (B/C/D) = min 1 per store
-            // Only applies if estoqueMatriz > 0 (there's stock to distribute)
-            const skusWithMatrizStock = data.filter(d => d.estoqueMatriz > 0 && d.curva);
-            let stockoutInStores = 0;
-            const storeStockoutRows = [];
-
-            skusWithMatrizStock.forEach(sku => {
-                const storeData = rawStoreData.find(s => s.sku === sku.sku);
-                if (!storeData) return;
-                const minQty = sku.curva === 'A' ? 2 : 1;
-                const storesBelowMin = storeColumns.filter(col => (storeData[col] || 0) < minQty);
-                if (storesBelowMin.length > 0) {
-                    stockoutInStores++;
-                    const details = storesBelowMin.map(col => {
-                        const qty = storeData[col] || 0;
-                        return col + (qty > 0 ? ' (' + qty + '/' + minQty + ')' : '');
-                    });
-                    storeStockoutRows.push({
-                        ...sku,
-                        minQty,
-                        storesWithout: details.join(', ')
-                    });
-                }
-            });
-
-            // Sort: A first, then by number of stores below min
-            storeStockoutRows.sort((a, b) => {
-                const curvaOrder = { A: 0, B: 1, C: 2, D: 3 };
-                if ((curvaOrder[a.curva] || 9) !== (curvaOrder[b.curva] || 9)) return (curvaOrder[a.curva] || 9) - (curvaOrder[b.curva] || 9);
-                return b.storesWithout.split(',').length - a.storesWithout.split(',').length;
-            });
-
-            document.getElementById('slStockoutInStores').textContent = stockoutInStores;
-
-            // Distribution opportunities: total missing units across all stores
-            let opportunities = 0;
-            skusWithMatrizStock.forEach(sku => {
-                const storeData = rawStoreData.find(s => s.sku === sku.sku);
-                if (!storeData) return;
-                const minQty = sku.curva === 'A' ? 2 : 1;
-                storeColumns.forEach(col => {
-                    const current = storeData[col] || 0;
-                    if (current < minQty) opportunities += (minQty - current);
-                });
-            });
-            document.getElementById('slDistributionOpp').textContent = opportunities;
-
-            // Stockout table
-            const stockoutBody = document.getElementById('storeStockoutBody');
-            stockoutBody.innerHTML = '';
-            storeStockoutRows.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${row.sku}</td>
-                    <td>${row.nome_produto}</td>
-                    <td><span class="badge badge-${row.curva.toLowerCase()}">${row.curva}</span> <span style="font-size:10px;color:var(--text-secondary);">min ${row.minQty}</span></td>
-                    <td>${row.estoqueMatriz}</td>
-                    <td>${row.storesWithout}</td>
-                `;
-                stockoutBody.appendChild(tr);
-            });
-
-            // Store distribution cards
-            const cardsContainer = document.getElementById('storeDistributionCards');
-            cardsContainer.innerHTML = '';
-
-            storeColumns.forEach(storeName => {
-                const storesWithData = rawStoreData.filter(s => (s[storeName] || 0) > 0);
-                const skusAtStore = data.filter(sku => {
-                    const storeData = rawStoreData.find(s => s.sku === sku.sku);
-                    return storeData && (storeData[storeName] || 0) > 0;
-                });
-                const totalASKUs = data.filter(d => d.curva === 'A').length;
-                const totalBSKUs = data.filter(d => d.curva === 'B').length;
-                const totalCSKUs = data.filter(d => d.curva === 'C').length;
-                const aCoverage = totalASKUs > 0 ? Math.round((skusAtStore.filter(s => s.curva === 'A').length / totalASKUs) * 100) : 0;
-                const bCoverage = totalBSKUs > 0 ? Math.round((skusAtStore.filter(s => s.curva === 'B').length / totalBSKUs) * 100) : 0;
-                const cCoverage = totalCSKUs > 0 ? Math.round((skusAtStore.filter(s => s.curva === 'C').length / totalCSKUs) * 100) : 0;
-
-                // Calculate piece counts
-                const totalPieces = rawStoreData.reduce((sum, d) => sum + (d[storeName] || 0), 0);
-                const grauPieces = rawStoreData.filter(row => {
-                    const sku = data.find(s => s.sku === row.sku);
-                    return sku && sku.descricao_classe === 'Óculos de Grau';
-                }).reduce((sum, d) => sum + (d[storeName] || 0), 0);
-                const solPieces = rawStoreData.filter(row => {
-                    const sku = data.find(s => s.sku === row.sku);
-                    return sku && sku.descricao_classe === 'Óculos de Sol';
-                }).reduce((sum, d) => sum + (d[storeName] || 0), 0);
-
-                // Count SKUs below minimum in this store
-                let belowMinCount = 0;
-                let missingUnits = 0;
-                skusWithMatrizStock.forEach(sku => {
-                    const sd = rawStoreData.find(s => s.sku === sku.sku);
-                    if (!sd) return;
-                    const minQty = sku.curva === 'A' ? 2 : 1;
-                    const current = sd[storeName] || 0;
-                    if (current < minQty) {
-                        belowMinCount++;
-                        missingUnits += (minQty - current);
+            
+            data.forEach(item => {
+                const storeRow = rawStoreData.find(r => r.sku === item.sku);
+                if (!storeRow) return;
+                
+                const minIdeal = item.curva === 'A' ? 2 : 1;
+                const hasMatrizStock = item.estoqueMatriz > 0;
+                
+                sortedStores.forEach(store => {
+                    const qty = Number(storeRow[store]) || 0;
+                    const stats = storeStats[store];
+                    
+                    if (qty > 0) {
+                        stats.totalSKUs++;
+                        stats.totalPcs += qty;
+                        if (item.curva === 'A') stats.curvaA++;
+                        else if (item.curva === 'B') stats.curvaB++;
+                        else if (item.curva === 'C') stats.curvaC++;
+                        else stats.curvaD++;
                     }
-                });
-
-                const card = document.createElement('div');
-                card.className = 'store-card';
-                card.innerHTML = `
-                    <div class="store-name">${storeName.replace(/_/g, ' ').toUpperCase()}</div>
-                    <div class="store-stat">Total SKUs: <span class="store-stat-value">${storesWithData.length}</span></div>
-                    <div class="store-stat">Total: <span class="store-stat-value">${totalPieces} pçs</span> | Grau: ${grauPieces} | Sol: ${solPieces}</div>
-                    <div class="store-stat">Curva A: <span class="store-stat-value">${aCoverage}%</span> | B: <span class="store-stat-value">${bCoverage}%</span> | C: <span class="store-stat-value">${cCoverage}%</span></div>
-                    <div class="store-stat" style="color:${belowMinCount > 0 ? '#ef4444' : '#10b981'};font-weight:600;">
-                        ${belowMinCount > 0 ? 'Abaixo mín: ' + belowMinCount + ' SKUs (' + missingUnits + ' pçs faltam)' : 'Todos SKUs no mínimo ✓'}
-                    </div>
-                `;
-                cardsContainer.appendChild(card);
-            });
-
-            // Overstock table
-            const overstockBody = document.getElementById('storeOverstockBody');
-            overstockBody.innerHTML = '';
-            const overstockRows = [];
-
-            data.forEach(sku => {
-                const storeData = rawStoreData.find(s => s.sku === sku.sku);
-                if (storeData) {
-                    storeColumns.forEach(storeName => {
-                        const storeStock = storeData[storeName] || 0;
-                        const totalMatrizImportacao = storeData.estoque_total_matriz_importacao || 0;
-                        const threshold = totalMatrizImportacao * 0.15;
-                        if (storeStock > threshold) {
-                            const percentage = totalMatrizImportacao > 0 ? ((storeStock / totalMatrizImportacao) * 100).toFixed(1) : 0;
-                            overstockRows.push({
-                                sku: sku.sku,
-                                nome_produto: sku.nome_produto,
-                                store: storeName,
-                                storeStock,
-                                percentage
-                            });
+                    
+                    if (hasMatrizStock) {
+                        if (qty < minIdeal) {
+                            stats.faltantes++;
+                            stats.faltantesUn += (minIdeal - qty);
+                            if (item.curva === 'A') stats.faltantesA++;
                         }
-                    });
-                }
-            });
-
-            overstockRows.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${row.sku}</td>
-                    <td>${row.nome_produto}</td>
-                    <td>${row.store.replace(/_/g, ' ').toUpperCase()}</td>
-                    <td>${row.storeStock}</td>
-                    <td>${row.percentage}%</td>
-                `;
-                overstockBody.appendChild(tr);
-            });
-        }
-
-        // ==================== INFORME POR LOJA ====================
-        let _informeLojaClassified = [];
-
-        function initInformeLoja(data) {
-            _informeLojaClassified = data;
-            const select = document.getElementById('informeLojaSelect');
-            // Clear existing options except the first
-            select.innerHTML = '<option value="">-- Seleccionar --</option>';
-            if (storeColumns.length === 0) return;
-            storeColumns.forEach(col => {
-                const opt = document.createElement('option');
-                opt.value = col;
-                opt.textContent = col.replace(/_/g, ' ').toUpperCase();
-                select.appendChild(opt);
-            });
-        }
-
-        function renderInformeLoja() {
-            const storeName = document.getElementById('informeLojaSelect').value;
-            const tbody = document.getElementById('informeLojaBody');
-            const kpis = document.getElementById('informeLojaKPIs');
-            const btnExcel = document.getElementById('btnInformeExcel');
-
-            if (!storeName) {
-                tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Selecciona una loja para ver el informe</td></tr>';
-                kpis.style.display = 'none';
-                btnExcel.style.display = 'none';
-                return;
-            }
-
-            kpis.style.display = 'block';
-            btnExcel.style.display = 'flex';
-
-            const data = _informeLojaClassified;
-            const totalRevenue = data.reduce((s, d) => s + d.vendaMedia, 0);
-
-            // Build rows for this store
-            const rows = [];
-            data.forEach(d => {
-                const sd = rawStoreData.find(s => s.sku === d.sku);
-                const stockLoja = sd ? (sd[storeName] || 0) : 0;
-
-                // Minimum ideal: only if there's stock in matriz
-                const hasMatrizStock = d.estoqueMatriz > 0;
-                const minIdeal = hasMatrizStock ? (d.curva === 'A' ? 2 : 1) : 0;
-                const diff = stockLoja - minIdeal;
-                const share = totalRevenue > 0 ? ((d.vendaMedia / totalRevenue) * 100) : 0;
-
-                let estado, accion;
-                if (minIdeal === 0 && stockLoja === 0) {
-                    // No stock in matriz and no stock in store - skip unless store has stock
-                    return;
-                }
-                if (minIdeal === 0 && stockLoja > 0) {
-                    // Store has stock but matriz doesn't - possible excess/dead
-                    estado = 'EXCESO';
-                    accion = 'Devolver a matriz o trocar';
-                } else if (diff > 0) {
-                    estado = 'EXCESO';
-                    accion = 'Devolver ' + diff + ' pzs a matriz';
-                } else if (diff < 0) {
-                    estado = 'FALTANTE';
-                    accion = 'Enviar ' + Math.abs(diff) + ' pzs a loja';
-                } else {
-                    estado = 'OK';
-                    accion = 'Mantener';
-                }
-
-                rows.push({
-                    ...d, stockLoja, minIdeal, diff, share, estado, accion
-                });
-            });
-
-            // Also include SKUs that the store has but are not in classified (edge case)
-            if (rawStoreData) {
-                rawStoreData.forEach(sd => {
-                    const stockLoja = sd[storeName] || 0;
-                    if (stockLoja > 0 && !rows.find(r => r.sku === sd.sku)) {
-                        rows.push({
-                            sku: sd.sku,
-                            nome_produto: sd.nome_produto || '—',
-                            descricao_classe: sd.descricao_classe || '',
-                            curva: 'D',
-                            vendaMedia: 0,
-                            estoqueMatriz: 0,
-                            stockLoja,
-                            minIdeal: 0,
-                            diff: stockLoja,
-                            share: 0,
-                            estado: 'EXCESO',
-                            accion: 'Devolver ' + stockLoja + ' pzs a matriz'
-                        });
+                        if (qty > minIdeal + 1) {
+                            stats.excesos++;
+                            stats.excesosUn += (qty - minIdeal);
+                        }
                     }
                 });
+            });
+            
+            sortedStores.forEach(store => {
+                totalFaltantes += storeStats[store].faltantes;
+                totalFaltantesUn += storeStats[store].faltantesUn;
+                totalExcessos += storeStats[store].excesos;
+            });
+            
+            const el = id => document.getElementById(id);
+            if (el('lojTotalStores')) el('lojTotalStores').textContent = numStores;
+            if (el('lojPrioridade')) el('lojPrioridade').textContent = 'Prioridade: ' + sortedStores.map(s => s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).substring(0, 3).toUpperCase()).join(' > ');
+            if (el('lojFaltantes')) el('lojFaltantes').textContent = totalFaltantes;
+            if (el('lojFaltantesUn')) el('lojFaltantesUn').textContent = totalFaltantesUn;
+            if (el('lojExcessos')) el('lojExcessos').textContent = totalExcessos;
+            
+            const cardsContainer = document.getElementById('lojaCards');
+            if (cardsContainer) {
+                cardsContainer.innerHTML = sortedStores.map((store, idx) => {
+                    const s = storeStats[store];
+                    const storeName = store.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                    const health = s.faltantesA === 0 ? 'green' : s.faltantesA <= 5 ? 'orange' : 'red';
+                    const healthLabel = health === 'green' ? 'Saud\u00e1vel' : health === 'orange' ? 'Aten\u00e7\u00e3o' : 'Cr\u00edtico';
+                    const healthColor = health === 'green' ? '#10b981' : health === 'orange' ? '#f59e0b' : '#ef4444';
+                    return `<div style="background:white;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.08);border-top:3px solid ${healthColor};">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                            <div><span style="font-size:15px;font-weight:700;">${storeName}</span><span style="font-size:11px;color:#999;margin-left:8px;">Prioridade #${idx + 1}</span></div>
+                            <span style="font-size:11px;font-weight:600;color:${healthColor};background:${healthColor}15;padding:2px 10px;border-radius:4px;">${healthLabel}</span>
+                        </div>
+                        <div style="font-size:12px;margin-bottom:10px;">
+                            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                                <span style="color:#888;">Stock total:</span>
+                                <strong>${s.totalPcs} un. (${s.totalSKUs} SKUs)</strong>
+                            </div>
+                            <div style="display:flex;gap:6px;margin-bottom:8px;">
+                                <span style="background:#0000E1;color:white;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;">A: ${s.curvaA}</span>
+                                <span style="background:#10b981;color:white;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;">B: ${s.curvaB}</span>
+                                <span style="background:#eab308;color:white;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;">C: ${s.curvaC}</span>
+                                <span style="background:#ef4444;color:white;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;">D: ${s.curvaD}</span>
+                            </div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                            <div style="background:#fef2f2;border-radius:6px;padding:10px;">
+                                <div style="font-size:10px;font-weight:700;color:#991b1b;margin-bottom:4px;">FALTANTES</div>
+                                <div style="font-size:12px;"><strong style="color:#ef4444;">${s.faltantes}</strong> SKUs | <strong style="color:#ef4444;">${s.faltantesUn}</strong> un.</div>
+                                ${s.faltantesA > 0 ? '<div style="font-size:10px;color:#ef4444;margin-top:4px;font-weight:600;">' + s.faltantesA + ' s\u00e3o Curva A</div>' : ''}
+                            </div>
+                            <div style="background:#eff6ff;border-radius:6px;padding:10px;">
+                                <div style="font-size:10px;font-weight:700;color:#1e40af;margin-bottom:4px;">EXCESSOS</div>
+                                <div style="font-size:12px;"><strong style="color:#3b82f6;">${s.excesos}</strong> SKUs | <strong style="color:#3b82f6;">${s.excesosUn}</strong> un.</div>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
             }
-
-            // Sort: FALTANTE first, then EXCESO, then OK. Within each group by curva
-            const estadoOrder = { 'FALTANTE': 0, 'EXCESO': 1, 'OK': 2 };
-            const curvaOrder = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
-            rows.sort((a, b) => {
-                if (estadoOrder[a.estado] !== estadoOrder[b.estado]) return estadoOrder[a.estado] - estadoOrder[b.estado];
-                return (curvaOrder[a.curva] ?? 9) - (curvaOrder[b.curva] ?? 9);
-            });
-
-            // KPIs
-            const totalSKUs = rows.filter(r => r.stockLoja > 0).length;
-            const totalPcs = rows.reduce((s, r) => s + r.stockLoja, 0);
-            const okCount = rows.filter(r => r.estado === 'OK').length;
-            const faltantes = rows.filter(r => r.estado === 'FALTANTE').length;
-            const excesos = rows.filter(r => r.estado === 'EXCESO').length;
-            const sinIdeal = rows.filter(r => r.minIdeal === 0 && r.stockLoja > 0).length;
-
-            document.getElementById('ilTotalSKUs').textContent = totalSKUs;
-            document.getElementById('ilTotalPcs').textContent = totalPcs;
-            document.getElementById('ilOKCount').textContent = okCount;
-            document.getElementById('ilFaltantes').textContent = faltantes;
-            document.getElementById('ilExcesos').textContent = excesos;
-            document.getElementById('ilSinIdeal').textContent = sinIdeal;
-
-            // Table
-            tbody.innerHTML = '';
-            if (rows.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Sin datos para esta loja</td></tr>';
-                return;
+            
+            const alertsContainer = document.getElementById('lojaAlerts');
+            if (alertsContainer) {
+                alertsContainer.innerHTML = sortedStores
+                    .filter(store => storeStats[store].faltantesA >= 5)
+                    .map(store => {
+                        const s = storeStats[store];
+                        const storeName = store.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                        const isCritical = s.faltantesA >= 10;
+                        return `<div style="margin-bottom:8px;background:${isCritical ? '#fef2f2' : '#fffbeb'};border-radius:8px;padding:14px;font-size:12px;color:${isCritical ? '#991b1b' : '#92400e'};border-left:3px solid ${isCritical ? '#ef4444' : '#f59e0b'};">
+                            <strong>${isCritical ? 'Alerta Cr\u00edtica:' : 'Aten\u00e7\u00e3o:'}</strong> ${storeName} tem ${s.faltantesA} SKUs Curva A faltantes. Priorizar envio.
+                        </div>`;
+                    }).join('');
             }
-
-            rows.forEach(row => {
-                const tr = document.createElement('tr');
-                const estadoColor = row.estado === 'OK' ? '#10b981' : row.estado === 'FALTANTE' ? '#ef4444' : '#f59e0b';
-                const estadoBg = row.estado === 'OK' ? 'rgba(16,185,129,0.1)' : row.estado === 'FALTANTE' ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)';
-                const diffText = row.diff > 0 ? '+' + row.diff : row.diff < 0 ? String(row.diff) : '0';
-                const diffColor = row.diff > 0 ? '#f59e0b' : row.diff < 0 ? '#ef4444' : '#10b981';
-                const classe = row.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol';
-
-                tr.innerHTML = `
-                    <td><span style="padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;color:${estadoColor};background:${estadoBg};">${row.estado}</span></td>
-                    <td><span class="badge badge-${(row.curva||'d').toLowerCase()}">${row.curva || 'D'}</span></td>
-                    <td>${row.sku}</td>
-                    <td>${row.nome_produto}</td>
-                    <td>${classe}</td>
-                    <td>${row.share.toFixed(1)}%</td>
-                    <td>${Math.round(row.vendaMedia || 0)}</td>
-                    <td style="font-weight:600;">${row.stockLoja}</td>
-                    <td>${row.minIdeal}</td>
-                    <td style="font-weight:600;color:${diffColor}">${diffText}</td>
-                    <td style="font-size:11px;">${row.accion}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function downloadInformeLojaExcel() {
-            const storeName = document.getElementById('informeLojaSelect').value;
-            if (!storeName) { alert('Selecciona una loja primero.'); return; }
-
-            const data = _informeLojaClassified;
-            const totalRevenue = data.reduce((s, d) => s + d.vendaMedia, 0);
-
-            // Rebuild rows (same logic as render)
-            const rows = [];
-            data.forEach(d => {
-                const sd = rawStoreData.find(s => s.sku === d.sku);
-                const stockLoja = sd ? (sd[storeName] || 0) : 0;
-                const hasMatrizStock = d.estoqueMatriz > 0;
-                const minIdeal = hasMatrizStock ? (d.curva === 'A' ? 2 : 1) : 0;
-                const diff = stockLoja - minIdeal;
-                const share = totalRevenue > 0 ? ((d.vendaMedia / totalRevenue) * 100) : 0;
-
-                let estado, accion;
-                if (minIdeal === 0 && stockLoja === 0) return;
-                if (minIdeal === 0 && stockLoja > 0) {
-                    estado = 'EXCESO'; accion = 'Devolver a matriz o trocar';
-                } else if (diff > 0) {
-                    estado = 'EXCESO'; accion = 'Devolver ' + diff + ' pzs a matriz';
-                } else if (diff < 0) {
-                    estado = 'FALTANTE'; accion = 'Enviar ' + Math.abs(diff) + ' pzs a loja';
-                } else {
-                    estado = 'OK'; accion = 'Mantener';
-                }
-                rows.push({ ...d, stockLoja, minIdeal, diff, share, estado, accion });
-            });
-
-            if (rawStoreData) {
-                rawStoreData.forEach(sd => {
-                    const stockLoja = sd[storeName] || 0;
-                    if (stockLoja > 0 && !rows.find(r => r.sku === sd.sku)) {
-                        rows.push({
-                            sku: sd.sku, nome_produto: sd.nome_produto || '—',
-                            descricao_classe: sd.descricao_classe || '', curva: 'D',
-                            vendaMedia: 0, estoqueMatriz: 0, stockLoja, minIdeal: 0,
-                            diff: stockLoja, share: 0, estado: 'EXCESO',
-                            accion: 'Devolver ' + stockLoja + ' pzs a matriz'
-                        });
-                    }
+            
+            const select = document.getElementById('lojaDetailSelect');
+            if (select && select.options.length <= 1) {
+                sortedStores.forEach(store => {
+                    const opt = document.createElement('option');
+                    opt.value = store;
+                    opt.textContent = store.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                    select.appendChild(opt);
                 });
             }
+            
+            window._lojasData = data;
+            window._sortedStores = sortedStores;
+        }
 
-            const estadoOrder = { 'FALTANTE': 0, 'EXCESO': 1, 'OK': 2 };
-            const curvaOrder = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+        function renderLojaDetail() {
+            const store = document.getElementById('lojaDetailSelect').value;
+            if (!store) {
+                document.getElementById('lojaDetailKPIs').style.display = 'none';
+                document.getElementById('lojaDetailBody').innerHTML = '<tr><td colspan="9" class="empty-state">Selecione uma loja</td></tr>';
+                return;
+            }
+            
+            document.getElementById('lojaDetailKPIs').style.display = 'block';
+            const data = window._lojasData || [];
+            const rows = [];
+            
+            data.forEach(item => {
+                const storeRow = rawStoreData.find(r => r.sku === item.sku);
+                if (!storeRow) return;
+                const qty = Number(storeRow[store]) || 0;
+                const minIdeal = item.estoqueMatriz > 0 ? (item.curva === 'A' ? 2 : 1) : 0;
+                if (minIdeal === 0 && qty === 0) return;
+                
+                const diff = qty - minIdeal;
+                let estado, accion;
+                if (diff === 0) { estado = '\u{1F7E2} OK'; accion = 'Nenhuma'; }
+                else if (diff < 0) { estado = '\u{1F534} Faltante'; accion = 'Enviar ' + Math.abs(diff) + ' un.'; }
+                else { estado = '\u{1F535} Excesso'; accion = 'Devolver ' + diff + ' un.'; }
+                
+                rows.push({ item, qty, minIdeal, diff, estado, accion });
+            });
+            
             rows.sort((a, b) => {
-                if (estadoOrder[a.estado] !== estadoOrder[b.estado]) return estadoOrder[a.estado] - estadoOrder[b.estado];
-                return (curvaOrder[a.curva] ?? 9) - (curvaOrder[b.curva] ?? 9);
+                if (a.diff < 0 && b.diff >= 0) return -1;
+                if (a.diff >= 0 && b.diff < 0) return 1;
+                if (a.diff < 0 && b.diff < 0) {
+                    const curvaOrder = { A: 0, B: 1, C: 2, D: 3 };
+                    return (curvaOrder[a.item.curva] || 3) - (curvaOrder[b.item.curva] || 3);
+                }
+                return a.diff - b.diff;
             });
+            
+            const ok = rows.filter(r => r.diff === 0).length;
+            const faltantes = rows.filter(r => r.diff < 0).length;
+            const excesos = rows.filter(r => r.diff > 0).length;
+            const totalPcs = rows.reduce((s, r) => s + r.qty, 0);
+            
+            const el = id => document.getElementById(id);
+            if (el('ldTotalSKUs')) el('ldTotalSKUs').textContent = rows.length;
+            if (el('ldTotalPcs')) el('ldTotalPcs').textContent = totalPcs;
+            if (el('ldOK')) el('ldOK').textContent = ok;
+            if (el('ldFaltantes')) el('ldFaltantes').textContent = faltantes;
+            if (el('ldExcessos')) el('ldExcessos').textContent = excesos;
+            
+            const tbody = document.getElementById('lojaDetailBody');
+            if (tbody) {
+                tbody.innerHTML = rows.map(r => `<tr style="${r.diff < 0 ? 'background:#fef2f2;' : r.diff > 0 ? 'background:#eff6ff;' : ''}">
+                    <td>${r.estado}</td>
+                    <td>${getCurvaBadge(r.item.curva)}</td>
+                    <td><strong>${r.item.sku}</strong></td>
+                    <td>${r.item.nome_produto || ''}</td>
+                    <td>${r.item.descricao_classe || ''}</td>
+                    <td style="text-align:center;">${r.qty}</td>
+                    <td style="text-align:center;">${r.minIdeal}</td>
+                    <td style="text-align:center;font-weight:600;color:${r.diff < 0 ? '#ef4444' : r.diff > 0 ? '#3b82f6' : '#10b981'};">${r.diff > 0 ? '+' : ''}${r.diff}</td>
+                    <td>${r.accion}</td>
+                </tr>`).join('');
+            }
+        }
 
-            const faltantes = rows.filter(r => r.estado === 'FALTANTE');
-            const excesos = rows.filter(r => r.estado === 'EXCESO');
-            const ok = rows.filter(r => r.estado === 'OK');
-            const displayName = storeName.replace(/_/g, ' ').toUpperCase();
-
-            let csv = '\uFEFF';
-            csv += 'INFORME DE STOCK - ' + displayName + '\n';
-            csv += 'Generado: ' + new Date().toLocaleDateString('pt-BR') + '\n';
-            csv += 'Regla: Curva A = min 2 piezas | Curva B/C/D = min 1 pieza\n';
-            csv += '\n';
-            csv += 'RESUMEN\n';
-            csv += 'SKUs en loja,' + rows.filter(r => r.stockLoja > 0).length + '\n';
-            csv += 'Total piezas,' + rows.reduce((s,r) => s + r.stockLoja, 0) + '\n';
-            csv += 'Faltantes (necesitan reposicion),' + faltantes.length + '\n';
-            csv += 'Excesos (posible devolucion),' + excesos.length + '\n';
-            csv += 'OK (stock correcto),' + ok.length + '\n';
-            csv += '\n';
-            csv += 'DETALLE\n';
-            csv += 'Estado,Curva,SKU,Produto,Classe,Share Vendas %,Venda Mensal,Stock Loja,Minimo Ideal,Diferencia,Accion\n';
-
-            rows.forEach(r => {
-                const classe = r.descricao_classe === 'Óculos de Grau' ? 'Grau' : 'Sol';
-                const nome = (r.nome_produto || '').replace(/,/g, ' ');
-                const diffText = r.diff > 0 ? '+' + r.diff : r.diff;
-                csv += `${r.estado},${r.curva || 'D'},${r.sku},"${nome}",${classe},${r.share.toFixed(1)},${Math.round(r.vendaMedia || 0)},${r.stockLoja},${r.minIdeal},${diffText},"${r.accion}"\n`;
+        // ==================== EXCEL DOWNLOADS ====================
+        function downloadOrdenesReposicion() {
+            const data = window._lojasData || [];
+            const sortedStores = window._sortedStores || storeColumns;
+            const now = new Date();
+            const ts = now.getFullYear().toString().slice(2) + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0');
+            
+            const rows = [];
+            data.forEach(item => {
+                const storeRow = rawStoreData.find(r => r.sku === item.sku);
+                if (!storeRow || item.estoqueMatriz <= 0) return;
+                const minIdeal = item.curva === 'A' ? 2 : 1;
+                let disponivel = item.estoqueMatriz;
+                
+                sortedStores.forEach(store => {
+                    if (disponivel <= 0) return;
+                    const qty = Number(storeRow[store]) || 0;
+                    const need = minIdeal - qty;
+                    if (need <= 0) return;
+                    const send = Math.min(need, disponivel);
+                    const initials = store.replace(/_/g, '').substring(0, 2).toUpperCase();
+                    const orderNum = 'REP' + initials + ts + 'M';
+                    rows.push({ orderNum, sku: item.sku, qtd: send, loja: store.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) });
+                    disponivel -= send;
+                });
             });
+            
+            if (rows.length === 0) { alert('Nenhuma ordem de reposi\u00e7\u00e3o necess\u00e1ria.'); return; }
+            
+            const ws_data = [['NUM_ORDEN', 'SKU', 'QTD', 'LOJA']];
+            rows.forEach(r => ws_data.push([r.orderNum, r.sku, r.qtd, r.loja]));
+            
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            ws['!cols'] = [{ wch: 24 }, { wch: 18 }, { wch: 8 }, { wch: 20 }];
+            XLSX.utils.book_append_sheet(wb, ws, 'Ordens Reposi\u00e7\u00e3o');
+            XLSX.writeFile(wb, 'ordens-reposicao-lojas.xlsx');
+        }
 
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'informe_' + storeName + '_' + new Date().toISOString().slice(0,10) + '.csv';
-            a.click();
-            URL.revokeObjectURL(url);
+        function downloadFaltantesExcessosExcel() {
+            const data = window._lojasData || [];
+            const sortedStores = window._sortedStores || storeColumns;
+            
+            const wb = XLSX.utils.book_new();
+            
+            sortedStores.forEach(store => {
+                const storeName = store.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                const rows = [['Estado', 'Curva', 'SKU', 'Produto', 'Classe', 'Stock Loja', 'M\u00ednimo Ideal', 'Diferen\u00e7a', 'A\u00e7\u00e3o']];
+                
+                data.forEach(item => {
+                    const storeRow = rawStoreData.find(r => r.sku === item.sku);
+                    if (!storeRow) return;
+                    const qty = Number(storeRow[store]) || 0;
+                    const minIdeal = item.estoqueMatriz > 0 ? (item.curva === 'A' ? 2 : 1) : 0;
+                    if (minIdeal === 0 && qty === 0) return;
+                    const diff = qty - minIdeal;
+                    if (diff === 0) return;
+                    const estado = diff < 0 ? 'Faltante' : 'Excesso';
+                    const accion = diff < 0 ? 'Enviar ' + Math.abs(diff) + ' un.' : 'Devolver ' + diff + ' un.';
+                    rows.push([estado, item.curva, item.sku, item.nome_produto || '', item.descricao_classe || '', qty, minIdeal, diff, accion]);
+                });
+                
+                const ws = XLSX.utils.aoa_to_sheet(rows);
+                ws['!cols'] = [{ wch: 12 }, { wch: 6 }, { wch: 18 }, { wch: 30 }, { wch: 15 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 20 }];
+                const sheetName = storeName.substring(0, 31);
+                XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            });
+            
+            XLSX.writeFile(wb, 'faltantes-excessos-lojas.xlsx');
         }
 
         function renderIdeias(data) {
@@ -4104,9 +3310,6 @@
                 }).join('');
 
             document.getElementById('insightFamilyPortfolio').innerHTML = familyHtml || '<div>Sem dados</div>';
-
-            // Health Score
-            calculateAndRenderHealthScores(data);
         }
 
         function calculateAndRenderHealthScores(data) {
@@ -4461,53 +3664,11 @@
         }
 
         // ==================== UTILITY FUNCTIONS ====================
-        function applyGlobalFilters(data) {
-            return data.filter(d => {
-                if (filters.classe && d.descricao_classe !== filters.classe) return false;
-                if (filters.genero && d.genero !== filters.genero) return false;
-                if (filters.formato && d.formato !== filters.formato) return false;
-                if (filters.familia && d.familia !== filters.familia) return false;
-                return true;
-            });
-        }
-
-        function getEstadoSemaphore(months) {
-            if (months < 2) return '<span class="semaphore-emoji">🔴</span><span class="status-critical">CRÍTICO</span>';
-            if (months < 4) return '<span class="semaphore-emoji">🟠</span><span class="status-alert">REPOR</span>';
-            if (months < 6) return '<span class="semaphore-emoji">🟡</span><span class="status-warning">VIGIAR</span>';
-            if (months <= 12) return '<span class="semaphore-emoji">🟢</span><span class="status-ok">OK</span>';
-            return '<span class="semaphore-emoji">🔵</span><span class="status-excess">EXCESSO</span>';
-        }
-
         function getTrendBadge(trend) {
             if (trend > 5) return `<span class="trend-arrow trend-up">↑ ${trend.toFixed(0)}%</span>`;
             if (trend < -5) return `<span class="trend-arrow trend-down">↓ ${trend.toFixed(0)}%</span>`;
             return `<span class="trend-arrow trend-flat">→ ${trend.toFixed(0)}%</span>`;
         }
-
-        function populateFilters() {
-            const classes = [...new Set(processedData.map(d => d.descricao_classe).filter(Boolean))].sort();
-            const generos = [...new Set(processedData.map(d => d.genero).filter(Boolean))].sort();
-            const formatos = [...new Set(processedData.map(d => d.formato).filter(Boolean))].sort();
-            const familias = [...new Set(processedData.map(d => d.familia).filter(Boolean))].sort();
-
-            const updateSelect = (id, options) => {
-                const select = document.getElementById(id);
-                options.forEach(opt => {
-                    const option = document.createElement('option');
-                    option.value = opt;
-                    option.textContent = opt;
-                    select.appendChild(option);
-                });
-            };
-
-            updateSelect('filterClasse', classes);
-            updateSelect('filterGenero', generos);
-            updateSelect('filterFormato', formatos);
-            updateSelect('filterFamilia', familias);
-        }
-
-        // updateLastUpdate removed — date now comes from meta.json in loadData()
 
         function showLoadingSpinner(show) {
             document.getElementById('loadingSpinner').classList.toggle('visible', show);
@@ -4524,17 +3685,6 @@
                     document.getElementById(sectionId).classList.add('active');
                     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
                     link.classList.add('active');
-                });
-            });
-
-            // Global filters
-            ['filterClasse', 'filterGenero', 'filterFormato', 'filterFamilia'].forEach(id => {
-                document.getElementById(id).addEventListener('change', (e) => {
-                    const key = id.replace('filter', '').toLowerCase();
-                    filters[key] = e.target.value;
-                    const classified = classifySKUsByABC(processedData);
-                    renderDesempenhoSKU(classified);
-                    renderInteligenciaEstoque(classified);
                 });
             });
 
@@ -5448,7 +4598,7 @@
                         tbl += '</table>';
                         tbl += '<table style="margin-top:6px;font-size:9px;color:#999;"><tr>';
                         tbl += '<td style="padding:2px 4px;"><table cellpadding="0" cellspacing="0"><tr><td style="width:10px;height:8px;background:#f59e0b;border-radius:2px;"></td><td style="padding-left:3px;">Fabricação</td></tr></table></td>';
-                        tbl += '<td style="padding:2px 4px;"><table cellpadding="0" cellspacing="0"><tr><td style="width:10px;height:8px;background:#3b82f6;border-radius:2px;"></td><td style="padding-left:3px;">Trânsito</td></tr></table></td>';
+                        tbl += '<td style="padding:2px 4px;"><table cellpadding="0" cellspacing="0"><tr><td style="width:10px;height:8px;background:#0000E1;border-radius:2px;"></td><td style="padding-left:3px;">Trânsito</td></tr></table></td>';
                         tbl += '<td style="padding:2px 4px;">* Mês atual</td>';
                         tbl += '</tr></table>';
                         return tbl;
@@ -5591,7 +4741,7 @@
                         tbl += '<table style="margin-top:6px;font-size:9px;color:#999;"><tr>';
                         tbl += '<td style="padding:2px 4px;"><table cellpadding="0" cellspacing="0"><tr><td style="width:10px;height:8px;background:#ef4444;border-radius:2px;"></td><td style="padding-left:3px;">Atrasado</td></tr></table></td>';
                         tbl += '<td style="padding:2px 4px;"><table cellpadding="0" cellspacing="0"><tr><td style="width:10px;height:8px;background:#f59e0b;border-radius:2px;"></td><td style="padding-left:3px;">Este mês</td></tr></table></td>';
-                        tbl += '<td style="padding:2px 4px;"><table cellpadding="0" cellspacing="0"><tr><td style="width:10px;height:8px;background:#3b82f6;border-radius:2px;"></td><td style="padding-left:3px;">Futuro</td></tr></table></td>';
+                        tbl += '<td style="padding:2px 4px;"><table cellpadding="0" cellspacing="0"><tr><td style="width:10px;height:8px;background:#0000E1;border-radius:2px;"></td><td style="padding-left:3px;">Futuro</td></tr></table></td>';
                         tbl += '</tr></table>';
                         return tbl;
                     })()}
