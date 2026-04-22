@@ -1349,6 +1349,23 @@
                     </div>
                 </div>
 
+                <!-- ====== MAPA DO PORTFÓLIO (Árvore de SKUs) ====== -->
+                <div style="background:white;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:20px;">
+                    <div style="font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text-primary);">Mapa do Portfólio</div>
+                    <div style="font-size:11px;color:var(--text-secondary);margin-bottom:16px;">De todos os SKUs registrados até a classificação final. As vendas são média mensal.</div>
+                    <div id="mapaPortfolioTree"></div>
+                    <div id="mapaPortfolioCards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px;"></div>
+                </div>
+
+                <!-- ====== DISTRIBUIÇÃO MATRIZ → LOJAS ====== -->
+                <div style="background:white;border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:20px;">
+                    <div style="font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text-primary);">Distribuição Matriz → Lojas</div>
+                    <div style="font-size:11px;color:var(--text-secondary);margin-bottom:16px;">Estoque na matriz que não está nas lojas = venda perdida. Cada card mostra estoque por curva, faltantes com share de vendas, e excessos.</div>
+                    <div id="distKPIs" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;"></div>
+                    <div id="distStoreCards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;"></div>
+                    <div id="distAlertas" style="margin-top:16px;"></div>
+                </div>
+
                 <div class="charts-grid">
                     <div class="chart-container">
                         <div class="chart-title">Vendas por Mês (Últimos 12 Meses)</div>
@@ -1561,7 +1578,7 @@
                                 <th>Import.</th>
                                 <th data-sort="coberturaMeses">Cob. Atual</th>
                                 <th>Cob. c/Imp</th>
-                                <th>Min. Ideal</th>
+                                <th>Min/Loja</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -2215,6 +2232,8 @@
         function renderAllSections() {
             const classified = classifySKUsByABC(processedData);
             renderPainelGeral(classified);
+            renderMapaPortfolio(classified);
+            renderDistribuicaoLojas(classified);
             renderIdeias(classified);
             calculateAndRenderHealthScores(classified);
             renderPerformanceSKU(classified);
@@ -2463,6 +2482,257 @@
         }
 
 
+        // ==================== MAPA DO PORTFÓLIO ====================
+        function renderMapaPortfolio(data) {
+            const totalSKUs = data.length;
+            const activeData = data.filter(d => d.sales3M > 0);
+            const inactiveData = data.filter(d => d.sales3M === 0);
+            const inactiveWithStock = inactiveData.filter(d => d.estoqueMatriz > 0);
+            const deadNoStock = inactiveData.filter(d => d.estoqueMatriz === 0);
+
+            const curvaA = data.filter(d => d.curva === 'A');
+            const curvaB = data.filter(d => d.curva === 'B');
+            const curvaC = data.filter(d => d.curva === 'C');
+            const curvaD = data.filter(d => d.curva === 'D');
+
+            const totalVendaMes = data.reduce((s, d) => s + d.vendaMedia, 0);
+            const salesOf = (arr) => arr.reduce((s, d) => s + d.vendaMedia, 0);
+            const pctSales = (arr) => totalVendaMes > 0 ? (salesOf(arr) / totalVendaMes * 100).toFixed(0) + '%' : '0%';
+
+            // Para matar: C+D, sin venta 6M, con estoque
+            const toKill = data.filter(d => (d.curva === 'C' || d.curva === 'D') && d.estoqueMatriz > 0 && d.last6MonthsSales === 0);
+            const toKillUnits = toKill.reduce((s, d) => s + d.estoqueMatriz, 0);
+            // En observación: vendió entre 3-6M atrás pero no en últimos 3M
+            const observing = inactiveWithStock.filter(d => d.last6MonthsSales > 0);
+
+            const treeNode = (label, value, pct, color, indent, bold, sub, salesPerMonth, salesPct) => {
+                const pl = indent * 28;
+                const dotSize = indent === 0 ? 12 : 10;
+                return `<div style="display:flex;align-items:center;padding:7px 0;padding-left:${pl}px;border-bottom:1px solid #f5f5f5;">
+                    <div style="width:${dotSize}px;height:${dotSize}px;border-radius:50%;background:${color||'#ccc'};margin-right:12px;flex-shrink:0;"></div>
+                    <div style="flex:1;min-width:0;">
+                        <span style="font-size:13px;font-weight:${bold?700:500};color:var(--text-primary);">${label}</span>
+                        ${sub ? `<span style="font-size:11px;color:#999;margin-left:8px;">${sub}</span>` : ''}
+                    </div>
+                    <div style="font-size:14px;font-weight:700;color:${color||'var(--text-primary)'};min-width:55px;text-align:right;">${value}</div>
+                    ${pct != null ? `<div style="font-size:11px;color:#888;margin-left:8px;min-width:50px;text-align:right;">${pct}</div>` : '<div style="margin-left:8px;min-width:50px;"></div>'}
+                    ${salesPerMonth != null ? `<div style="font-size:12px;font-weight:600;color:#444;margin-left:12px;min-width:80px;text-align:right;">${salesPerMonth}</div>` : '<div style="margin-left:12px;min-width:80px;"></div>'}
+                    ${salesPct != null ? `<div style="font-size:12px;font-weight:700;color:var(--livo-blue);margin-left:8px;min-width:70px;text-align:right;background:#f0f4ff;padding:1px 6px;border-radius:4px;">${salesPct}</div>` : '<div style="margin-left:8px;min-width:70px;"></div>'}
+                </div>`;
+            };
+
+            const header = `<div style="display:flex;align-items:center;padding:8px 0;border-bottom:2px solid #e0e0e0;margin-bottom:4px;">
+                <div style="width:12px;margin-right:12px;flex-shrink:0;"></div>
+                <div style="flex:1;min-width:0;"><span style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.5px;">Classificação</span></div>
+                <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.5px;min-width:55px;text-align:right;">SKUs</div>
+                <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-left:8px;min-width:50px;text-align:right;">% Cat.</div>
+                <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-left:12px;min-width:80px;text-align:right;">Vendas/Mês</div>
+                <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-left:8px;min-width:70px;text-align:right;">% Vendas</div>
+            </div>`;
+
+            const activePct = totalSKUs > 0 ? (activeData.length / totalSKUs * 100).toFixed(0) + '%' : '0%';
+            const inactivePct = totalSKUs > 0 ? (inactiveWithStock.length / totalSKUs * 100).toFixed(0) + '%' : '0%';
+
+            const tree = header
+                + treeNode('Total SKUs no Dashboard', totalSKUs, null, '#1a1a2e', 0, true, null, Math.round(totalVendaMes).toLocaleString('pt-BR'), '100%')
+                + treeNode('Ativos (venderam nos últimos 3M)', activeData.length, activePct, '#10b981', 1, true, null, Math.round(salesOf(activeData)).toLocaleString('pt-BR'), '100%')
+                + treeNode('Curva A — proteger e repor sempre', curvaA.length, (totalSKUs > 0 ? (curvaA.length/totalSKUs*100).toFixed(0)+'%' : '0%'), '#0000E1', 2, false, null, Math.round(salesOf(curvaA)).toLocaleString('pt-BR'), pctSales(curvaA))
+                + treeNode('Curva B — manter estoque ativo', curvaB.length, (totalSKUs > 0 ? (curvaB.length/totalSKUs*100).toFixed(0)+'%' : '0%'), '#10b981', 2, false, null, Math.round(salesOf(curvaB)).toLocaleString('pt-BR'), pctSales(curvaB))
+                + treeNode('Curva C — revisar, não repor da China', curvaC.length, (totalSKUs > 0 ? (curvaC.length/totalSKUs*100).toFixed(0)+'%' : '0%'), '#eab308', 2, false, null, Math.round(salesOf(curvaC)).toLocaleString('pt-BR'), pctSales(curvaC))
+                + treeNode('Curva D — cauda longa, liquidar', curvaD.length, (totalSKUs > 0 ? (curvaD.length/totalSKUs*100).toFixed(0)+'%' : '0%'), '#ef4444', 2, false, null, Math.round(salesOf(curvaD)).toLocaleString('pt-BR'), pctSales(curvaD))
+                + '<div style="height:8px;"></div>'
+                + treeNode('Inativos (sem venda 3M, com estoque)', inactiveWithStock.length, inactivePct, '#f59e0b', 1, true, null, '0', '0%')
+                + treeNode('Para matar (C+D, sem venda 6M, com estoque)', toKill.length, null, '#ef4444', 2, false, toKillUnits.toLocaleString('pt-BR') + ' un. paradas', null, null)
+                + treeNode('Em observação (vendeu entre 3-6M atrás)', observing.length, null, '#f59e0b', 2, false, 'monitorar antes de decidir', null, null)
+                + '<div style="height:8px;"></div>'
+                + treeNode('Sem estoque e sem venda', deadNoStock.length, null, '#ccc', 1, false, 'filtrados — não impactam operação', null, null);
+
+            document.getElementById('mapaPortfolioTree').innerHTML = tree;
+
+            // Mini cards — info operativa por curva
+            const totalStock = data.reduce((s, d) => s + d.estoqueMatriz, 0);
+            const stockA = curvaA.reduce((s, d) => s + d.estoqueMatriz, 0);
+            const stockB = curvaB.reduce((s, d) => s + d.estoqueMatriz, 0);
+            const stockC = curvaC.reduce((s, d) => s + d.estoqueMatriz, 0);
+            const stockD = curvaD.reduce((s, d) => s + d.estoqueMatriz, 0);
+
+            // Ventas último mes por curva
+            const salesM0A = curvaA.reduce((s, d) => s + (d.vendas_m00 || 0), 0);
+            const salesM0B = curvaB.reduce((s, d) => s + (d.vendas_m00 || 0), 0);
+            const salesM0C = curvaC.reduce((s, d) => s + (d.vendas_m00 || 0), 0);
+            const salesM0D = curvaD.reduce((s, d) => s + (d.vendas_m00 || 0), 0);
+
+            // Reposiciones urgentes (cobertura < 4M, A+B)
+            const _cobEfMap = (d) => d.vendaMedia > 0 ? (d.estoqueMatriz + (d.importacoesPendentes || 0)) / d.vendaMedia : Infinity;
+            const abNeedReorder = data.filter(d => (d.curva === 'A' || d.curva === 'B') && _cobEfMap(d) < 4 && _cobEfMap(d) !== Infinity);
+            const abCritical = data.filter(d => (d.curva === 'A' || d.curva === 'B') && _cobEfMap(d) < 2 && _cobEfMap(d) !== Infinity);
+
+            // Rupturas (estoque = 0 con ventas)
+            const ruptA = curvaA.filter(d => d.estoqueMatriz === 0 && d.vendaMedia > 0).length;
+            const ruptB = curvaB.filter(d => d.estoqueMatriz === 0 && d.vendaMedia > 0).length;
+
+            const miniCard = (bg, accent, title, value, detail) => `
+                <div style="background:${bg};border-radius:8px;padding:14px;">
+                    <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px;">${title}</div>
+                    <div style="font-size:22px;font-weight:700;color:${accent};">${value}</div>
+                    <div style="font-size:10px;color:#666;margin-top:4px;line-height:1.5;">${detail}</div>
+                </div>`;
+
+            document.getElementById('mapaPortfolioCards').innerHTML =
+                miniCard('#f0f4ff', 'var(--livo-blue)', 'Vendas Último Mês por Curva',
+                    (salesM0A + salesM0B + salesM0C + salesM0D).toLocaleString('pt-BR') + ' un.',
+                    `A: ${salesM0A.toLocaleString('pt-BR')} | B: ${salesM0B.toLocaleString('pt-BR')} | C: ${salesM0C.toLocaleString('pt-BR')} | D: ${salesM0D.toLocaleString('pt-BR')}`)
+                + miniCard('#f0fdf4', '#10b981', 'Peças em Stock por Curva',
+                    totalStock.toLocaleString('pt-BR') + ' un.',
+                    `A: ${stockA.toLocaleString('pt-BR')} | B: ${stockB.toLocaleString('pt-BR')} | C: ${stockC.toLocaleString('pt-BR')} | D: ${stockD.toLocaleString('pt-BR')}`)
+                + miniCard('#fff7ed', '#f97316', 'Reposições Urgentes (A+B)',
+                    abNeedReorder.length + ' SKUs',
+                    `${abCritical.length} críticos (cob. &lt;2M) | ${abNeedReorder.length - abCritical.length} a vigiar (cob. &lt;4M)`)
+                + miniCard('#fef2f2', '#ef4444', 'Risco de Ruptura',
+                    (ruptA + ruptB) + ' SKUs A+B em ruptura',
+                    `${ruptA} Curva A | ${ruptB} Curva B — perda direta de receita`);
+        }
+
+        // ==================== DISTRIBUIÇÃO MATRIZ → LOJAS ====================
+        function renderDistribuicaoLojas(data) {
+            if (rawStoreData.length === 0 || storeColumns.length === 0) {
+                document.getElementById('distKPIs').innerHTML = '<div style="grid-column:span 4;text-align:center;color:var(--text-secondary);padding:20px;">Dados de lojas não disponíveis.</div>';
+                return;
+            }
+
+            const numStores = storeColumns.length;
+
+            // Build store stats
+            const storeStats = storeColumns.map(col => {
+                const storeName = col.replace('estoque_', '').replace(/_/g, ' ');
+                let totalSKUs = 0, stockUnits = 0;
+                let cA = 0, cB = 0, cC = 0, cD = 0;
+                let skusBelowMin = 0, missingUnits = 0, curvaAMissing = 0;
+                let excessSKUs = 0, excessUnits = 0;
+                let missingSalesShare = 0;
+
+                data.forEach(item => {
+                    const storeRow = rawStoreData.find(r => r.sku === item.sku);
+                    const qty = storeRow ? (Number(storeRow[col]) || 0) : 0;
+                    if (qty > 0) {
+                        totalSKUs++;
+                        stockUnits += qty;
+                    }
+                    if (qty > 0 && item.curva === 'A') cA++;
+                    if (qty > 0 && item.curva === 'B') cB++;
+                    if (qty > 0 && item.curva === 'C') cC++;
+                    if (qty > 0 && item.curva === 'D') cD++;
+
+                    const minIdeal = item.curva === 'A' ? 2 : 1;
+                    // Solo considerar SKUs que tienen estoque en matriz (pueden ser enviados)
+                    if (item.estoqueMatriz > 0 && item.vendaMedia > 0) {
+                        if (qty < minIdeal) {
+                            skusBelowMin++;
+                            missingUnits += (minIdeal - qty);
+                            missingSalesShare += item.vendaMedia;
+                            if (item.curva === 'A' && qty < 2) curvaAMissing++;
+                        }
+                        if (qty > minIdeal + 2) {
+                            excessSKUs++;
+                            excessUnits += (qty - minIdeal);
+                        }
+                    }
+                });
+
+                const totalVendaMes = data.reduce((s, d) => s + d.vendaMedia, 0);
+                const missingSalesPct = totalVendaMes > 0 ? (missingSalesShare / totalVendaMes * 100).toFixed(1) : 0;
+
+                return { name: storeName, totalSKUs, stockUnits, curvaA: cA, curvaB: cB, curvaC: cC, curvaD: cD, skusBelowMin, missingUnits, curvaAMissing, missingSalesShare: missingSalesPct, excessSKUs, excessUnits };
+            });
+
+            // KPIs
+            const totalMatrizStock = data.reduce((s, d) => s + d.estoqueMatriz, 0);
+            const skusWithMatriz = data.filter(d => d.estoqueMatriz > 0).length;
+            const skusOnlyMatriz = data.filter(d => {
+                if (d.estoqueMatriz === 0) return false;
+                const storeRow = rawStoreData.find(r => r.sku === d.sku);
+                if (!storeRow) return true;
+                const totalInStores = storeColumns.reduce((s, c) => s + (Number(storeRow[c]) || 0), 0);
+                return totalInStores === 0;
+            }).length;
+            const totalFaltantes = storeStats.reduce((s, st) => s + st.missingUnits, 0);
+            const avgMissingSales = storeStats.length > 0 ? (storeStats.reduce((s, st) => s + parseFloat(st.missingSalesShare), 0) / storeStats.length).toFixed(1) : 0;
+
+            const kpiCard = (label, value, accent, border, sub) => `
+                <div style="background:white;border-radius:8px;padding:14px 18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);${border ? 'border-left:3px solid '+border+';' : ''}">
+                    <div style="font-size:10px;color:#888;text-transform:uppercase;font-weight:700;letter-spacing:0.3px;">${label}</div>
+                    <div style="font-size:26px;font-weight:700;color:${accent || 'var(--text-primary)'};margin-top:2px;">${value}</div>
+                    ${sub ? `<div style="font-size:10px;color:#999;margin-top:3px;">${sub}</div>` : ''}
+                </div>`;
+
+            document.getElementById('distKPIs').innerHTML =
+                kpiCard('Estoque Matriz', totalMatrizStock.toLocaleString('pt-BR'), null, null, skusWithMatriz + ' SKUs com estoque disponível')
+                + kpiCard('SKUs só na Matriz', skusOnlyMatriz, '#f59e0b', '#f59e0b', 'Estão na matriz mas em NENHUMA loja')
+                + kpiCard('Total Faltantes em Lojas', totalFaltantes + ' un.', '#ef4444', '#ef4444', 'Para completar mínimos em todas as lojas')
+                + kpiCard('Share Vendas em Risco (média)', avgMissingSales + '%', '#ef4444', '#ef4444', '% de receita afetada pelas rupturas em loja');
+
+            // Store cards
+            const storeCard = (store) => {
+                const health = store.curvaAMissing === 0 ? 'green' : store.curvaAMissing <= 3 ? 'orange' : 'red';
+                const healthLabel = health === 'green' ? 'Saudável' : health === 'orange' ? 'Atenção' : 'Crítico';
+                const healthColor = health === 'green' ? '#10b981' : health === 'orange' ? '#f59e0b' : '#ef4444';
+                return `<div style="background:white;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.08);border-top:3px solid ${healthColor};">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <div style="font-size:15px;font-weight:700;text-transform:capitalize;">${store.name}</div>
+                        <span style="font-size:11px;font-weight:600;color:${healthColor};background:${healthColor}15;padding:2px 8px;border-radius:4px;">${healthLabel}</span>
+                    </div>
+                    <div style="font-size:12px;margin-bottom:10px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                            <span style="color:#888;">Estoque total:</span>
+                            <strong>${store.stockUnits} un. (${store.totalSKUs} SKUs)</strong>
+                        </div>
+                        <div style="display:flex;gap:6px;margin-bottom:8px;">
+                            <span style="background:#0000E1;color:white;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;">A: ${store.curvaA}</span>
+                            <span style="background:#10b981;color:white;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;">B: ${store.curvaB}</span>
+                            <span style="background:#eab308;color:white;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;">C: ${store.curvaC}</span>
+                            <span style="background:#ef4444;color:white;padding:1px 8px;border-radius:4px;font-size:10px;font-weight:600;">D: ${store.curvaD}</span>
+                        </div>
+                    </div>
+                    <div style="background:#fef2f2;border-radius:6px;padding:10px;font-size:11px;margin-bottom:8px;">
+                        <div style="font-weight:700;color:#991b1b;margin-bottom:4px;">Faltantes (abaixo do mínimo)</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+                            <div><span style="color:#888;">SKUs faltantes:</span> <strong style="color:#ef4444;">${store.skusBelowMin}</strong></div>
+                            <div><span style="color:#888;">Unidades:</span> <strong style="color:#ef4444;">${store.missingUnits}</strong></div>
+                            <div><span style="color:#888;">Curva A faltando:</span> <strong style="color:#ef4444;">${store.curvaAMissing}</strong></div>
+                            <div><span style="color:#888;">Share vendas faltantes:</span> <strong style="color:#ef4444;">${store.missingSalesShare}%</strong></div>
+                        </div>
+                    </div>
+                    <div style="background:#eff6ff;border-radius:6px;padding:10px;font-size:11px;">
+                        <div style="font-weight:700;color:#1e40af;margin-bottom:4px;">Excessos (acima do máximo)</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+                            <div><span style="color:#888;">SKUs em excesso:</span> <strong style="color:var(--livo-blue);">${store.excessSKUs}</strong></div>
+                            <div><span style="color:#888;">Unidades excedentes:</span> <strong style="color:var(--livo-blue);">${store.excessUnits}</strong></div>
+                        </div>
+                    </div>
+                </div>`;
+            };
+
+            document.getElementById('distStoreCards').innerHTML = storeStats.map(s => storeCard(s)).join('');
+
+            // Alertas
+            const criticalStores = storeStats.filter(s => s.curvaAMissing > 3).sort((a,b) => b.curvaAMissing - a.curvaAMissing);
+            const warningStores = storeStats.filter(s => s.curvaAMissing > 0 && s.curvaAMissing <= 3).sort((a,b) => b.curvaAMissing - a.curvaAMissing);
+
+            let alertas = '';
+            criticalStores.forEach(s => {
+                alertas += `<div style="margin-bottom:8px;background:#fef2f2;border-radius:8px;padding:14px;font-size:12px;color:#991b1b;border-left:3px solid #ef4444;">
+                    <strong>Alerta Crítica:</strong> ${s.name} tem ${s.curvaAMissing} SKUs Curva A sem estoque mínimo, representando ${s.missingSalesShare}% do share de vendas. Priorizar envio imediato.
+                </div>`;
+            });
+            warningStores.slice(0, 3).forEach(s => {
+                alertas += `<div style="margin-bottom:8px;background:#fffbeb;border-radius:8px;padding:14px;font-size:12px;color:#92400e;border-left:3px solid #f59e0b;">
+                    <strong>Atenção:</strong> ${s.name} tem ${s.curvaAMissing} SKUs Curva A faltando (${s.missingSalesShare}% do share). Revisar distribuição.
+                </div>`;
+            });
+
+            document.getElementById('distAlertas').innerHTML = alertas;
+        }
+
         // ==================== getCurvaBadge helper ====================
         function getCurvaBadge(curva) {
             const colors = { A: '#0000E1', B: '#10b981', C: '#eab308', D: '#ef4444' };
@@ -2505,7 +2775,7 @@
                 const cobComImp = item.vendaMedia > 0 ? (item.estoqueMatriz + item.importacoesPendentes) / item.vendaMedia : Infinity;
                 
                 // Min ideal
-                const minIdeal = item.estoqueMatriz > 0 ? (item.curva === 'A' ? 2 * numStores : 1 * numStores) : 0;
+                const minIdeal = item.curva === 'A' ? 2 : 1;
                 
                 // Status
                 const cob = item.coberturaMeses;
