@@ -1552,14 +1552,18 @@
                 <h2 class="section-title">Performance SKU</h2>
                 <div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">
                     Todos os SKUs ordenados por share de venda média/mês (maior a menor). Vista única com stock matriz, lojas, importações e cobertura.
+                    <br><span style="font-size:11px;">Fonte: <a href="https://script.google.com/macros/s/AKfycbzo_3vQG2aWNHyAdTV6MxFagP-0u3gyK-_fnkoOVKbT8cqk-omt63V5qdgOIFlCWUdN/exec?sheet=all" target="_blank" style="color:var(--livo-blue);">Google Sheets Web App (salesData + storeStockData)</a></span>
                 </div>
                 
+                <!-- Cards resumen por curva -->
+                <div id="perfCurvaCards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;"></div>
+
                 <div style="margin-bottom: 12px;">
                     <input type="text" id="perfSearchInput" placeholder="Buscar por SKU, produto ou família..."
                         style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; font-family: inherit; outline: none;"
                         oninput="filterPerformanceTable()">
                 </div>
-                
+
                 <div class="table-container" style="max-height: 700px; overflow-y: auto;">
                     <table id="performanceTable">
                         <thead style="position: sticky; top: 0; z-index: 10; background: #f9fafb;">
@@ -1719,7 +1723,14 @@
                     </div>
                     
                     <!-- Summary bar -->
-                    <div id="purchaseSummary" style="background:var(--dark-sidebar);border-radius:8px;padding:16px;display:none;grid-template-columns:repeat(4,1fr);gap:16px;color:white;">
+                    <div id="purchaseSummary" style="background:var(--text-primary);border-radius:10px;padding:20px 24px;display:none;grid-template-columns:repeat(4,1fr);gap:20px;color:white;align-items:center;">
+                    </div>
+
+                    <!-- Download Excel button -->
+                    <div style="margin-top:16px;text-align:right;">
+                        <button onclick="downloadOrdenCompra900()" style="background:var(--livo-green);color:#000;border:none;border-radius:8px;padding:10px 24px;font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;cursor:pointer;">
+                            Descargar Excel — Orden de Compra 900 pzs
+                        </button>
                     </div>
                 </div>
                 
@@ -2753,11 +2764,50 @@
             const sorted = [...data].sort((a, b) => b.vendaMedia - a.vendaMedia);
             const totalVenda = sorted.reduce((s, d) => s + d.vendaMedia, 0);
             const numStores = storeColumns.length;
-            
+
+            // === CURVA SUMMARY CARDS ===
+            const cardsEl = document.getElementById('perfCurvaCards');
+            if (cardsEl) {
+                const curvas = ['A', 'B', 'C', 'D'];
+                const curvaColors = { A: '#0000E1', B: '#10b981', C: '#eab308', D: '#ef4444' };
+                const curvaLabels = { A: 'Proteger', B: 'Manter', C: 'Revisar', D: 'Liquidar' };
+
+                cardsEl.innerHTML = curvas.map(c => {
+                    const items = data.filter(d => d.curva === c);
+                    const skuCount = items.length;
+                    const stock = items.reduce((s, d) => s + d.estoqueMatriz, 0);
+                    const sales3M = items.reduce((s, d) => s + (d.vendas_m00||0) + (d.vendas_m01||0) + (d.vendas_m02||0), 0);
+                    const vendaMes = items.reduce((s, d) => s + d.vendaMedia, 0);
+                    const sharePct = totalVenda > 0 ? (vendaMes / totalVenda * 100).toFixed(1) : 0;
+                    const withStock = items.filter(d => d.estoqueMatriz > 0 && d.vendaMedia > 0);
+                    const avgCob = withStock.length > 0 ? (withStock.reduce((s, d) => s + (d.coberturaMeses === Infinity ? 0 : d.coberturaMeses), 0) / withStock.length).toFixed(1) : '—';
+                    const rupturas = items.filter(d => d.estoqueMatriz === 0 && d.vendaMedia > 0).length;
+                    const imports = items.reduce((s, d) => s + (d.importacoesPendentes || 0), 0);
+                    const color = curvaColors[c];
+
+                    return `<div style="background:white;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.08);border-top:3px solid ${color};">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                            <span style="font-size:18px;font-weight:700;color:${color};">Curva ${c}</span>
+                            <span style="font-size:11px;font-weight:600;color:${color};background:${color}15;padding:2px 10px;border-radius:4px;">${curvaLabels[c]}</span>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;">
+                            <div><span style="color:#888;">SKUs:</span> <strong>${skuCount}</strong></div>
+                            <div><span style="color:#888;">Share vendas:</span> <strong>${sharePct}%</strong></div>
+                            <div><span style="color:#888;">Stock matriz:</span> <strong>${stock.toLocaleString('pt-BR')}</strong></div>
+                            <div><span style="color:#888;">Vendas 3M:</span> <strong>${sales3M.toLocaleString('pt-BR')}</strong></div>
+                            <div><span style="color:#888;">Cob. média:</span> <strong>${avgCob}M</strong></div>
+                            <div><span style="color:#888;">Import. pend.:</span> <strong>${imports.toLocaleString('pt-BR')}</strong></div>
+                            <div><span style="color:#888;">Rupturas:</span> <strong style="color:${rupturas > 0 ? '#ef4444' : '#10b981'};">${rupturas}</strong></div>
+                            <div><span style="color:#888;">Venda/mês:</span> <strong>${Math.round(vendaMes).toLocaleString('pt-BR')}</strong></div>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+
             let cumShare = 0;
             const tbody = document.getElementById('performanceBody');
             if (!tbody) return;
-            
+
             tbody.innerHTML = sorted.map((item, idx) => {
                 const share = totalVenda > 0 ? (item.vendaMedia / totalVenda * 100) : 0;
                 cumShare += share;
@@ -3043,25 +3093,40 @@
                 summaryEl.style.display = 'grid';
                 summaryEl.innerHTML = `
                     <div style="text-align:center;">
-                        <div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;">Total Compra</div>
-                        <div style="font-size:24px;font-weight:700;">${numFamilies * pcsPerFamily}</div>
-                        <div style="font-size:10px;color:rgba(255,255,255,0.4);">pe\u00e7as</div>
+                        <div style="font-size:13px;color:rgba(255,255,255,0.7);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;">Total Compra</div>
+                        <div style="font-size:36px;font-weight:700;margin:6px 0;">${numFamilies * pcsPerFamily}</div>
+                        <div style="font-size:14px;color:rgba(255,255,255,0.6);">peças</div>
                     </div>
                     <div style="text-align:center;">
-                        <div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;">Fam\u00edlias</div>
-                        <div style="font-size:24px;font-weight:700;">${numFamilies}</div>
-                        <div style="font-size:10px;color:rgba(255,255,255,0.4);">${sorted.map(f => f.name).join(' + ')}</div>
+                        <div style="font-size:13px;color:rgba(255,255,255,0.7);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;">Famílias</div>
+                        <div style="font-size:36px;font-weight:700;margin:6px 0;">${numFamilies}</div>
+                        <div style="font-size:14px;color:rgba(255,255,255,0.6);">${sorted.map(f => f.name).join(' + ')}</div>
                     </div>
                     <div style="text-align:center;">
-                        <div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;">Lead Time</div>
-                        <div style="font-size:24px;font-weight:700;">4M</div>
-                        <div style="font-size:10px;color:rgba(255,255,255,0.4);">chegada estimada</div>
+                        <div style="font-size:13px;color:rgba(255,255,255,0.7);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;">Lead Time</div>
+                        <div style="font-size:36px;font-weight:700;margin:6px 0;">4M</div>
+                        <div style="font-size:14px;color:rgba(255,255,255,0.6);">chegada estimada</div>
                     </div>
                     <div style="text-align:center;">
-                        <div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;">Cobertura Objetivo</div>
-                        <div style="font-size:24px;font-weight:700;color:#10b981;">8M+</div>
-                        <div style="font-size:10px;color:rgba(255,255,255,0.4);">para SKUs A/B</div>
+                        <div style="font-size:13px;color:rgba(255,255,255,0.7);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;">Cobertura Objetivo</div>
+                        <div style="font-size:36px;font-weight:700;color:var(--livo-green);margin:6px 0;">8M+</div>
+                        <div style="font-size:14px;color:rgba(255,255,255,0.6);">para SKUs A/B</div>
                     </div>`;
+
+                // Store allocation data for Excel download
+                window._purchaseAllocation = sorted.map(fam => {
+                    const needsSKUs = fam.skus.filter(s => s.coberturaMeses < 8 && s.vendaMedia > 0).sort((a, b) => a.coberturaMeses - b.coberturaMeses);
+                    let remaining = pcsPerFamily;
+                    const allocs = [];
+                    needsSKUs.forEach(s => {
+                        if (remaining <= 0) return;
+                        const need = Math.ceil((8 - Math.max(0, s.coberturaMeses)) * s.vendaMedia);
+                        const alloc = Math.min(need, remaining);
+                        if (alloc > 0) { allocs.push({ sku: s, qtd: alloc }); remaining -= alloc; }
+                    });
+                    if (remaining > 0 && allocs.length > 0) allocs[0].qtd += remaining;
+                    return { familia: fam.name, allocations: allocs };
+                });
             }
         }
 
@@ -3321,6 +3386,107 @@
         }
 
         // ==================== EXCEL DOWNLOADS ====================
+        function downloadOrdenCompra900() {
+            const allocs = window._purchaseAllocation;
+            if (!allocs || allocs.length === 0) {
+                alert('Nenhuma sugestão de compra disponível.');
+                return;
+            }
+
+            const now = new Date();
+            const ts = now.getFullYear().toString().slice(2) + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0');
+            const fileName = `OC${ts}.xlsx`;
+
+            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' }, name: 'Calibri', sz: 11 }, fill: { fgColor: { rgb: '0000E1' } }, alignment: { horizontal: 'center' }, border: { bottom: { style: 'thin', color: { rgb: '000000' } } } };
+            const cellStyle = { font: { name: 'Calibri', sz: 11 }, alignment: { horizontal: 'left' }, border: { bottom: { style: 'thin', color: { rgb: 'E0E0E0' } } } };
+            const numStyle = { ...cellStyle, alignment: { horizontal: 'center' } };
+
+            const rows = [['SKU', 'Produto', 'Família', 'Classe', 'Curva', 'Venda/Mês', 'Est. Matriz', 'Cob. Atual', 'Qtd Compra']];
+            let totalQtd = 0;
+
+            allocs.forEach(fam => {
+                fam.allocations.forEach(a => {
+                    rows.push([
+                        a.sku.sku || '',
+                        a.sku.nome_produto || '',
+                        fam.familia,
+                        a.sku.descricao_classe || '',
+                        a.sku.curva || '',
+                        Math.round(a.sku.vendaMedia),
+                        a.sku.estoqueMatriz,
+                        a.sku.coberturaMeses === Infinity ? 'N/A' : a.sku.coberturaMeses.toFixed(1) + 'M',
+                        a.qtd
+                    ]);
+                    totalQtd += a.qtd;
+                });
+            });
+
+            // Add total row
+            rows.push(['', '', '', '', '', '', '', 'TOTAL', totalQtd]);
+
+            const ws = XLSX.utils.aoa_to_sheet(rows);
+
+            // Column widths
+            ws['!cols'] = [
+                { wch: 14 }, // SKU
+                { wch: 35 }, // Produto
+                { wch: 14 }, // Familia
+                { wch: 16 }, // Classe
+                { wch: 6 },  // Curva
+                { wch: 10 }, // Venda/Mes
+                { wch: 10 }, // Est Matriz
+                { wch: 10 }, // Cob Atual
+                { wch: 12 }, // Qtd Compra
+            ];
+
+            // Style headers
+            for (let c = 0; c < 9; c++) {
+                const cell = ws[XLSX.utils.encode_cell({ r: 0, c })];
+                if (cell) cell.s = headerStyle;
+            }
+
+            // Style data rows
+            for (let r = 1; r < rows.length; r++) {
+                for (let c = 0; c < 9; c++) {
+                    const cell = ws[XLSX.utils.encode_cell({ r, c })];
+                    if (cell) {
+                        cell.s = (c >= 5) ? numStyle : cellStyle;
+                        // Bold total row
+                        if (r === rows.length - 1) cell.s = { ...cell.s, font: { ...cell.s.font, bold: true } };
+                    }
+                }
+            }
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Orden Compra');
+
+            // Add summary sheet
+            const summaryRows = [
+                ['ORDEN DE COMPRA — SUGESTÃO AUTOMÁTICA'],
+                [''],
+                ['Fecha', now.toLocaleDateString('pt-BR')],
+                ['Total Peças', totalQtd],
+                ['Famílias', allocs.map(a => a.familia).join(', ')],
+                ['MOQ por Família', 300],
+                ['Lead Time', '4 meses'],
+                ['Cobertura Objetivo', '8 meses'],
+                [''],
+                ['DETALLE POR FAMÍLIA'],
+            ];
+            allocs.forEach(fam => {
+                const famQtd = fam.allocations.reduce((s, a) => s + a.qtd, 0);
+                summaryRows.push([fam.familia, famQtd + ' pzs', fam.allocations.length + ' SKUs']);
+            });
+
+            const ws2 = XLSX.utils.aoa_to_sheet(summaryRows);
+            ws2['!cols'] = [{ wch: 25 }, { wch: 15 }, { wch: 15 }];
+            const titleCell = ws2[XLSX.utils.encode_cell({ r: 0, c: 0 })];
+            if (titleCell) titleCell.s = { font: { bold: true, sz: 14, name: 'Calibri', color: { rgb: '0000E1' } } };
+
+            XLSX.utils.book_append_sheet(wb, ws2, 'Resumo');
+            XLSX.writeFile(wb, fileName);
+        }
+
         function downloadOrdenesReposicion() {
             const data = window._lojasData || [];
             const sortedStores = window._sortedStores || storeColumns;
