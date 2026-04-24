@@ -131,7 +131,7 @@
             background: none;
             width: 100%;
             text-align: left;
-            font-size: 14px;
+            font-size: 15px;
         }
 
         .nav-link:hover {
@@ -1191,9 +1191,9 @@
                     <li class="nav-item"><a class="nav-link" data-section="reposicao">🔄 Reposição</a></li>
                     <li class="nav-item"><a class="nav-link" data-section="lojas">🏪 Lojas</a></li>
                 </ul>
-                <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);margin:20px 0 8px;padding-left:12px;padding-top:16px;border-top:1px solid var(--border-color);">Planificación</div>
+                <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);margin:20px 0 8px;padding-left:12px;padding-top:16px;border-top:1px solid var(--border-color);">Planejamento</div>
                 <ul class="sidebar-nav">
-                    <li class="nav-item"><a class="nav-link" data-section="pronostico-compras">🔮 Pronóstico Compras</a></li>
+                    <li class="nav-item"><a class="nav-link" data-section="pronostico-compras">🔮 Previsão Compras</a></li>
                     <li class="nav-item"><a class="nav-link" data-section="fornecedores">🇨🇳 Importaciones China</a></li>
                 </ul>
             </nav>
@@ -1523,7 +1523,7 @@
                             oninput="filterPerformanceTable()">
                     </div>
                     <button onclick="downloadPerformanceXlsx()" style="padding:8px 20px;background:#217346;color:white;border:none;border-radius:8px;font-size:13px;font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;white-space:nowrap;height:38px;">
-                        Descargar .xlsx
+                        Baixar .xlsx
                     </button>
                 </div>
                 <div id="perfFilterInfo" style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;display:none;"></div>
@@ -1831,13 +1831,13 @@
             <!-- ==================== PRONOSTICO COMPRAS ==================== -->
             <section class="section" id="pronostico-compras">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                    <h2 class="section-title" style="margin-bottom:0;">Pronóstico de Compras</h2>
+                    <h2 class="section-title" style="margin-bottom:0;">Previsão de Compras</h2>
                     <button onclick="downloadForecastXlsx()" style="padding:8px 20px;background:#217346;color:white;border:none;border-radius:8px;font-size:13px;font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;">
-                        Descargar .xlsx
+                        Baixar .xlsx
                     </button>
                 </div>
                 <div style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;">
-                    Proyección de demanda y compra para los próximos 15 meses. Ajusta los parámetros y tiendas nuevas para simular escenarios.
+                    Projeção de demanda e compra. Ajuste os parâmetros e lojas novas para simular cenários. O cálculo considera estoque atual + importações em trânsito.
                 </div>
 
                 <!-- Top bar: KPIs -->
@@ -1845,23 +1845,32 @@
                     <div class="kpi-card">
                         <div class="kpi-label" id="fcLabelDemand">Demanda total</div>
                         <div class="kpi-value" style="font-size:30px;" id="fcTotalDemand">0</div>
-                        <div class="kpi-subtitle" style="font-size:12px;color:var(--text-secondary);margin-top:2px;">piezas proyectadas</div>
+                        <div class="kpi-subtitle" style="font-size:12px;color:var(--text-secondary);margin-top:2px;">peças projetadas</div>
                     </div>
                     <div class="kpi-card" style="border-left:3px solid #10b981;">
-                        <div class="kpi-label">Stock actual + import.</div>
+                        <div class="kpi-label">Estoque atual + import.</div>
                         <div class="kpi-value" style="font-size:30px;color:#10b981;" id="fcTotalInitStock">0</div>
-                        <div class="kpi-subtitle" style="font-size:12px;color:var(--text-secondary);margin-top:2px;">piezas disponibles</div>
+                        <div class="kpi-subtitle" style="font-size:12px;color:var(--text-secondary);margin-top:2px;">peças disponíveis</div>
                     </div>
                     <div class="kpi-card" style="border-left:3px solid #FC4F00;">
-                        <div class="kpi-label">Compra necesaria</div>
+                        <div class="kpi-label">Compra necessária</div>
                         <div class="kpi-value" style="font-size:30px;color:#FC4F00;" id="fcTotalBuy">0</div>
-                        <div class="kpi-subtitle" style="font-size:12px;color:var(--text-secondary);margin-top:2px;">piezas a ordenar</div>
+                        <div class="kpi-subtitle" style="font-size:12px;color:var(--text-secondary);margin-top:2px;">peças a pedir</div>
                     </div>
                     <div class="kpi-card" style="border-left:3px solid #0000E1;">
                         <div class="kpi-label">Compra acumulada</div>
                         <div class="kpi-value" style="font-size:30px;color:#0000E1;" id="fcTotalAccum">0</div>
-                        <div class="kpi-subtitle" style="font-size:12px;color:var(--text-secondary);margin-top:2px;">total en 15 meses</div>
+                        <div class="kpi-subtitle" style="font-size:12px;color:var(--text-secondary);margin-top:2px;">total no período</div>
                     </div>
+                </div>
+
+                <!-- Leyenda KPIs -->
+                <div style="background:var(--card-bg);border-radius:10px;padding:14px 20px;margin-bottom:20px;border:1px solid var(--border-color);font-size:13px;color:var(--text-secondary);line-height:1.8;">
+                    <strong style="color:var(--text-primary);">Como ler:</strong>
+                    <strong>Demanda total</strong> = peças que serão consumidas (vendas + estoque inicial lojas novas + ramp-up) no período projetado.
+                    <strong>Estoque atual + import.</strong> = peças disponíveis hoje na matriz + importações em trânsito.
+                    <strong style="color:#FC4F00;">Compra necessária</strong> = peças que precisam ser encomendadas ao fornecedor para cobrir a demanda.
+                    <strong style="color:#0000E1;">Compra acumulada</strong> = total de peças a encomendar ao longo do período.
                 </div>
 
                 <!-- Two columns: Params + Ramp-up -->
@@ -1870,11 +1879,11 @@
                     <div style="background:var(--card-bg);border-radius:12px;padding:20px;box-shadow:var(--shadow-sm);">
                         <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
                             <span style="width:28px;height:28px;background:#0000E115;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;">&#9881;</span>
-                            <h3 style="font-size:14px;font-weight:600;color:var(--text-primary);">Parámetros</h3>
+                            <h3 style="font-size:14px;font-weight:600;color:var(--text-primary);">Parâmetros</h3>
                         </div>
                         <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;">
                             <div>
-                                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px;">Meses a proyectar</label>
+                                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px;">Meses a projetar</label>
                                 <div style="display:flex;align-items:center;gap:4px;">
                                     <input type="number" id="fcMonths" value="15" min="3" max="24" style="width:72px;padding:10px;font-size:20px;font-weight:600;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;text-align:center;" onchange="initForecast()">
                                     <span style="font-size:12px;color:var(--text-secondary);">meses</span>
@@ -1888,14 +1897,14 @@
                                 </div>
                             </div>
                             <div>
-                                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px;">Stock seguridad</label>
+                                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px;">Estoque segurança</label>
                                 <div style="display:flex;align-items:center;gap:4px;">
                                     <input type="number" id="fcSafetyStock" value="2" min="0" max="6" style="width:72px;padding:10px;font-size:20px;font-weight:600;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;text-align:center;" onchange="recalcForecast()">
                                     <span style="font-size:12px;color:var(--text-secondary);">meses</span>
                                 </div>
                             </div>
                             <div>
-                                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px;">Crecimiento</label>
+                                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px;">Crescimento</label>
                                 <div style="display:flex;align-items:center;gap:4px;">
                                     <input type="number" id="fcGrowth" value="3" min="0" max="20" style="width:72px;padding:10px;font-size:20px;font-weight:600;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;text-align:center;" onchange="recalcForecast()">
                                     <span style="font-size:12px;color:var(--text-secondary);">%/mes</span>
@@ -1908,7 +1917,7 @@
                     <div style="background:var(--card-bg);border-radius:12px;padding:20px;box-shadow:var(--shadow-sm);">
                         <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
                             <span style="width:28px;height:28px;background:#10b98115;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;">&#9650;</span>
-                            <h3 style="font-size:14px;font-weight:600;color:var(--text-primary);">Ramp-up tiendas nuevas</h3>
+                            <h3 style="font-size:14px;font-weight:600;color:var(--text-primary);">Ramp-up lojas novas</h3>
                         </div>
                         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
                             <div style="text-align:center;">
@@ -1927,46 +1936,46 @@
                                 <div style="margin-top:6px;height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;"><div style="height:100%;width:100%;background:#10b981;border-radius:3px;transition:width 0.3s;" id="rampBar3"></div></div>
                             </div>
                         </div>
-                        <div style="font-size:11px;color:var(--text-secondary);text-align:center;">Stock inicial: curva A = 2 pzs, B/C/D = 1 pz por SKU activo</div>
+                        <div style="font-size:11px;color:var(--text-secondary);text-align:center;">Estoque inicial: curva A = 2 pçs, B/C/D = 1 pç por SKU activo</div>
                     </div>
                 </div>
 
                 <!-- Store openings timeline -->
                 <div style="background:var(--card-bg);border-radius:12px;padding:20px;box-shadow:var(--shadow-sm);margin-bottom:20px;">
-                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
-                        <span style="width:28px;height:28px;background:#DEFF0040;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;">&#127978;</span>
-                        <h3 style="font-size:14px;font-weight:600;color:var(--text-primary);">Inauguración de Tiendas</h3>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:18px;">🏪</span>
+                            <h3 style="font-size:16px;font-weight:600;color:var(--text-primary);">Inauguração de Lojas</h3>
+                        </div>
+                        <div id="fcStoreSummary" style="font-size:14px;color:var(--text-secondary);display:flex;gap:20px;"></div>
                     </div>
-                    <div style="display:flex;gap:20px;align-items:flex-start;">
-                        <div id="fcStoreInputs" style="flex:1;min-width:0;"></div>
-                        <div id="fcStoreSummary" style="flex:0 0 160px;font-size:13px;color:var(--text-secondary);background:var(--content-bg);border-radius:10px;padding:14px;"></div>
-                    </div>
+                    <div id="fcStoreInputs"></div>
                 </div>
 
                 <!-- Chart -->
                 <div style="background:var(--card-bg);border-radius:12px;padding:20px;box-shadow:var(--shadow-sm);margin-bottom:20px;">
-                    <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Demanda Proyectada vs Stock Disponible</h3>
-                    <div style="position:relative;height:320px;">
+                    <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Demanda Projetada vs Estoque Disponível</h3>
+                    <div style="position:relative;height:420px;">
                         <canvas id="fcChart"></canvas>
                     </div>
                 </div>
 
                 <!-- Table consolidada -->
                 <div style="background:var(--card-bg);border-radius:12px;padding:20px;box-shadow:var(--shadow-sm);margin-bottom:20px;">
-                    <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Necesidad de Compra Mes a Mes — Consolidado</h3>
+                    <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Necessidade de Compra Mês a Mês — Consolidado</h3>
                     <div class="table-container" style="max-height:500px;overflow-y:auto;">
                         <table id="fcTable">
                             <thead style="position:sticky;top:0;z-index:10;background:#f9fafb;">
                                 <tr>
-                                    <th>Mes</th>
-                                    <th>Tiendas</th>
-                                    <th>Demanda Base</th>
-                                    <th>Stock Inicial</th>
-                                    <th>Ramp-up</th>
-                                    <th>Demanda Total</th>
-                                    <th>Stock Disponible</th>
-                                    <th>Necesidad Compra</th>
-                                    <th>Compra Acumulada</th>
+                                    <th style="text-align:center;">Mês</th>
+                                    <th style="text-align:center;">Lojas</th>
+                                    <th style="text-align:center;">Demanda Base</th>
+                                    <th style="text-align:center;">Estoque Inicial</th>
+                                    <th style="text-align:center;">Ramp-up</th>
+                                    <th style="text-align:center;">Demanda Total</th>
+                                    <th style="text-align:center;">Estoque Disponível</th>
+                                    <th style="text-align:center;">Necessidade Compra</th>
+                                    <th style="text-align:center;">Compra Acumulada</th>
                                 </tr>
                             </thead>
                             <tbody id="fcTableBody">
@@ -1980,18 +1989,18 @@
                 <div style="background:var(--card-bg);border-radius:12px;padding:20px;box-shadow:var(--shadow-sm);margin-bottom:20px;">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
                         <div style="display:flex;align-items:center;gap:8px;">
-                            <h3 style="font-size:14px;font-weight:600;">Pronóstico por SKU</h3>
+                            <h3 style="font-size:14px;font-weight:600;">Previsão por SKU</h3>
                             <span style="font-size:12px;color:var(--text-secondary);" id="fcSkuCount"></span>
                         </div>
                         <div style="display:flex;gap:8px;align-items:center;">
                             <select id="fcSkuCurvaFilter" onchange="renderForecastSKU()" style="padding:6px 10px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;font-family:inherit;background:white;">
-                                <option value="">Todas las curvas</option>
+                                <option value="">Todas as curvas</option>
                                 <option value="A">Curva A</option>
                                 <option value="B">Curva B</option>
                                 <option value="C">Curva C</option>
                                 <option value="D">Curva D</option>
                             </select>
-                            <input type="text" id="fcSkuSearch" placeholder="Buscar SKU, producto..." oninput="renderForecastSKU()" style="padding:6px 10px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;font-family:inherit;width:200px;">
+                            <input type="text" id="fcSkuSearch" placeholder="Buscar SKU, produto..." oninput="renderForecastSKU()" style="padding:6px 10px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;font-family:inherit;width:200px;">
                             <button onclick="downloadForecastSkuXlsx()" style="padding:6px 16px;background:#217346;color:white;border:none;border-radius:6px;font-size:12px;font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;">
                                 .xlsx
                             </button>
@@ -2001,19 +2010,21 @@
                         <table id="fcSkuTable">
                             <thead style="position:sticky;top:0;z-index:10;background:#f9fafb;">
                                 <tr>
-                                    <th>SKU</th>
-                                    <th>Producto</th>
-                                    <th>Curva</th>
-                                    <th>Venta/Mes</th>
-                                    <th>Stock Actual</th>
-                                    <th>Cob. Actual</th>
-                                    <th>Demanda 15M</th>
-                                    <th>Compra Necesaria</th>
-                                    <th>Prioridad</th>
+                                    <th style="text-align:center;">SKU</th>
+                                    <th style="text-align:center;">Produto</th>
+                                    <th style="text-align:center;">Curva</th>
+                                    <th style="text-align:center;">Venda/Mês</th>
+                                    <th style="text-align:center;">Estoque</th>
+                                    <th style="text-align:center;">Import.</th>
+                                    <th style="text-align:center;">Cob.</th>
+                                    <th style="text-align:center;">Demanda</th>
+                                    <th style="text-align:center;">Compra</th>
+                                    <th style="text-align:center;">Esgota em</th>
+                                    <th style="text-align:center;">Prioridade</th>
                                 </tr>
                             </thead>
                             <tbody id="fcSkuTableBody">
-                                <tr><td colspan="9" class="empty-state">Carregando dados...</td></tr>
+                                <tr><td colspan="11" class="empty-state">Carregando dados...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -3264,19 +3275,15 @@
             if (rb2) rb2.style.width = (rampM2 * 100) + '%';
             if (rb3) rb3.style.width = (rampM3 * 100) + '%';
 
-            // Current base metrics
-            const totalVendaMes = classified.reduce((s, d) => s + d.vendaMedia, 0);
             const currentStores = storeColumns.length || 18;
+            const totalVendaMes = classified.reduce((s, d) => s + d.vendaMedia, 0);
             const vendaPerStore = currentStores > 0 ? totalVendaMes / currentStores : 0;
 
-            // SKU counts by curva for initial stock calc
+            // SKU counts for initial stock per store
             const activeSKUs = classified.filter(d => d.vendaMedia > 0 || d.estoqueMatriz > 0);
             const skuCountA = activeSKUs.filter(d => d.curva === 'A').length;
             const skuCountBCD = activeSKUs.filter(d => d.curva !== 'A').length;
             const initialStockPerStore = (skuCountA * 2) + (skuCountBCD * 1);
-
-            // Current total stock (matriz + importaciones en camino)
-            let currentStock = classified.reduce((s, d) => s + d.estoqueMatriz + (d.importacoesPendentes || 0), 0);
 
             // Read new stores per month
             const newStoresPerMonth = [];
@@ -3285,80 +3292,148 @@
             }
             const totalNewStores = newStoresPerMonth.reduce((s, v) => s + v, 0);
 
-            // Build month-by-month projection
+            // Track ramp-up stores
+            const rampStores = [];
+            newStoresPerMonth.forEach((ns, i) => { if (ns > 0) rampStores.push({ month: i, qty: ns }); });
+
+            // ===== BOTTOM-UP: Calculate per SKU, then aggregate =====
+            const monthLabels = [];
             const now = new Date();
-            const monthData = [];
-            let runningStores = currentStores;
-            let runningStock = currentStock;
-            let accumBuy = 0;
-
-            // Track ramp-up stores: array of { monthOpened, qty }
-            const rampUpStores = [];
-
             for (let i = 0; i < numMonths; i++) {
                 const d = new Date(now.getFullYear(), now.getMonth() + 1 + i, 1);
-                const monthLabel = d.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
+                const label = d.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+                monthLabels.push(label.charAt(0).toUpperCase() + label.slice(1));
+            }
 
-                // New stores this month
-                const newStores = newStoresPerMonth[i];
-                if (newStores > 0) {
-                    rampUpStores.push({ monthOpened: i, qty: newStores });
+            // Initialize consolidated month accumulators
+            const monthAgg = [];
+            for (let i = 0; i < numMonths; i++) {
+                monthAgg.push({ baseDemand: 0, initStock: 0, rampDemand: 0, totalDemand: 0, needBuy: 0, stockAvail: 0 });
+            }
+
+            // Per-SKU simulation
+            fcSkuData = [];
+            activeSKUs.forEach(item => {
+                const skuVendaPerStore = currentStores > 0 ? item.vendaMedia / currentStores : 0;
+                const minPerStore = item.curva === 'A' ? 2 : 1;
+                let skuStock = item.estoqueMatriz + (item.importacoesPendentes || 0);
+                let skuTotalDemand = 0;
+                let skuTotalBuy = 0;
+                let skuFirstBuyMonth = -1;
+                const skuMonthly = [];
+
+                for (let i = 0; i < numMonths; i++) {
+                    const gf = Math.pow(1 + growthPct, i);
+                    const ns = newStoresPerMonth[i];
+
+                    // Base demand for this SKU this month
+                    const skuBaseDemand = item.vendaMedia * gf;
+
+                    // Initial stock for new stores
+                    const skuInitStock = ns * minPerStore;
+
+                    // Ramp-up from previously opened stores
+                    let skuRamp = 0;
+                    rampStores.forEach(rs => {
+                        const diff = i - rs.month;
+                        if (diff <= 0) return;
+                        const rp = diff === 1 ? rampM1 : diff === 2 ? rampM2 : rampM3;
+                        skuRamp += skuVendaPerStore * rp * rs.qty * gf;
+                    });
+
+                    const skuMonthDemand = Math.round(skuBaseDemand + skuInitStock + skuRamp);
+
+                    // Consume stock
+                    skuStock -= skuMonthDemand;
+                    const skuNeedBuy = skuStock < 0 ? Math.abs(skuStock) : 0;
+                    if (skuNeedBuy > 0) {
+                        skuStock = 0;
+                        if (skuFirstBuyMonth < 0) skuFirstBuyMonth = i;
+                    }
+
+                    skuTotalDemand += skuMonthDemand;
+                    skuTotalBuy += skuNeedBuy;
+
+                    // Aggregate to consolidated
+                    monthAgg[i].baseDemand += Math.round(skuBaseDemand * gf / gf); // keep ungrown for display
+                    monthAgg[i].initStock += skuInitStock;
+                    monthAgg[i].rampDemand += Math.round(skuRamp);
+                    monthAgg[i].totalDemand += skuMonthDemand;
+                    monthAgg[i].needBuy += skuNeedBuy;
+
+                    skuMonthly.push({ demand: skuMonthDemand, buy: skuNeedBuy, stock: Math.max(skuStock, 0) });
                 }
 
-                // Initial stock for new stores this month
-                const initStock = newStores * initialStockPerStore;
+                // Priority
+                let prioridad, prioColor;
+                if (skuFirstBuyMonth >= 0 && skuFirstBuyMonth <= 2 && (item.curva === 'A' || item.curva === 'B')) {
+                    prioridad = 'Urgente!'; prioColor = '#ef4444';
+                } else if (skuFirstBuyMonth >= 0 && skuFirstBuyMonth <= 4) {
+                    prioridad = 'Alta'; prioColor = '#f59e0b';
+                } else if (skuTotalBuy > 0) {
+                    prioridad = 'Média'; prioColor = '#0000E1';
+                } else {
+                    prioridad = 'Baixa'; prioColor = '#10b981';
+                }
 
-                // Base demand from existing stores (with growth)
-                const growthFactor = Math.pow(1 + growthPct, i);
-                const baseDemand = Math.round(totalVendaMes * growthFactor);
-
-                // Ramp-up demand from stores opened in previous months
-                let rampDemand = 0;
-                rampUpStores.forEach(rs => {
-                    const monthsSinceOpen = i - rs.monthOpened;
-                    if (monthsSinceOpen <= 0) return; // opened this month = only initial stock
-                    let rampPct;
-                    if (monthsSinceOpen === 1) rampPct = rampM1;
-                    else if (monthsSinceOpen === 2) rampPct = rampM2;
-                    else rampPct = rampM3;
-                    rampDemand += Math.round(vendaPerStore * rampPct * rs.qty * growthFactor);
+                fcSkuData.push({
+                    sku: item.sku,
+                    nome_produto: item.nome_produto || '',
+                    familia: item.familia || '',
+                    curva: item.curva,
+                    vendaMedia: item.vendaMedia,
+                    estoqueMatriz: item.estoqueMatriz,
+                    importacoes: item.importacoesPendentes || 0,
+                    coberturaMeses: item.coberturaMeses,
+                    demanda15: skuTotalDemand,
+                    compraNecesaria: skuTotalBuy,
+                    firstBuyMonth: skuFirstBuyMonth,
+                    prioridad: prioridad,
+                    prioColor: prioColor,
+                    monthly: skuMonthly
                 });
+            });
 
-                // Total demand = base + ramp-up
-                const totalDemand = baseDemand + rampDemand + initStock;
+            fcSkuData.sort((a, b) => b.compraNecesaria - a.compraNecesaria);
 
-                // Stock available after this month
-                runningStock = runningStock - totalDemand;
-                const needBuy = runningStock < 0 ? Math.abs(runningStock) : 0;
-                if (needBuy > 0) {
-                    runningStock = 0; // Reset; we'll need to buy
-                }
+            // Build consolidated monthData from aggregated SKU data
+            let runningStores = currentStores;
+            let totalStockNow = classified.reduce((s, d) => s + d.estoqueMatriz + (d.importacoesPendentes || 0), 0);
+            let accumBuy = 0;
+            // Calculate running stock from SKU-level (sum all SKU stocks per month)
+            const monthData = [];
+            for (let i = 0; i < numMonths; i++) {
+                const ns = newStoresPerMonth[i];
+                runningStores += ns;
+                const ag = monthAgg[i];
+                accumBuy += ag.needBuy;
 
-                accumBuy += needBuy;
-                runningStores += newStores;
+                // Sum remaining stock across all SKUs for this month
+                let monthStockRemaining = 0;
+                fcSkuData.forEach(s => { monthStockRemaining += s.monthly[i].stock; });
 
                 monthData.push({
-                    month: monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1),
+                    month: monthLabels[i],
                     stores: runningStores,
-                    newStores: newStores,
-                    baseDemand: baseDemand,
-                    initStock: initStock,
-                    rampDemand: rampDemand,
-                    totalDemand: totalDemand,
-                    stockAvail: Math.max(runningStock, 0),
-                    needBuy: needBuy,
+                    newStores: ns,
+                    baseDemand: ag.baseDemand,
+                    initStock: ag.initStock,
+                    rampDemand: ag.rampDemand,
+                    totalDemand: ag.totalDemand,
+                    stockAvail: monthStockRemaining,
+                    needBuy: ag.needBuy,
                     accumBuy: accumBuy
                 });
             }
 
             // Update KPIs
             const el = id => document.getElementById(id);
-            const totalDemand15 = monthData.reduce((s, m) => s + m.totalDemand, 0);
+            const totalDemandAll = monthData.reduce((s, m) => s + m.totalDemand, 0);
             const totalInitStock = monthData.reduce((s, m) => s + m.initStock, 0);
             const totalBuy = monthData.reduce((s, m) => s + m.needBuy, 0);
             if (el('fcLabelDemand')) el('fcLabelDemand').textContent = 'Demanda total ' + numMonths + 'M';
-            if (el('fcTotalDemand')) el('fcTotalDemand').textContent = totalDemand15.toLocaleString('pt-BR');
-            if (el('fcTotalInitStock')) el('fcTotalInitStock').textContent = currentStock.toLocaleString('pt-BR');
+            if (el('fcTotalDemand')) el('fcTotalDemand').textContent = totalDemandAll.toLocaleString('pt-BR');
+            if (el('fcTotalInitStock')) el('fcTotalInitStock').textContent = totalStockNow.toLocaleString('pt-BR');
             if (el('fcTotalBuy')) el('fcTotalBuy').textContent = totalBuy.toLocaleString('pt-BR');
             if (el('fcTotalAccum')) el('fcTotalAccum').textContent = accumBuy.toLocaleString('pt-BR');
 
@@ -3366,18 +3441,12 @@
             const summaryEl = el('fcStoreSummary');
             if (summaryEl) {
                 summaryEl.innerHTML = `
-                    <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);margin-bottom:4px;">Resumen</div>
-                        <div><span style="color:var(--text-secondary);font-size:12px;">Actuales</span><br><strong style="font-size:18px;">${currentStores}</strong></div>
-                        <div><span style="color:var(--text-secondary);font-size:12px;">Nuevas</span><br><strong style="font-size:18px;color:#10b981;">+${totalNewStores}</strong></div>
-                        <div><span style="color:var(--text-secondary);font-size:12px;">Total proyectado</span><br><strong style="font-size:18px;">${currentStores + totalNewStores}</strong></div>
-                        <div style="border-top:1px solid var(--border-color);padding-top:8px;margin-top:4px;">
-                            <span style="color:var(--text-secondary);font-size:12px;">Stock inicial/tienda</span><br><strong style="font-size:14px;color:#0000E1;">~${initialStockPerStore.toLocaleString('pt-BR')} pzs</strong>
-                        </div>
-                        <div>
-                            <span style="color:var(--text-secondary);font-size:12px;">Stock total nuevas</span><br><strong style="font-size:14px;color:#0000E1;">${totalInitStock.toLocaleString('pt-BR')} pzs</strong>
-                        </div>
-                    </div>`;
+                        <span>Atuais: <strong>${currentStores}</strong></span>
+                        <span>Novas: <strong style="color:#10b981;">+${totalNewStores}</strong></span>
+                        <span>Total: <strong>${currentStores + totalNewStores}</strong></span>
+                        <span>Estoque/loja: <strong style="color:#0000E1;">~${initialStockPerStore.toLocaleString('pt-BR')}</strong></span>
+                        <span>Estoque total novas: <strong style="color:#0000E1;">${totalInitStock.toLocaleString('pt-BR')} pçs</strong></span>
+                    `;
             }
 
             // Render table
@@ -3387,16 +3456,17 @@
                     const isNewStore = m.newStores > 0;
                     const bg = isNewStore ? 'background:#10b98108;' : '';
                     const stockColor = m.stockAvail === 0 ? '#ef4444' : m.stockAvail < totalVendaMes * 2 ? '#f59e0b' : '#10b981';
+                    const c = 'text-align:center;';
                     return `<tr style="${bg}">
-                        <td><strong>${m.month}</strong></td>
-                        <td>${m.stores}${isNewStore ? ' <span style="color:#10b981;font-size:11px;font-weight:600;">+' + m.newStores + '</span>' : ''}</td>
-                        <td style="text-align:right;">${m.baseDemand.toLocaleString('pt-BR')}</td>
-                        <td style="text-align:right;${m.initStock > 0 ? 'color:#0000E1;font-weight:600;' : ''}">${m.initStock > 0 ? m.initStock.toLocaleString('pt-BR') : '—'}</td>
-                        <td style="text-align:right;${m.rampDemand > 0 ? 'color:#7c3aed;' : ''}">${m.rampDemand > 0 ? m.rampDemand.toLocaleString('pt-BR') : '—'}</td>
-                        <td style="text-align:right;font-weight:600;">${m.totalDemand.toLocaleString('pt-BR')}</td>
-                        <td style="text-align:right;color:${stockColor};font-weight:600;">${m.stockAvail.toLocaleString('pt-BR')}</td>
-                        <td style="text-align:right;${m.needBuy > 0 ? 'color:#ef4444;font-weight:600;' : ''}">${m.needBuy > 0 ? m.needBuy.toLocaleString('pt-BR') : '—'}</td>
-                        <td style="text-align:right;font-weight:600;color:#f59e0b;">${m.accumBuy.toLocaleString('pt-BR')}</td>
+                        <td style="${c}"><strong>${m.month}</strong></td>
+                        <td style="${c}">${m.stores}${isNewStore ? ' <span style="color:#10b981;font-size:12px;font-weight:600;">+' + m.newStores + '</span>' : ''}</td>
+                        <td style="${c}">${m.baseDemand.toLocaleString('pt-BR')}</td>
+                        <td style="${c}${m.initStock > 0 ? 'color:#0000E1;font-weight:600;' : ''}">${m.initStock > 0 ? m.initStock.toLocaleString('pt-BR') : '—'}</td>
+                        <td style="${c}${m.rampDemand > 0 ? 'color:#7c3aed;' : ''}">${m.rampDemand > 0 ? m.rampDemand.toLocaleString('pt-BR') : '—'}</td>
+                        <td style="${c}font-weight:600;">${m.totalDemand.toLocaleString('pt-BR')}</td>
+                        <td style="${c}color:${stockColor};font-weight:600;">${m.stockAvail.toLocaleString('pt-BR')}</td>
+                        <td style="${c}${m.needBuy > 0 ? 'color:#ef4444;font-weight:600;' : ''}">${m.needBuy > 0 ? m.needBuy.toLocaleString('pt-BR') : '—'}</td>
+                        <td style="${c}font-weight:600;color:#f59e0b;">${m.accumBuy.toLocaleString('pt-BR')}</td>
                     </tr>`;
                 }).join('');
             }
@@ -3404,23 +3474,23 @@
             // Render chart
             renderForecastChart(monthData);
 
-            // Render SKU forecast
-            calcForecastSKU();
+            // Render SKU table (data already calculated above)
+            renderForecastSKU();
         }
 
         function renderForecastChart(monthData) {
             const canvas = document.getElementById('fcChart');
             if (!canvas) return;
 
-            if (fcChartInstance) {
-                fcChartInstance.destroy();
-            }
+            if (fcChartInstance) fcChartInstance.destroy();
 
             const labels = monthData.map(m => m.month);
-            const demandBase = monthData.map(m => m.baseDemand);
-            const demandRamp = monthData.map(m => m.rampDemand + m.initStock);
+            const demandTotal = monthData.map(m => m.totalDemand);
             const stockAvail = monthData.map(m => m.stockAvail);
+            const needBuy = monthData.map(m => m.needBuy);
             const accumBuy = monthData.map(m => m.accumBuy);
+
+            const fmtK = v => { if (v === 0) return ''; return v >= 1000 ? (v/1000).toFixed(1) + 'K' : v.toString(); };
 
             fcChartInstance = new Chart(canvas, {
                 type: 'bar',
@@ -3428,45 +3498,53 @@
                     labels: labels,
                     datasets: [
                         {
-                            label: 'Demanda tiendas actuales',
-                            data: demandBase,
-                            backgroundColor: '#0000E1',
-                            stack: 'demand',
-                            order: 2
+                            label: 'Demanda total',
+                            data: demandTotal,
+                            backgroundColor: '#0000E1CC',
+                            borderRadius: 4,
+                            order: 3,
+                            yAxisID: 'yDemand',
+                            barPercentage: 0.7
                         },
                         {
-                            label: 'Stock inicial + ramp-up',
-                            data: demandRamp,
-                            backgroundColor: '#10b981',
-                            stack: 'demand',
-                            order: 2
+                            label: 'Necessidade compra',
+                            data: needBuy,
+                            backgroundColor: '#FC4F00CC',
+                            borderRadius: 4,
+                            order: 2,
+                            yAxisID: 'yDemand',
+                            barPercentage: 0.7
                         },
                         {
-                            label: 'Stock disponible',
+                            label: 'Estoque disponível',
                             data: stockAvail,
                             type: 'line',
-                            borderColor: '#f59e0b',
-                            backgroundColor: '#f59e0b20',
+                            borderColor: '#10b981',
+                            backgroundColor: '#10b98115',
                             fill: true,
                             tension: 0.3,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#f59e0b',
-                            borderWidth: 2,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#10b981',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            borderWidth: 3,
                             order: 1,
-                            yAxisID: 'y'
+                            yAxisID: 'yStock'
                         },
                         {
                             label: 'Compra acumulada',
                             data: accumBuy,
                             type: 'line',
-                            borderColor: '#ef4444',
-                            borderDash: [5, 3],
-                            pointRadius: 3,
-                            pointBackgroundColor: '#ef4444',
+                            borderColor: '#f59e0b',
+                            borderDash: [6, 4],
+                            pointRadius: 4,
+                            pointBackgroundColor: '#f59e0b',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
                             borderWidth: 2,
                             fill: false,
                             order: 0,
-                            yAxisID: 'y'
+                            yAxisID: 'yStock'
                         }
                     ]
                 },
@@ -3475,37 +3553,53 @@
                     maintainAspectRatio: false,
                     interaction: { intersect: false, mode: 'index' },
                     plugins: {
-                        legend: { position: 'top', labels: { usePointStyle: true, font: { size: 14, family: 'Poppins', weight: '500' }, padding: 20 } },
+                        legend: {
+                            position: 'bottom',
+                            labels: { usePointStyle: true, font: { size: 14, family: 'Poppins', weight: '500' }, padding: 24, pointStyleWidth: 12 }
+                        },
                         datalabels: {
-                            display: function(ctx) {
-                                return ctx.datasetIndex <= 1;
-                            },
-                            anchor: 'end',
-                            align: 'top',
-                            offset: 2,
-                            font: { size: 11, family: 'Poppins', weight: '600' },
+                            display: function(ctx) { return true; },
+                            anchor: function(ctx) { return ctx.datasetIndex <= 1 ? 'end' : 'end'; },
+                            align: function(ctx) { return ctx.datasetIndex <= 1 ? 'top' : 'top'; },
+                            offset: 4,
+                            font: function(ctx) { return { size: ctx.datasetIndex <= 1 ? 12 : 11, family: 'Poppins', weight: '600' }; },
                             color: function(ctx) {
-                                return ctx.datasetIndex === 0 ? '#0000E1' : '#10b981';
+                                const colors = ['#0000E1', '#FC4F00', '#10b981', '#f59e0b'];
+                                return colors[ctx.datasetIndex] || '#333';
                             },
-                            formatter: function(value) {
-                                if (value === 0) return '';
-                                return value >= 1000 ? (value / 1000).toFixed(1) + 'K' : value;
-                            }
+                            formatter: function(value) { return fmtK(value); }
                         },
                         tooltip: {
-                            titleFont: { size: 14, family: 'Poppins' },
-                            bodyFont: { size: 13, family: 'Poppins' },
-                            padding: 12,
+                            titleFont: { size: 15, family: 'Poppins', weight: '600' },
+                            bodyFont: { size: 14, family: 'Poppins' },
+                            padding: 14,
+                            boxPadding: 6,
                             callbacks: {
                                 label: function(ctx) {
-                                    return ctx.dataset.label + ': ' + ctx.parsed.y.toLocaleString('pt-BR') + ' pzs';
+                                    return ' ' + ctx.dataset.label + ': ' + ctx.parsed.y.toLocaleString('pt-BR') + ' pçs';
                                 }
                             }
                         }
                     },
                     scales: {
-                        x: { ticks: { font: { size: 12, family: 'Poppins' }, maxRotation: 45 } },
-                        y: { beginAtZero: true, ticks: { font: { size: 12, family: 'Poppins' }, callback: v => v >= 1000 ? (v/1000).toFixed(0) + 'K' : v } }
+                        x: {
+                            ticks: { font: { size: 13, family: 'Poppins' }, maxRotation: 45, autoSkip: false },
+                            grid: { display: false }
+                        },
+                        yDemand: {
+                            position: 'left',
+                            beginAtZero: true,
+                            title: { display: true, text: 'Demanda (pçs/mês)', font: { size: 13, family: 'Poppins' }, color: '#0000E1' },
+                            ticks: { font: { size: 12, family: 'Poppins' }, color: '#0000E1', callback: v => fmtK(v) },
+                            grid: { color: '#0000E110' }
+                        },
+                        yStock: {
+                            position: 'right',
+                            beginAtZero: true,
+                            title: { display: true, text: 'Estoque / Acumulado (pçs)', font: { size: 13, family: 'Poppins' }, color: '#10b981' },
+                            ticks: { font: { size: 12, family: 'Poppins' }, color: '#10b981', callback: v => fmtK(v) },
+                            grid: { display: false }
+                        }
                     }
                 }
             });
@@ -3541,87 +3635,12 @@
             }
             ws['!cols'] = [{ wch: 14 }, { wch: 10 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 16 }, { wch: 16 }, { wch: 16 }];
 
-            XLSX.utils.book_append_sheet(wb, ws, 'Pronóstico Compras');
+            XLSX.utils.book_append_sheet(wb, ws, 'Previsão Compras');
             XLSX.writeFile(wb, 'pronostico-compras-15m.xlsx');
         }
 
         // ==================== FORECAST POR SKU ====================
         let fcSkuData = [];
-
-        function calcForecastSKU() {
-            if (!processedData || processedData.length === 0) return;
-            const classified = classifySKUsByABC(processedData);
-            const numMonths = parseInt((document.getElementById('fcMonths') || {}).value) || 15;
-            const growthPct = (parseFloat(document.getElementById('fcGrowth').value) || 0) / 100;
-            const rampM1 = (parseInt(document.getElementById('fcRampM1').value) || 0) / 100;
-            const rampM2 = (parseInt(document.getElementById('fcRampM2').value) || 0) / 100;
-            const rampM3 = (parseInt(document.getElementById('fcRampM3').value) || 0) / 100;
-            const currentStores = storeColumns.length || 18;
-
-            // Read new stores
-            const newStoresPerMonth = [];
-            for (let i = 0; i < numMonths; i++) {
-                newStoresPerMonth.push(parseInt((document.getElementById('fcStore_' + i) || {}).value) || 0);
-            }
-            const totalNewStores = newStoresPerMonth.reduce((s, v) => s + v, 0);
-
-            // Track ramp-up
-            const rampStores = [];
-            newStoresPerMonth.forEach((ns, i) => { if (ns > 0) rampStores.push({ month: i, qty: ns }); });
-
-            fcSkuData = classified.filter(d => d.vendaMedia > 0 || d.estoqueMatriz > 0).map(item => {
-                const vendaPerStore = currentStores > 0 ? item.vendaMedia / currentStores : 0;
-                const minPerStore = item.curva === 'A' ? 2 : 1;
-                let demanda15 = 0;
-                let initStockTotal = 0;
-
-                for (let i = 0; i < numMonths; i++) {
-                    const gf = Math.pow(1 + growthPct, i);
-                    let monthDemand = item.vendaMedia * gf;
-
-                    // Initial stock for new stores this month
-                    const ns = newStoresPerMonth[i];
-                    if (ns > 0) initStockTotal += ns * minPerStore;
-
-                    // Ramp-up from previously opened stores
-                    rampStores.forEach(rs => {
-                        const diff = i - rs.month;
-                        if (diff <= 0) return;
-                        let rp = diff === 1 ? rampM1 : diff === 2 ? rampM2 : rampM3;
-                        monthDemand += vendaPerStore * rp * rs.qty * gf;
-                    });
-
-                    demanda15 += monthDemand;
-                }
-
-                demanda15 = Math.round(demanda15 + initStockTotal);
-                const compraNecesaria = Math.max(0, demanda15 - item.estoqueMatriz - (item.importacoesPendentes || 0));
-
-                // Priority
-                let prioridad, prioColor;
-                const cob = item.coberturaMeses;
-                if (cob < 2 && (item.curva === 'A' || item.curva === 'B')) { prioridad = 'Urgente'; prioColor = '#ef4444'; }
-                else if (cob < 4) { prioridad = 'Alta'; prioColor = '#f59e0b'; }
-                else if (compraNecesaria > 0) { prioridad = 'Media'; prioColor = '#0000E1'; }
-                else { prioridad = 'Baja'; prioColor = '#10b981'; }
-
-                return {
-                    sku: item.sku,
-                    nome_produto: item.nome_produto || '',
-                    familia: item.familia || '',
-                    curva: item.curva,
-                    vendaMedia: item.vendaMedia,
-                    estoqueMatriz: item.estoqueMatriz,
-                    coberturaMeses: item.coberturaMeses,
-                    demanda15: demanda15,
-                    compraNecesaria: compraNecesaria,
-                    prioridad: prioridad,
-                    prioColor: prioColor
-                };
-            }).sort((a, b) => b.compraNecesaria - a.compraNecesaria);
-
-            renderForecastSKU();
-        }
 
         function renderForecastSKU() {
             const tbody = document.getElementById('fcSkuTableBody');
@@ -3641,23 +3660,27 @@
                 const cob = item.coberturaMeses;
                 const cobStr = cob === Infinity ? '\u221e' : cob.toFixed(1) + 'M';
                 const cobColor = cob < 2 ? '#ef4444' : cob < 4 ? '#f59e0b' : '#333';
-                const rowBg = item.prioridad === 'Urgente' ? 'background:#fef2f2;' : item.prioridad === 'Alta' ? 'background:#fffbeb;' : '';
+                const rowBg = item.prioridad === 'Urgente!' ? 'background:#fef2f2;' : item.prioridad === 'Alta' ? 'background:#fffbeb;' : '';
+                const fbm = item.firstBuyMonth >= 0 ? 'Mês ' + (item.firstBuyMonth + 1) : '—';
+                const fbmColor = item.firstBuyMonth >= 0 && item.firstBuyMonth <= 2 ? '#ef4444' : item.firstBuyMonth >= 0 ? '#f59e0b' : '#10b981';
 
                 return `<tr style="${rowBg}">
-                    <td><strong>${item.sku}</strong></td>
-                    <td>${item.nome_produto}</td>
-                    <td>${getCurvaBadge(item.curva)}</td>
-                    <td style="text-align:right;font-weight:600;">${item.vendaMedia.toFixed(1)}</td>
-                    <td style="text-align:right;">${item.estoqueMatriz.toLocaleString('pt-BR')}</td>
+                    <td style="text-align:center;"><strong>${item.sku}</strong></td>
+                    <td style="text-align:center;">${item.nome_produto}</td>
+                    <td style="text-align:center;">${getCurvaBadge(item.curva)}</td>
+                    <td style="text-align:center;font-weight:600;">${item.vendaMedia.toFixed(1)}</td>
+                    <td style="text-align:center;">${item.estoqueMatriz.toLocaleString('pt-BR')}</td>
+                    <td style="text-align:center;color:#10b981;">${(item.importacoes || 0) > 0 ? item.importacoes.toLocaleString('pt-BR') : '—'}</td>
                     <td style="text-align:center;font-weight:600;color:${cobColor};">${cobStr}</td>
-                    <td style="text-align:right;">${item.demanda15.toLocaleString('pt-BR')}</td>
-                    <td style="text-align:right;font-weight:600;color:${item.compraNecesaria > 0 ? '#ef4444' : '#10b981'};">${item.compraNecesaria > 0 ? item.compraNecesaria.toLocaleString('pt-BR') : '—'}</td>
-                    <td><span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:12px;font-weight:600;color:white;background:${item.prioColor};">${item.prioridad}</span></td>
+                    <td style="text-align:center;">${item.demanda15.toLocaleString('pt-BR')}</td>
+                    <td style="text-align:center;font-weight:600;color:${item.compraNecesaria > 0 ? '#ef4444' : '#10b981'};">${item.compraNecesaria > 0 ? item.compraNecesaria.toLocaleString('pt-BR') : '—'}</td>
+                    <td style="text-align:center;font-weight:600;color:${fbmColor};">${fbm}</td>
+                    <td style="text-align:center;"><span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:12px;font-weight:600;color:white;background:${item.prioColor};">${item.prioridad}</span></td>
                 </tr>`;
             }).join('');
 
             if (filtered.length > 200) {
-                tbody.innerHTML += '<tr><td colspan="9" style="text-align:center;color:var(--text-secondary);padding:12px;">... mostrando 200 de ' + filtered.length + ' SKUs. Use filtros para refinar.</td></tr>';
+                tbody.innerHTML += '<tr><td colspan="11" style="text-align:center;color:var(--text-secondary);padding:12px;">... mostrando 200 de ' + filtered.length + ' SKUs. Use filtros para refinar.</td></tr>';
             }
         }
 
@@ -3668,15 +3691,15 @@
             if (curvaFilter) filtered = filtered.filter(d => d.curva === curvaFilter);
             if (searchQuery) filtered = filtered.filter(d => (d.sku + ' ' + d.nome_produto + ' ' + d.familia).toLowerCase().includes(searchQuery));
 
-            const data = [['SKU', 'Producto', 'Curva', 'Venta/Mes', 'Stock Actual', 'Cob. Actual', 'Demanda 15M', 'Compra Necesaria', 'Prioridad']];
+            const data = [['SKU', 'Produto', 'Curva', 'Venda/Mês', 'Estoque', 'Import.', 'Cob.', 'Demanda', 'Compra Necessária', 'Esgota em (mês)', 'Prioridade']];
             filtered.forEach(d => {
-                data.push([d.sku, d.nome_produto, d.curva, Math.round(d.vendaMedia * 10) / 10, d.estoqueMatriz, d.coberturaMeses === Infinity ? 999 : Math.round(d.coberturaMeses * 10) / 10, d.demanda15, d.compraNecesaria, d.prioridad]);
+                data.push([d.sku, d.nome_produto, d.curva, Math.round(d.vendaMedia * 10) / 10, d.estoqueMatriz, d.importacoes || 0, d.coberturaMeses === Infinity ? 999 : Math.round(d.coberturaMeses * 10) / 10, d.demanda15, d.compraNecesaria, d.firstBuyMonth >= 0 ? d.firstBuyMonth + 1 : '', d.prioridad]);
             });
 
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(data);
             const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 11 }, fill: { fgColor: { rgb: '0000E1' } }, alignment: { horizontal: 'center' } };
-            for (let c = 0; c < 9; c++) {
+            for (let c = 0; c < 11; c++) {
                 const ref = XLSX.utils.encode_cell({ r: 0, c: c });
                 if (ws[ref]) ws[ref].s = headerStyle;
             }
