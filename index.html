@@ -733,6 +733,21 @@
         .forn-panel { display: none; }
         .forn-panel.active { display: block; }
 
+        .perf-filter-btn {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            background: white;
+            color: var(--text-secondary);
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.15s;
+        }
+        .perf-filter-btn:hover { border-color: var(--btn-color, #333); color: var(--btn-color, #333); }
+        .perf-filter-btn.active { background: var(--btn-color, #333); color: white; border-color: var(--btn-color, #333); }
+
         .forn-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -1204,7 +1219,8 @@
                     <li class="nav-item"><a class="nav-link" data-section="status-importacoes">Status Importações</a></li>
                     <li class="nav-item"><a class="nav-link" data-section="reposicao">Reposição</a></li>
                     <li class="nav-item"><a class="nav-link" data-section="lojas">Lojas</a></li>
-                    <li class="nav-item" style="margin-top:16px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.1);"><a class="nav-link" data-section="fornecedores">Importaciones China</a></li>
+                    <li class="nav-item" style="margin-top:16px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.1);"><a class="nav-link" data-section="pronostico-compras">Pronóstico Compras</a></li>
+                    <li class="nav-item"><a class="nav-link" data-section="fornecedores">Importaciones China</a></li>
                 </ul>
             </nav>
 
@@ -1484,15 +1500,47 @@
                     Todos os SKUs ordenados por share de venda média/mês (maior a menor). Vista única com stock matriz, lojas, importações e cobertura.
                     <br><span style="font-size:13px;">Fonte: <a href="https://metabase.livocompany.com/question/9377-vendas-ultimos-meses-oculos" target="_blank" style="color:var(--livo-blue);">Vendas Últimos Meses (Metabase)</a> · <a href="https://metabase.livocompany.com/question/9309-stock-lojas" target="_blank" style="color:var(--livo-blue);">Stock Lojas (Metabase)</a> · <a href="https://script.google.com/macros/s/AKfycbzo_3vQG2aWNHyAdTV6MxFagP-0u3gyK-_fnkoOVKbT8cqk-omt63V5qdgOIFlCWUdN/exec?sheet=all" target="_blank" style="color:var(--livo-blue);">Google Sheets API</a></span>
                 </div>
-                
+
                 <!-- Cards resumen por curva -->
                 <div id="perfCurvaCards" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;"></div>
 
-                <div style="margin-bottom: 12px;">
-                    <input type="text" id="perfSearchInput" placeholder="Buscar por SKU, produto ou família..."
-                        style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; font-family: inherit; outline: none;"
-                        oninput="filterPerformanceTable()">
+                <!-- Filter bar -->
+                <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+                    <button class="perf-filter-btn active" data-filter="all" onclick="applyPerfFilter('all',this)">Todos</button>
+                    <button class="perf-filter-btn" data-filter="A" onclick="applyPerfFilter('A',this)" style="--btn-color:#0000E1;">Curva A</button>
+                    <button class="perf-filter-btn" data-filter="B" onclick="applyPerfFilter('B',this)" style="--btn-color:#10b981;">Curva B</button>
+                    <button class="perf-filter-btn" data-filter="C" onclick="applyPerfFilter('C',this)" style="--btn-color:#eab308;">Curva C</button>
+                    <button class="perf-filter-btn" data-filter="D" onclick="applyPerfFilter('D',this)" style="--btn-color:#ef4444;">Curva D</button>
+                    <span style="width:1px;height:24px;background:var(--border-color);margin:0 4px;"></span>
+                    <button class="perf-filter-btn" data-filter="baixa-rot" onclick="applyPerfFilter('baixa-rot',this)" style="--btn-color:#ef4444;">Baja Rotación 3M</button>
+                    <button class="perf-filter-btn" data-filter="top-3m" onclick="applyPerfFilter('top-3m',this)" style="--btn-color:#10b981;">Top Ventas 3M</button>
+                    <button class="perf-filter-btn" data-filter="top-1m" onclick="applyPerfFilter('top-1m',this)" style="--btn-color:#0000E1;">Top Ventas 1M</button>
                 </div>
+                <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+                    <select id="perfFilterClasse" onchange="filterPerformanceTable()" style="padding:8px 12px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;font-family:inherit;background:white;">
+                        <option value="">Todas las clases</option>
+                        <option value="Óculos de Sol">Óculos de Sol</option>
+                        <option value="Óculos de Grau">Óculos de Grau</option>
+                    </select>
+                    <select id="perfFilterStatus" onchange="filterPerformanceTable()" style="padding:8px 12px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;font-family:inherit;background:white;">
+                        <option value="">Todos los status</option>
+                        <option value="Crítico">Crítico</option>
+                        <option value="Repor">Repor</option>
+                        <option value="Vigiar">Vigiar</option>
+                        <option value="OK">OK</option>
+                        <option value="Excesso">Excesso</option>
+                    </select>
+                    <select id="perfFilterFamilia" onchange="filterPerformanceTable()" style="padding:8px 12px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;font-family:inherit;background:white;">
+                        <option value="">Todas las familias</option>
+                    </select>
+                    <input type="text" id="perfSearchInput" placeholder="Buscar SKU, produto, família..."
+                        style="flex:1;min-width:200px;padding:8px 14px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;font-family:inherit;outline:none;"
+                        oninput="filterPerformanceTable()">
+                    <button onclick="downloadPerformanceXlsx()" style="padding:8px 20px;background:#217346;color:white;border:none;border-radius:8px;font-size:13px;font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;white-space:nowrap;">
+                        Descargar .xlsx
+                    </button>
+                </div>
+                <div id="perfFilterInfo" style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;display:none;"></div>
 
                 <div class="table-container" style="max-height: 700px; overflow-y: auto;">
                     <table id="performanceTable">
@@ -1791,6 +1839,118 @@
                             <tr><td colspan="9" class="empty-state">Selecione uma loja</td></tr>
                         </tbody>
                     </table>
+                </div>
+            </section>
+
+            <!-- ==================== PRONOSTICO COMPRAS ==================== -->
+            <section class="section" id="pronostico-compras">
+                <h2 class="section-title">Pronóstico de Compras</h2>
+                <div style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;">
+                    Proyección de demanda y necesidades de compra para los próximos 15 meses. Considera ventas actuales, inauguración de tiendas nuevas (stock inicial + ramp-up) y lead time de China.
+                </div>
+
+                <!-- Parámetros -->
+                <div style="background:var(--card-bg);border-radius:10px;padding:20px;border:1px solid var(--border-color);margin-bottom:20px;">
+                    <h3 style="font-size:15px;font-weight:600;margin-bottom:16px;color:var(--text-primary);">Parámetros de Proyección</h3>
+                    <div style="display:flex;gap:20px;margin-bottom:20px;flex-wrap:wrap;">
+                        <div>
+                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">Lead time proveedor (meses)</label>
+                            <input type="number" id="fcLeadTime" value="4" min="1" max="12" style="width:80px;padding:8px;font-size:13px;border:1px solid var(--border-color);border-radius:6px;font-family:inherit;" onchange="recalcForecast()">
+                        </div>
+                        <div>
+                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">Stock de seguridad (meses)</label>
+                            <input type="number" id="fcSafetyStock" value="2" min="0" max="6" style="width:80px;padding:8px;font-size:13px;border:1px solid var(--border-color);border-radius:6px;font-family:inherit;" onchange="recalcForecast()">
+                        </div>
+                        <div>
+                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">Crecimiento esperado (%/mes)</label>
+                            <input type="number" id="fcGrowth" value="3" min="0" max="20" style="width:80px;padding:8px;font-size:13px;border:1px solid var(--border-color);border-radius:6px;font-family:inherit;" onchange="recalcForecast()">
+                        </div>
+                    </div>
+
+                    <h3 style="font-size:15px;font-weight:600;margin-bottom:8px;color:var(--text-primary);">Ramp-up de Tiendas Nuevas</h3>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">
+                        Porcentaje de la demanda promedio por tienda que genera una tienda nueva en sus primeros meses. Stock inicial se calcula aparte (curva A = 2 uds, B/C/D = 1 ud por SKU activo).
+                    </div>
+                    <div style="display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap;">
+                        <div>
+                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">Mes 1 (%)</label>
+                            <input type="number" id="fcRampM1" value="40" min="0" max="100" style="width:80px;padding:8px;font-size:13px;border:1px solid var(--border-color);border-radius:6px;font-family:inherit;" onchange="recalcForecast()">
+                        </div>
+                        <div>
+                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">Mes 2 (%)</label>
+                            <input type="number" id="fcRampM2" value="70" min="0" max="100" style="width:80px;padding:8px;font-size:13px;border:1px solid var(--border-color);border-radius:6px;font-family:inherit;" onchange="recalcForecast()">
+                        </div>
+                        <div>
+                            <label style="font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;">Mes 3+ (%)</label>
+                            <input type="number" id="fcRampM3" value="100" min="0" max="100" style="width:80px;padding:8px;font-size:13px;border:1px solid var(--border-color);border-radius:6px;font-family:inherit;" onchange="recalcForecast()">
+                        </div>
+                    </div>
+
+                    <h3 style="font-size:15px;font-weight:600;margin-bottom:8px;color:var(--text-primary);">Inauguración de Tiendas Nuevas</h3>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">
+                        Ingresa cuántas tiendas se inauguran cada mes. El stock inicial se calcula automáticamente según mínimos por curva.
+                    </div>
+                    <div id="fcStoreInputs" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;"></div>
+
+                    <div id="fcStoreSummary" style="padding:12px 16px;background:var(--content-bg);border-radius:8px;font-size:13px;color:var(--text-secondary);"></div>
+                </div>
+
+                <!-- KPIs -->
+                <div class="kpi-grid" style="margin-bottom:20px;">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Demanda total 15M (pzs)</div>
+                        <div class="kpi-value" id="fcTotalDemand">0</div>
+                    </div>
+                    <div class="kpi-card" style="border-left:3px solid #10b981;">
+                        <div class="kpi-label">Stock inicial tiendas (pzs)</div>
+                        <div class="kpi-value" id="fcTotalInitStock" style="color:#10b981;">0</div>
+                    </div>
+                    <div class="kpi-card" style="border-left:3px solid #0000E1;">
+                        <div class="kpi-label">Compra necesaria (pzs)</div>
+                        <div class="kpi-value" id="fcTotalBuy" style="color:#0000E1;">0</div>
+                    </div>
+                    <div class="kpi-card" style="border-left:3px solid #f59e0b;">
+                        <div class="kpi-label">Compra acumulada (pzs)</div>
+                        <div class="kpi-value" id="fcTotalAccum" style="color:#f59e0b;">0</div>
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div style="background:var(--card-bg);border-radius:10px;padding:20px;border:1px solid var(--border-color);margin-bottom:20px;">
+                    <h3 style="font-size:15px;font-weight:600;margin-bottom:12px;">Demanda Proyectada vs Stock Disponible</h3>
+                    <div style="position:relative;height:300px;">
+                        <canvas id="fcChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div style="background:var(--card-bg);border-radius:10px;padding:20px;border:1px solid var(--border-color);margin-bottom:20px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <h3 style="font-size:15px;font-weight:600;">Necesidad de Compra Mes a Mes</h3>
+                        <button onclick="downloadForecastXlsx()" style="padding:8px 20px;background:#217346;color:white;border:none;border-radius:8px;font-size:13px;font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;">
+                            Descargar .xlsx
+                        </button>
+                    </div>
+                    <div class="table-container" style="max-height:500px;overflow-y:auto;">
+                        <table id="fcTable">
+                            <thead style="position:sticky;top:0;z-index:10;background:#f9fafb;">
+                                <tr>
+                                    <th>Mes</th>
+                                    <th>Tiendas</th>
+                                    <th>Demanda Base</th>
+                                    <th>Stock Inicial</th>
+                                    <th>Ramp-up</th>
+                                    <th>Demanda Total</th>
+                                    <th>Stock Disponible</th>
+                                    <th>Necesidad Compra</th>
+                                    <th>Compra Acumulada</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fcTableBody">
+                                <tr><td colspan="9" class="empty-state">Carregando dados...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
@@ -2185,6 +2345,7 @@
             renderStatusImportacoes(classified);
             renderReposicao(classified);
             renderLojas(classified);
+            initForecast();
         }
 
         function renderPainelGeral(data) {
@@ -2780,7 +2941,7 @@
                 
                 const rowBg = status === 'Cr\u00edtico' ? 'background:#fef2f2;' : status === 'Repor' ? 'background:#fff7ed;' : '';
                 
-                return `<tr style="${rowBg}" data-search="${(item.sku + ' ' + (item.nome_produto||'') + ' ' + (item.familia||'')).toLowerCase()}">
+                return `<tr style="${rowBg}" data-search="${(item.sku + ' ' + (item.nome_produto||'') + ' ' + (item.familia||'')).toLowerCase()}" data-curva="${item.curva}" data-classe="${item.descricao_classe || ''}" data-familia="${item.familia || ''}" data-status="${status}" data-sales3m="${item.sales3M || 0}" data-sales1m="${item.vendas_m00 || 0}" data-vendamedia="${item.vendaMedia}">
                     <td style="color:#999;text-align:center;">${idx + 1}</td>
                     <td><strong>${item.sku}</strong></td>
                     <td>${item.nome_produto || ''}</td>
@@ -2799,14 +2960,465 @@
                     <td>${statusIcons[status] || ''} ${status}</td>
                 </tr>`;
             }).join('');
+
+            // Populate familia dropdown
+            const famSelect = document.getElementById('perfFilterFamilia');
+            if (famSelect && famSelect.options.length <= 1) {
+                const familias = [...new Set(sorted.map(d => d.familia).filter(Boolean))].sort();
+                familias.forEach(f => {
+                    const opt = document.createElement('option');
+                    opt.value = f;
+                    opt.textContent = f;
+                    famSelect.appendChild(opt);
+                });
+            }
+        }
+
+        // ==================== PERFORMANCE FILTER SYSTEM ====================
+        let activePerfFilter = 'all';
+
+        function applyPerfFilter(filter, btn) {
+            activePerfFilter = filter;
+            document.querySelectorAll('.perf-filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterPerformanceTable();
         }
 
         function filterPerformanceTable() {
-            const query = document.getElementById('perfSearchInput').value.toLowerCase();
-            document.querySelectorAll('#performanceBody tr').forEach(row => {
-                const search = row.getAttribute('data-search') || '';
-                row.style.display = search.includes(query) ? '' : 'none';
+            const query = (document.getElementById('perfSearchInput').value || '').toLowerCase();
+            const classeFilter = (document.getElementById('perfFilterClasse') || {}).value || '';
+            const statusFilter = (document.getElementById('perfFilterStatus') || {}).value || '';
+            const familiaFilter = (document.getElementById('perfFilterFamilia') || {}).value || '';
+            const rows = document.querySelectorAll('#performanceBody tr');
+            let visibleCount = 0;
+
+            // For top/bottom filters, first collect all rows data to find thresholds
+            let sales3mValues = [];
+            let sales1mValues = [];
+            if (activePerfFilter === 'baixa-rot' || activePerfFilter === 'top-3m' || activePerfFilter === 'top-1m') {
+                rows.forEach(row => {
+                    const s3 = parseFloat(row.getAttribute('data-sales3m') || 0);
+                    const s1 = parseFloat(row.getAttribute('data-sales1m') || 0);
+                    const vm = parseFloat(row.getAttribute('data-vendamedia') || 0);
+                    if (vm > 0) { // Only consider active products
+                        sales3mValues.push(s3);
+                        sales1mValues.push(s1);
+                    }
+                });
+                sales3mValues.sort((a, b) => a - b);
+                sales1mValues.sort((a, b) => b - a);
+            }
+
+            // Thresholds: bottom 20% for baja rotacion, top 20% for top ventas
+            const baixaRotThreshold = sales3mValues.length > 0 ? sales3mValues[Math.floor(sales3mValues.length * 0.2)] : 0;
+            const top3mThreshold = sales3mValues.length > 0 ? sales3mValues[Math.floor(sales3mValues.length * 0.8)] : Infinity;
+            const top1mThreshold = sales1mValues.length > 0 ? sales1mValues[Math.min(Math.floor(sales1mValues.length * 0.2), sales1mValues.length - 1)] : Infinity;
+
+            rows.forEach(row => {
+                if (!row.getAttribute('data-search')) { row.style.display = ''; return; }
+
+                let show = true;
+
+                // Text search
+                if (query && !(row.getAttribute('data-search') || '').includes(query)) show = false;
+
+                // Classe filter
+                if (show && classeFilter && row.getAttribute('data-classe') !== classeFilter) show = false;
+
+                // Status filter
+                if (show && statusFilter && row.getAttribute('data-status') !== statusFilter) show = false;
+
+                // Familia filter
+                if (show && familiaFilter && row.getAttribute('data-familia') !== familiaFilter) show = false;
+
+                // Curva / special filters
+                if (show && activePerfFilter !== 'all') {
+                    const curva = row.getAttribute('data-curva');
+                    const s3 = parseFloat(row.getAttribute('data-sales3m') || 0);
+                    const s1 = parseFloat(row.getAttribute('data-sales1m') || 0);
+                    const vm = parseFloat(row.getAttribute('data-vendamedia') || 0);
+
+                    if (activePerfFilter === 'A' || activePerfFilter === 'B' || activePerfFilter === 'C' || activePerfFilter === 'D') {
+                        if (curva !== activePerfFilter) show = false;
+                    } else if (activePerfFilter === 'baixa-rot') {
+                        // Baja rotación: ventas 3M en el percentil más bajo, o sin ventas en 3M con stock
+                        if (s3 > baixaRotThreshold || vm === 0) show = false;
+                    } else if (activePerfFilter === 'top-3m') {
+                        if (s3 < top3mThreshold || vm === 0) show = false;
+                    } else if (activePerfFilter === 'top-1m') {
+                        if (s1 < top1mThreshold || vm === 0) show = false;
+                    }
+                }
+
+                row.style.display = show ? '' : 'none';
+                if (show) visibleCount++;
             });
+
+            // Show filter info
+            const infoEl = document.getElementById('perfFilterInfo');
+            if (infoEl) {
+                const totalRows = document.querySelectorAll('#performanceBody tr[data-search]').length;
+                if (activePerfFilter !== 'all' || query || classeFilter || statusFilter || familiaFilter) {
+                    const labels = { 'all': 'Todos', 'A': 'Curva A', 'B': 'Curva B', 'C': 'Curva C', 'D': 'Curva D', 'baixa-rot': 'Baja Rotación 3M (bottom 20%)', 'top-3m': 'Top Ventas 3M (top 20%)', 'top-1m': 'Top Ventas Último Mes (top 20%)' };
+                    infoEl.style.display = 'block';
+                    infoEl.textContent = `Mostrando ${visibleCount} de ${totalRows} SKUs` + (activePerfFilter !== 'all' ? ` — Filtro: ${labels[activePerfFilter]}` : '');
+                } else {
+                    infoEl.style.display = 'none';
+                }
+            }
+        }
+
+        // ==================== DOWNLOAD PERFORMANCE XLSX ====================
+        function downloadPerformanceXlsx() {
+            const rows = document.querySelectorAll('#performanceBody tr');
+            const data = [['#', 'SKU', 'Produto', 'Família', 'Classe', 'Curva', 'Venda/Mês', 'Share %', 'Acum %', 'Est. Matriz', 'Est. Lojas', 'Import.', 'Cob. Atual', 'Cob. c/Imp', 'Min/Loja', 'Status']];
+            let idx = 0;
+            rows.forEach(row => {
+                if (row.style.display === 'none' || !row.getAttribute('data-search')) return;
+                idx++;
+                const cells = row.querySelectorAll('td');
+                if (cells.length < 16) return;
+                data.push([
+                    idx,
+                    cells[1].textContent.trim(),
+                    cells[2].textContent.trim(),
+                    cells[3].textContent.trim(),
+                    cells[4].textContent.trim(),
+                    cells[5].textContent.trim(),
+                    parseFloat(cells[6].textContent) || 0,
+                    cells[7].textContent.trim(),
+                    cells[8].textContent.trim(),
+                    parseInt(cells[9].textContent.replace(/\./g, '')) || 0,
+                    parseInt(cells[10].textContent) || 0,
+                    cells[11].textContent.trim() === '—' ? 0 : parseInt(cells[11].textContent) || 0,
+                    cells[12].textContent.trim(),
+                    cells[13].textContent.trim(),
+                    parseInt(cells[14].textContent) || 0,
+                    cells[15].textContent.trim()
+                ]);
+            });
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+
+            // Style header
+            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 11 }, fill: { fgColor: { rgb: '0000E1' } }, alignment: { horizontal: 'center' } };
+            for (let c = 0; c < 16; c++) {
+                const ref = XLSX.utils.encode_cell({ r: 0, c: c });
+                if (ws[ref]) ws[ref].s = headerStyle;
+            }
+
+            // Column widths
+            ws['!cols'] = [{ wch: 5 }, { wch: 14 }, { wch: 30 }, { wch: 18 }, { wch: 16 }, { wch: 7 }, { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 9 }, { wch: 12 }];
+
+            XLSX.utils.book_append_sheet(wb, ws, 'Performance SKU');
+            const filterLabel = activePerfFilter !== 'all' ? '_' + activePerfFilter : '';
+            XLSX.writeFile(wb, `performance-sku${filterLabel}.xlsx`);
+        }
+
+        // ==================== PRONOSTICO DE COMPRAS ====================
+        let fcChartInstance = null;
+
+        function initForecast() {
+            const container = document.getElementById('fcStoreInputs');
+            if (!container) return;
+
+            // Generate 15 months from current month
+            const now = new Date();
+            const months = [];
+            for (let i = 0; i < 15; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth() + 1 + i, 1);
+                const label = d.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
+                months.push({ label: label.charAt(0).toUpperCase() + label.slice(1), date: d });
+            }
+
+            container.innerHTML = months.map((m, i) => `
+                <div style="text-align:center;">
+                    <label style="display:block;font-size:11px;color:var(--text-secondary);margin-bottom:4px;">${m.label}</label>
+                    <input type="number" id="fcStore_${i}" value="0" min="0" max="20"
+                        style="width:100%;text-align:center;padding:6px;font-size:13px;border:1px solid var(--border-color);border-radius:6px;font-family:inherit;"
+                        onchange="onStoreInputChange(this);recalcForecast()">
+                </div>
+            `).join('');
+
+            recalcForecast();
+        }
+
+        function onStoreInputChange(input) {
+            const val = parseInt(input.value) || 0;
+            if (val > 0) {
+                input.style.borderColor = '#10b981';
+                input.style.background = '#10b98110';
+            } else {
+                input.style.borderColor = '';
+                input.style.background = '';
+            }
+        }
+
+        function recalcForecast() {
+            if (!processedData || processedData.length === 0) return;
+            const classified = classifySKUsByABC(processedData);
+
+            // Read params
+            const leadTime = parseInt(document.getElementById('fcLeadTime').value) || 4;
+            const safetyMonths = parseInt(document.getElementById('fcSafetyStock').value) || 2;
+            const growthPct = (parseFloat(document.getElementById('fcGrowth').value) || 0) / 100;
+            const rampM1 = (parseInt(document.getElementById('fcRampM1').value) || 0) / 100;
+            const rampM2 = (parseInt(document.getElementById('fcRampM2').value) || 0) / 100;
+            const rampM3 = (parseInt(document.getElementById('fcRampM3').value) || 0) / 100;
+
+            // Current base metrics
+            const totalVendaMes = classified.reduce((s, d) => s + d.vendaMedia, 0);
+            const currentStores = storeColumns.length || 18;
+            const vendaPerStore = currentStores > 0 ? totalVendaMes / currentStores : 0;
+
+            // SKU counts by curva for initial stock calc
+            const activeSKUs = classified.filter(d => d.vendaMedia > 0 || d.estoqueMatriz > 0);
+            const skuCountA = activeSKUs.filter(d => d.curva === 'A').length;
+            const skuCountBCD = activeSKUs.filter(d => d.curva !== 'A').length;
+            const initialStockPerStore = (skuCountA * 2) + (skuCountBCD * 1);
+
+            // Current total stock (matriz)
+            let currentStock = classified.reduce((s, d) => s + d.estoqueMatriz, 0);
+
+            // Read new stores per month
+            const newStoresPerMonth = [];
+            for (let i = 0; i < 15; i++) {
+                newStoresPerMonth.push(parseInt((document.getElementById('fcStore_' + i) || {}).value) || 0);
+            }
+            const totalNewStores = newStoresPerMonth.reduce((s, v) => s + v, 0);
+
+            // Build month-by-month projection
+            const now = new Date();
+            const monthData = [];
+            let runningStores = currentStores;
+            let runningStock = currentStock;
+            let accumBuy = 0;
+
+            // Track ramp-up stores: array of { monthOpened, qty }
+            const rampUpStores = [];
+
+            for (let i = 0; i < 15; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth() + 1 + i, 1);
+                const monthLabel = d.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
+
+                // New stores this month
+                const newStores = newStoresPerMonth[i];
+                if (newStores > 0) {
+                    rampUpStores.push({ monthOpened: i, qty: newStores });
+                }
+
+                // Initial stock for new stores this month
+                const initStock = newStores * initialStockPerStore;
+
+                // Base demand from existing stores (with growth)
+                const growthFactor = Math.pow(1 + growthPct, i);
+                const baseDemand = Math.round(totalVendaMes * growthFactor);
+
+                // Ramp-up demand from stores opened in previous months
+                let rampDemand = 0;
+                rampUpStores.forEach(rs => {
+                    const monthsSinceOpen = i - rs.monthOpened;
+                    if (monthsSinceOpen <= 0) return; // opened this month = only initial stock
+                    let rampPct;
+                    if (monthsSinceOpen === 1) rampPct = rampM1;
+                    else if (monthsSinceOpen === 2) rampPct = rampM2;
+                    else rampPct = rampM3;
+                    rampDemand += Math.round(vendaPerStore * rampPct * rs.qty * growthFactor);
+                });
+
+                // Total demand = base + ramp-up
+                const totalDemand = baseDemand + rampDemand + initStock;
+
+                // Stock available after this month
+                runningStock = runningStock - totalDemand;
+                const needBuy = runningStock < 0 ? Math.abs(runningStock) : 0;
+                if (needBuy > 0) {
+                    runningStock = 0; // Reset; we'll need to buy
+                }
+
+                accumBuy += needBuy;
+                runningStores += newStores;
+
+                monthData.push({
+                    month: monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1),
+                    stores: runningStores,
+                    newStores: newStores,
+                    baseDemand: baseDemand,
+                    initStock: initStock,
+                    rampDemand: rampDemand,
+                    totalDemand: totalDemand,
+                    stockAvail: Math.max(runningStock, 0),
+                    needBuy: needBuy,
+                    accumBuy: accumBuy
+                });
+            }
+
+            // Update KPIs
+            const el = id => document.getElementById(id);
+            const totalDemand15 = monthData.reduce((s, m) => s + m.totalDemand, 0);
+            const totalInitStock = monthData.reduce((s, m) => s + m.initStock, 0);
+            const totalBuy = monthData.reduce((s, m) => s + m.needBuy, 0);
+            if (el('fcTotalDemand')) el('fcTotalDemand').textContent = totalDemand15.toLocaleString('pt-BR');
+            if (el('fcTotalInitStock')) el('fcTotalInitStock').textContent = totalInitStock.toLocaleString('pt-BR');
+            if (el('fcTotalBuy')) el('fcTotalBuy').textContent = totalBuy.toLocaleString('pt-BR');
+            if (el('fcTotalAccum')) el('fcTotalAccum').textContent = accumBuy.toLocaleString('pt-BR');
+
+            // Update store summary
+            const summaryEl = el('fcStoreSummary');
+            if (summaryEl) {
+                summaryEl.innerHTML = `
+                    <div style="display:flex;gap:24px;flex-wrap:wrap;">
+                        <span>Tiendas actuales: <strong>${currentStores}</strong></span>
+                        <span>Nuevas en 15 meses: <strong style="color:#10b981;">+${totalNewStores}</strong></span>
+                        <span>Total proyectado: <strong>${currentStores + totalNewStores}</strong></span>
+                        <span>Stock inicial por tienda: <strong style="color:#0000E1;">~${initialStockPerStore.toLocaleString('pt-BR')} pzs</strong></span>
+                        <span>Stock inicial total nuevas: <strong style="color:#0000E1;">${totalInitStock.toLocaleString('pt-BR')} pzs</strong></span>
+                    </div>`;
+            }
+
+            // Render table
+            const tbody = el('fcTableBody');
+            if (tbody) {
+                tbody.innerHTML = monthData.map((m, i) => {
+                    const isNewStore = m.newStores > 0;
+                    const bg = isNewStore ? 'background:#10b98108;' : '';
+                    const stockColor = m.stockAvail === 0 ? '#ef4444' : m.stockAvail < totalVendaMes * 2 ? '#f59e0b' : '#10b981';
+                    return `<tr style="${bg}">
+                        <td><strong>${m.month}</strong></td>
+                        <td>${m.stores}${isNewStore ? ' <span style="color:#10b981;font-size:11px;font-weight:600;">+' + m.newStores + '</span>' : ''}</td>
+                        <td style="text-align:right;">${m.baseDemand.toLocaleString('pt-BR')}</td>
+                        <td style="text-align:right;${m.initStock > 0 ? 'color:#0000E1;font-weight:600;' : ''}">${m.initStock > 0 ? m.initStock.toLocaleString('pt-BR') : '—'}</td>
+                        <td style="text-align:right;${m.rampDemand > 0 ? 'color:#7c3aed;' : ''}">${m.rampDemand > 0 ? m.rampDemand.toLocaleString('pt-BR') : '—'}</td>
+                        <td style="text-align:right;font-weight:600;">${m.totalDemand.toLocaleString('pt-BR')}</td>
+                        <td style="text-align:right;color:${stockColor};font-weight:600;">${m.stockAvail.toLocaleString('pt-BR')}</td>
+                        <td style="text-align:right;${m.needBuy > 0 ? 'color:#ef4444;font-weight:600;' : ''}">${m.needBuy > 0 ? m.needBuy.toLocaleString('pt-BR') : '—'}</td>
+                        <td style="text-align:right;font-weight:600;color:#f59e0b;">${m.accumBuy.toLocaleString('pt-BR')}</td>
+                    </tr>`;
+                }).join('');
+            }
+
+            // Render chart
+            renderForecastChart(monthData);
+        }
+
+        function renderForecastChart(monthData) {
+            const canvas = document.getElementById('fcChart');
+            if (!canvas) return;
+
+            if (fcChartInstance) {
+                fcChartInstance.destroy();
+            }
+
+            const labels = monthData.map(m => m.month);
+            const demandBase = monthData.map(m => m.baseDemand);
+            const demandRamp = monthData.map(m => m.rampDemand + m.initStock);
+            const stockAvail = monthData.map(m => m.stockAvail);
+            const accumBuy = monthData.map(m => m.accumBuy);
+
+            fcChartInstance = new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Demanda tiendas actuales',
+                            data: demandBase,
+                            backgroundColor: '#0000E1',
+                            stack: 'demand',
+                            order: 2
+                        },
+                        {
+                            label: 'Stock inicial + ramp-up',
+                            data: demandRamp,
+                            backgroundColor: '#10b981',
+                            stack: 'demand',
+                            order: 2
+                        },
+                        {
+                            label: 'Stock disponible',
+                            data: stockAvail,
+                            type: 'line',
+                            borderColor: '#f59e0b',
+                            backgroundColor: '#f59e0b20',
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#f59e0b',
+                            borderWidth: 2,
+                            order: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Compra acumulada',
+                            data: accumBuy,
+                            type: 'line',
+                            borderColor: '#ef4444',
+                            borderDash: [5, 3],
+                            pointRadius: 3,
+                            pointBackgroundColor: '#ef4444',
+                            borderWidth: 2,
+                            fill: false,
+                            order: 0,
+                            yAxisID: 'y'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    plugins: {
+                        legend: { position: 'top', labels: { usePointStyle: true, font: { size: 12, family: 'Poppins' } } },
+                        datalabels: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.dataset.label + ': ' + ctx.parsed.y.toLocaleString('pt-BR') + ' pzs';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { ticks: { font: { size: 11 }, maxRotation: 45 } },
+                        y: { beginAtZero: true, ticks: { font: { size: 11 }, callback: v => v.toLocaleString('pt-BR') } }
+                    }
+                }
+            });
+        }
+
+        function downloadForecastXlsx() {
+            const rows = document.querySelectorAll('#fcTableBody tr');
+            const data = [['Mes', 'Tiendas', 'Demanda Base', 'Stock Inicial', 'Ramp-up', 'Demanda Total', 'Stock Disponible', 'Necesidad Compra', 'Compra Acumulada']];
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length < 9) return;
+                data.push([
+                    cells[0].textContent.trim(),
+                    parseInt(cells[1].textContent) || 0,
+                    parseInt(cells[2].textContent.replace(/\./g, '')) || 0,
+                    cells[3].textContent.trim() === '—' ? 0 : parseInt(cells[3].textContent.replace(/\./g, '')) || 0,
+                    cells[4].textContent.trim() === '—' ? 0 : parseInt(cells[4].textContent.replace(/\./g, '')) || 0,
+                    parseInt(cells[5].textContent.replace(/\./g, '')) || 0,
+                    parseInt(cells[6].textContent.replace(/\./g, '')) || 0,
+                    cells[7].textContent.trim() === '—' ? 0 : parseInt(cells[7].textContent.replace(/\./g, '')) || 0,
+                    parseInt(cells[8].textContent.replace(/\./g, '')) || 0
+                ]);
+            });
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+
+            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 11 }, fill: { fgColor: { rgb: '0000E1' } }, alignment: { horizontal: 'center' } };
+            for (let c = 0; c < 9; c++) {
+                const ref = XLSX.utils.encode_cell({ r: 0, c: c });
+                if (ws[ref]) ws[ref].s = headerStyle;
+            }
+            ws['!cols'] = [{ wch: 14 }, { wch: 10 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 16 }, { wch: 16 }, { wch: 16 }];
+
+            XLSX.utils.book_append_sheet(wb, ws, 'Pronóstico Compras');
+            XLSX.writeFile(wb, 'pronostico-compras-15m.xlsx');
         }
 
         // ==================== STATUS IMPORTACOES ====================
