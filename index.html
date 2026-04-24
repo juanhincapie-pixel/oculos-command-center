@@ -1868,26 +1868,26 @@
                 </div>
 
                 <!-- Top bar: KPIs -->
-                <div style="background:var(--dark-sidebar);border-radius:12px;padding:20px 24px;margin-bottom:20px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
-                    <div>
-                        <div style="font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Demanda total 15M</div>
-                        <div style="font-size:28px;font-weight:700;color:white;" id="fcTotalDemand">0</div>
-                        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">piezas proyectadas</div>
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Demanda total 15M</div>
+                        <div class="kpi-value" style="font-size:30px;" id="fcTotalDemand">0</div>
+                        <div class="kpi-subtitle" style="font-size:12px;color:var(--text-secondary);margin-top:2px;">piezas proyectadas</div>
                     </div>
-                    <div>
-                        <div style="font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Stock inicial nuevas</div>
-                        <div style="font-size:28px;font-weight:700;color:#DEFF00;" id="fcTotalInitStock">0</div>
-                        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">piezas inauguración</div>
+                    <div class="kpi-card" style="border-left:3px solid #10b981;">
+                        <div class="kpi-label">Stock actual + import.</div>
+                        <div class="kpi-value" style="font-size:30px;color:#10b981;" id="fcTotalInitStock">0</div>
+                        <div class="kpi-subtitle" style="font-size:12px;color:var(--text-secondary);margin-top:2px;">piezas disponibles</div>
                     </div>
-                    <div>
-                        <div style="font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Compra necesaria</div>
-                        <div style="font-size:28px;font-weight:700;color:#FC4F00;" id="fcTotalBuy">0</div>
-                        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">piezas a ordenar</div>
+                    <div class="kpi-card" style="border-left:3px solid #FC4F00;">
+                        <div class="kpi-label">Compra necesaria</div>
+                        <div class="kpi-value" style="font-size:30px;color:#FC4F00;" id="fcTotalBuy">0</div>
+                        <div class="kpi-subtitle" style="font-size:12px;color:var(--text-secondary);margin-top:2px;">piezas a ordenar</div>
                     </div>
-                    <div>
-                        <div style="font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Compra acumulada</div>
-                        <div style="font-size:28px;font-weight:700;color:#0096FA;" id="fcTotalAccum">0</div>
-                        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">total en 15 meses</div>
+                    <div class="kpi-card" style="border-left:3px solid #0000E1;">
+                        <div class="kpi-label">Compra acumulada</div>
+                        <div class="kpi-value" style="font-size:30px;color:#0000E1;" id="fcTotalAccum">0</div>
+                        <div class="kpi-subtitle" style="font-size:12px;color:var(--text-secondary);margin-top:2px;">total en 15 meses</div>
                     </div>
                 </div>
 
@@ -1903,21 +1903,21 @@
                             <div>
                                 <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px;">Lead time</label>
                                 <div style="display:flex;align-items:center;gap:4px;">
-                                    <input type="number" id="fcLeadTime" value="4" min="1" max="12" style="width:60px;padding:8px;font-size:14px;font-weight:600;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;text-align:center;" onchange="recalcForecast()">
+                                    <input type="number" id="fcLeadTime" value="4" min="1" max="12" style="width:72px;padding:10px;font-size:20px;font-weight:600;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;text-align:center;" onchange="recalcForecast()">
                                     <span style="font-size:12px;color:var(--text-secondary);">meses</span>
                                 </div>
                             </div>
                             <div>
                                 <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px;">Stock seguridad</label>
                                 <div style="display:flex;align-items:center;gap:4px;">
-                                    <input type="number" id="fcSafetyStock" value="2" min="0" max="6" style="width:60px;padding:8px;font-size:14px;font-weight:600;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;text-align:center;" onchange="recalcForecast()">
+                                    <input type="number" id="fcSafetyStock" value="2" min="0" max="6" style="width:72px;padding:10px;font-size:20px;font-weight:600;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;text-align:center;" onchange="recalcForecast()">
                                     <span style="font-size:12px;color:var(--text-secondary);">meses</span>
                                 </div>
                             </div>
                             <div>
                                 <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px;">Crecimiento</label>
                                 <div style="display:flex;align-items:center;gap:4px;">
-                                    <input type="number" id="fcGrowth" value="3" min="0" max="20" style="width:60px;padding:8px;font-size:14px;font-weight:600;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;text-align:center;" onchange="recalcForecast()">
+                                    <input type="number" id="fcGrowth" value="3" min="0" max="20" style="width:72px;padding:10px;font-size:20px;font-weight:600;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;text-align:center;" onchange="recalcForecast()">
                                     <span style="font-size:12px;color:var(--text-secondary);">%/mes</span>
                                 </div>
                             </div>
@@ -1933,17 +1933,17 @@
                         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
                             <div style="text-align:center;">
                                 <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">MES 1</label>
-                                <input type="number" id="fcRampM1" value="40" min="0" max="100" style="width:60px;padding:8px;font-size:14px;font-weight:600;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;text-align:center;" onchange="recalcForecast()">
+                                <input type="number" id="fcRampM1" value="40" min="0" max="100" style="width:72px;padding:10px;font-size:20px;font-weight:600;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;text-align:center;" onchange="recalcForecast()">
                                 <div style="margin-top:6px;height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;"><div style="height:100%;width:40%;background:#10b981;border-radius:3px;transition:width 0.3s;" id="rampBar1"></div></div>
                             </div>
                             <div style="text-align:center;">
                                 <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">MES 2</label>
-                                <input type="number" id="fcRampM2" value="70" min="0" max="100" style="width:60px;padding:8px;font-size:14px;font-weight:600;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;text-align:center;" onchange="recalcForecast()">
+                                <input type="number" id="fcRampM2" value="70" min="0" max="100" style="width:72px;padding:10px;font-size:20px;font-weight:600;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;text-align:center;" onchange="recalcForecast()">
                                 <div style="margin-top:6px;height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;"><div style="height:100%;width:70%;background:#10b981;border-radius:3px;transition:width 0.3s;" id="rampBar2"></div></div>
                             </div>
                             <div style="text-align:center;">
                                 <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">MES 3+</label>
-                                <input type="number" id="fcRampM3" value="100" min="0" max="100" style="width:60px;padding:8px;font-size:14px;font-weight:600;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;text-align:center;" onchange="recalcForecast()">
+                                <input type="number" id="fcRampM3" value="100" min="0" max="100" style="width:72px;padding:10px;font-size:20px;font-weight:600;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;text-align:center;" onchange="recalcForecast()">
                                 <div style="margin-top:6px;height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;"><div style="height:100%;width:100%;background:#10b981;border-radius:3px;transition:width 0.3s;" id="rampBar3"></div></div>
                             </div>
                         </div>
@@ -3272,8 +3272,8 @@
             const skuCountBCD = activeSKUs.filter(d => d.curva !== 'A').length;
             const initialStockPerStore = (skuCountA * 2) + (skuCountBCD * 1);
 
-            // Current total stock (matriz)
-            let currentStock = classified.reduce((s, d) => s + d.estoqueMatriz, 0);
+            // Current total stock (matriz + importaciones en camino)
+            let currentStock = classified.reduce((s, d) => s + d.estoqueMatriz + (d.importacoesPendentes || 0), 0);
 
             // Read new stores per month
             const newStoresPerMonth = [];
@@ -3354,7 +3354,7 @@
             const totalInitStock = monthData.reduce((s, m) => s + m.initStock, 0);
             const totalBuy = monthData.reduce((s, m) => s + m.needBuy, 0);
             if (el('fcTotalDemand')) el('fcTotalDemand').textContent = totalDemand15.toLocaleString('pt-BR');
-            if (el('fcTotalInitStock')) el('fcTotalInitStock').textContent = totalInitStock.toLocaleString('pt-BR');
+            if (el('fcTotalInitStock')) el('fcTotalInitStock').textContent = currentStock.toLocaleString('pt-BR');
             if (el('fcTotalBuy')) el('fcTotalBuy').textContent = totalBuy.toLocaleString('pt-BR');
             if (el('fcTotalAccum')) el('fcTotalAccum').textContent = accumBuy.toLocaleString('pt-BR');
 
