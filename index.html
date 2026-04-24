@@ -80,9 +80,8 @@
         }
 
         .sidebar-header {
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            padding-bottom: 0;
         }
 
         .sidebar-title {
@@ -141,7 +140,7 @@
         }
 
         .nav-link.active {
-            background-color: #0000E110;
+            background-color: #E8E0FF;
             color: #0000E1;
             font-weight: 600;
         }
@@ -1180,25 +1179,25 @@
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <div style="font-size:11px;font-weight:600;letter-spacing:1.5px;color:#FC4F00;text-transform:uppercase;margin-bottom:6px;">LIVO EYETECH</div>
-                <h1 class="sidebar-title">ÓCULOS</h1>
-                <p class="sidebar-subtitle">Command Center</p>
+                <div style="font-size:13px;font-weight:700;letter-spacing:1px;color:#0000E1;margin-bottom:16px;">LIVO EYETECH</div>
             </div>
 
             <nav class="sidebar-section">
+                <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);margin-bottom:8px;padding-left:12px;">Command Center</div>
                 <ul class="sidebar-nav">
-                    <li class="nav-item"><a class="nav-link active" data-section="painel-geral">Painel Geral</a></li>
-                    <li class="nav-item"><a class="nav-link" data-section="performance-sku">Performance SKU</a></li>
-                    <li class="nav-item"><a class="nav-link" data-section="status-importacoes">Status Importações</a></li>
-                    <li class="nav-item"><a class="nav-link" data-section="reposicao">Reposição</a></li>
-                    <li class="nav-item"><a class="nav-link" data-section="lojas">Lojas</a></li>
-                    <li class="nav-item" style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border-color);"><a class="nav-link" data-section="pronostico-compras">Pronóstico Compras</a></li>
-                    <li class="nav-item"><a class="nav-link" data-section="fornecedores">Importaciones China</a></li>
+                    <li class="nav-item"><a class="nav-link active" data-section="painel-geral">📊 Painel Geral</a></li>
+                    <li class="nav-item"><a class="nav-link" data-section="performance-sku">📈 Performance SKU</a></li>
+                    <li class="nav-item"><a class="nav-link" data-section="status-importacoes">📦 Status Importações</a></li>
+                    <li class="nav-item"><a class="nav-link" data-section="reposicao">🔄 Reposição</a></li>
+                    <li class="nav-item"><a class="nav-link" data-section="lojas">🏪 Lojas</a></li>
+                </ul>
+                <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);margin:20px 0 8px;padding-left:12px;padding-top:16px;border-top:1px solid var(--border-color);">Planificación</div>
+                <ul class="sidebar-nav">
+                    <li class="nav-item"><a class="nav-link" data-section="pronostico-compras">🔮 Pronóstico Compras</a></li>
+                    <li class="nav-item"><a class="nav-link" data-section="fornecedores">🇨🇳 Importaciones China</a></li>
                 </ul>
             </nav>
 
-            <!-- Sidebar contextual metrics -->
-            <div id="sidebarContext" style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border-color);"></div>
 
         </aside>
 
@@ -1938,9 +1937,9 @@
                         <span style="width:28px;height:28px;background:#DEFF0040;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;">&#127978;</span>
                         <h3 style="font-size:14px;font-weight:600;color:var(--text-primary);">Inauguración de Tiendas</h3>
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 200px;gap:20px;">
-                        <div id="fcStoreInputs"></div>
-                        <div id="fcStoreSummary" style="font-size:13px;color:var(--text-secondary);background:var(--content-bg);border-radius:10px;padding:16px;"></div>
+                    <div style="display:flex;gap:20px;align-items:flex-start;">
+                        <div id="fcStoreInputs" style="flex:1;min-width:0;"></div>
+                        <div id="fcStoreSummary" style="flex:0 0 160px;font-size:13px;color:var(--text-secondary);background:var(--content-bg);border-radius:10px;padding:14px;"></div>
                     </div>
                 </div>
 
@@ -3209,11 +3208,11 @@
                 months.push({ mon, yr, full: mon + ' ' + yr });
             }
 
-            container.innerHTML = '<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;">' + months.map((m, i) => {
+            container.innerHTML = '<div style="display:flex;gap:6px;padding-bottom:8px;">' + months.map((m, i) => {
                 const prevVal = fcPrevStoreValues[i] || 0;
                 const hasVal = prevVal > 0;
                 return `
-                <div style="flex:0 0 auto;text-align:center;min-width:70px;" id="fcStoreWrap_${i}">
+                <div style="flex:1;text-align:center;min-width:50px;" id="fcStoreWrap_${i}">
                     <div style="font-size:10px;font-weight:600;color:var(--text-secondary);letter-spacing:0.5px;margin-bottom:2px;">${m.mon}</div>
                     <div style="font-size:10px;color:var(--text-secondary);margin-bottom:6px;">${m.yr}</div>
                     <input type="number" id="fcStore_${i}" value="${prevVal}" min="0" max="20"
