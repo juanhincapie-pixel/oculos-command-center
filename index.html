@@ -6556,6 +6556,42 @@ ${reportBody}
 
         function copyForwarderReport() {
             const content = document.getElementById('forwarder-report-content');
+            const html = content.innerHTML;
+            // Build plain text fallback from table
+            const rows = content.querySelectorAll('tr');
+            let plain = '';
+            const textParts = content.cloneNode(true);
+            // Extract text preserving structure
+            textParts.querySelectorAll('table').forEach(t => {
+                let tbl = '';
+                t.querySelectorAll('tr').forEach(row => {
+                    const cells = row.querySelectorAll('th, td');
+                    tbl += Array.from(cells).map(c => c.textContent.trim()).join('\t') + '\n';
+                });
+                t.replaceWith(document.createTextNode(tbl));
+            });
+            plain = textParts.textContent;
+
+            // Use Clipboard API with explicit text/html to preserve headers in Gmail
+            if (navigator.clipboard && navigator.clipboard.write) {
+                const blobHtml = new Blob([html], { type: 'text/html' });
+                const blobText = new Blob([plain], { type: 'text/plain' });
+                navigator.clipboard.write([
+                    new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText })
+                ]).then(() => {
+                    showSaveNotice();
+                    document.getElementById('forn-save-notice').textContent = 'Relatório copiado!';
+                    setTimeout(() => { document.getElementById('forn-save-notice').textContent = 'Dados salvos com sucesso'; }, 2000);
+                }).catch(() => {
+                    // Fallback to execCommand
+                    fallbackCopyForwarder(content);
+                });
+            } else {
+                fallbackCopyForwarder(content);
+            }
+        }
+
+        function fallbackCopyForwarder(content) {
             const range = document.createRange();
             range.selectNodeContents(content);
             const sel = window.getSelection();
