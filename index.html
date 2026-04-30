@@ -1179,7 +1179,7 @@
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <div style="font-size:13px;font-weight:700;letter-spacing:1px;color:#0000E1;margin-bottom:16px;">LIVO EYETECH</div>
+                <div style="font-size:20px;font-weight:800;letter-spacing:2px;color:#0000E1;margin-bottom:20px;padding:12px 0;">LIVO EYETECH</div>
             </div>
 
             <nav class="sidebar-section">
@@ -1547,11 +1547,12 @@
                                 <th data-sort="coberturaMeses">Cob. Atual</th>
                                 <th>Cob. c/Imp</th>
                                 <th>Min/Loja</th>
+                                <th>Chegada</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
                         <tbody id="performanceBody">
-                            <tr><td colspan="16" class="empty-state">Carregando dados...</td></tr>
+                            <tr><td colspan="17" class="empty-state">Carregando dados...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -2058,8 +2059,8 @@
                             <button class="forn-btn forn-filter-btn active" id="filter-ativas" onclick="setLogFilter('ativas')" style="border-radius:0;border:none;padding:7px 14px;font-size:13px;">Ativas</button>
                             <button class="forn-btn forn-filter-btn" id="filter-todas" onclick="setLogFilter('todas')" style="border-radius:0;border:none;border-left:1px solid var(--border-color);padding:7px 14px;font-size:13px;">Todas</button>
                         </div>
-                        <input type="text" id="log-search-pi" placeholder="Buscar por PI / Proforma..." oninput="filterLogistica()"
-                               style="padding:7px 12px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;font-family:'Poppins',sans-serif;width:220px;background:#fafafa;color:var(--text-primary);">
+                        <input type="text" id="log-search-pi" placeholder="Buscar PI, produto, SKU..." oninput="filterLogistica()"
+                               style="padding:7px 12px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;font-family:'Poppins',sans-serif;width:260px;background:#fafafa;color:var(--text-primary);">
                         <select id="log-filter-fornecedor" onchange="filterLogistica()"
                                 style="padding:7px 12px;border:1px solid var(--border-color);border-radius:6px;font-size:13px;font-family:'Poppins',sans-serif;background:#fafafa;color:var(--text-primary);appearance:auto;">
                             <option value="">Todos Fornecedores</option>
@@ -2071,6 +2072,8 @@
                         <button class="forn-btn" style="background:#8b5cf6;color:white;" onclick="generateForwarderReport()">Relatório Forwarder</button>
                         <button class="forn-btn forn-btn-primary" onclick="addLogisticaOrder()">+ Novo Pedido</button>
                     </div>
+                    <!-- SKU search results banner -->
+                    <div id="sku-search-results"></div>
                     <!-- Gantt Logística -->
                     <div id="gantt-logistica" style="margin-bottom:24px;background:#fff;border:1px solid var(--border-color);border-radius:8px;padding:16px;overflow-x:auto;"></div>
                     <div id="logistica-orders"></div>
@@ -2411,9 +2414,39 @@
             });
         }
 
+        // Enrich classified data with manual import SKUs from localStorage
+        function enrichWithManualImports(classified) {
+            try {
+                const fornData = loadFornecedoresData();
+                const logOrders = fornData.logistica || [];
+                // Build SKU → total manual import qty (only non-delivered orders)
+                const manualImportQty = {};
+                logOrders.forEach(order => {
+                    const isEntregado = ['Entregado', 'Entregue a Terceiro', 'Cancelado'].includes(order.status);
+                    if (isEntregado) return; // already delivered, don't count as pending
+                    const skus = (order.skuItems && order.skuItems.length > 0)
+                        ? order.skuItems
+                        : (IMPORT_SKU_MAP[order.proforma] || []);
+                    skus.forEach(s => {
+                        manualImportQty[s.sku] = (manualImportQty[s.sku] || 0) + (s.qtd || 0);
+                    });
+                });
+                // Override importacoesPendentes with manual data where available
+                return classified.map(item => {
+                    const manualQty = manualImportQty[item.sku];
+                    if (manualQty !== undefined && manualQty > 0) {
+                        const newImport = manualQty;
+                        const newCobComImp = item.vendaMedia > 0 ? (item.estoqueMatriz + newImport) / item.vendaMedia : Infinity;
+                        return { ...item, importacoesPendentes: newImport };
+                    }
+                    return item;
+                });
+            } catch(e) { return classified; }
+        }
+
         // ==================== RENDER FUNCTIONS ====================
         function renderAllSections() {
-            const classified = classifySKUsByABC(processedData);
+            const classified = enrichWithManualImports(classifySKUsByABC(processedData));
             renderPainelGeral(classified);
             renderMapaPortfolio(classified);
             renderDistribuicaoLojas(classified);
@@ -2982,6 +3015,32 @@
                 }).join('');
             }
 
+            // Build SKU → import arrival lookup from logistica orders (user-managed skuItems + IMPORT_SKU_MAP fallback)
+            const _skuArrivalMap = {};
+            try {
+                const fornData = loadFornecedoresData();
+                const logOrders = fornData.logistica || [];
+                logOrders.forEach(order => {
+                    const isEntregado = ['Entregado', 'Entregue a Terceiro'].includes(order.status);
+                    // Use user-managed skuItems first, fallback to hardcoded map
+                    const skus = (order.skuItems && order.skuItems.length > 0)
+                        ? order.skuItems
+                        : (IMPORT_SKU_MAP[order.proforma] || []);
+                    skus.forEach(s => {
+                        const existing = _skuArrivalMap[s.sku];
+                        if (!existing || (!isEntregado && existing.entregado)) {
+                            _skuArrivalMap[s.sku] = {
+                                proforma: order.proforma,
+                                entrega: order.entrega,
+                                status: order.status,
+                                entregado: isEntregado,
+                                qtd: s.qtd
+                            };
+                        }
+                    });
+                });
+            } catch(e) {}
+
             let cumShare = 0;
             const tbody = document.getElementById('performanceBody');
             if (!tbody) return;
@@ -3035,6 +3094,12 @@
                     <td style="text-align:center;font-weight:600;color:${cob < 4 ? '#ef4444' : '#333'};">${cob === Infinity ? '\u221e' : cob.toFixed(1) + 'M'}</td>
                     <td style="text-align:center;color:${cobComImp < 4 ? '#ef4444' : '#10b981'};">${cobComImp === Infinity ? '\u221e' : cobComImp.toFixed(1) + 'M'}</td>
                     <td style="text-align:center;">${minIdeal}</td>
+                    <td style="text-align:center;font-size:12px;">${(() => {
+                        const arr = _skuArrivalMap[item.sku];
+                        if (!arr) return '<span style="color:#ccc;">—</span>';
+                        if (arr.entregado) return '<span style="color:#10b981;font-weight:600;">Entregue</span>';
+                        return '<span style="background:#fef3c7;color:#92400e;padding:2px 6px;border-radius:6px;font-weight:500;">' + formatDateBR(arr.entrega) + '</span>';
+                    })()}</td>
                     <td>${statusIcons[status] || ''} ${status}</td>
                 </tr>`;
             }).join('');
@@ -3149,13 +3214,13 @@
         // ==================== DOWNLOAD PERFORMANCE XLSX ====================
         function downloadPerformanceXlsx() {
             const rows = document.querySelectorAll('#performanceBody tr');
-            const data = [['#', 'SKU', 'Produto', 'Família', 'Classe', 'Curva', 'Venda/Mês', 'Share %', 'Acum %', 'Est. Matriz', 'Est. Lojas', 'Import.', 'Cob. Atual', 'Cob. c/Imp', 'Min/Loja', 'Status']];
+            const data = [['#', 'SKU', 'Produto', 'Família', 'Classe', 'Curva', 'Venda/Mês', 'Share %', 'Acum %', 'Est. Matriz', 'Est. Lojas', 'Import.', 'Cob. Atual', 'Cob. c/Imp', 'Min/Loja', 'Chegada', 'Status']];
             let idx = 0;
             rows.forEach(row => {
                 if (row.style.display === 'none' || !row.getAttribute('data-search')) return;
                 idx++;
                 const cells = row.querySelectorAll('td');
-                if (cells.length < 16) return;
+                if (cells.length < 17) return;
                 data.push([
                     idx,
                     cells[1].textContent.trim(),
@@ -3172,7 +3237,8 @@
                     cells[12].textContent.trim(),
                     cells[13].textContent.trim(),
                     parseInt(cells[14].textContent) || 0,
-                    cells[15].textContent.trim()
+                    cells[15].textContent.trim(),
+                    cells[16].textContent.trim()
                 ]);
             });
 
@@ -3181,13 +3247,13 @@
 
             // Style header
             const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 11 }, fill: { fgColor: { rgb: '0000E1' } }, alignment: { horizontal: 'center' } };
-            for (let c = 0; c < 16; c++) {
+            for (let c = 0; c < 17; c++) {
                 const ref = XLSX.utils.encode_cell({ r: 0, c: c });
                 if (ws[ref]) ws[ref].s = headerStyle;
             }
 
             // Column widths
-            ws['!cols'] = [{ wch: 5 }, { wch: 14 }, { wch: 30 }, { wch: 18 }, { wch: 16 }, { wch: 7 }, { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 9 }, { wch: 12 }];
+            ws['!cols'] = [{ wch: 5 }, { wch: 14 }, { wch: 30 }, { wch: 18 }, { wch: 16 }, { wch: 7 }, { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 9 }, { wch: 14 }, { wch: 12 }];
 
             XLSX.utils.book_append_sheet(wb, ws, 'Performance SKU');
             const filterLabel = activePerfFilter !== 'all' ? '_' + activePerfFilter : '';
@@ -5071,9 +5137,84 @@
                 { id: '18', fornecedor: 'Lingshi', proforma: 'L25058 - Tags & Reader', produtos: 'Etiquetas e Pistola', via: 'Aéreo', dataEncomenda: '2025-11-30', dataEntrada: '2025-11-30', embarque: '2025-11-30', entrega: '2025-12-13', campanha: '', duracao: 13, status: 'Entregado', obs: 'Entregue 13/12.' },
                 { id: '19', fornecedor: 'Lingshi', proforma: '25PX125', produtos: 'Óculos Esportivos', via: 'Aéreo', dataEncomenda: '2025-12-09', dataEntrada: '2025-12-10', embarque: '2026-02-13', entrega: '2026-03-05', campanha: '2026-03-01', duracao: 75, status: 'Entregado', obs: 'Alina confirma pedido pronto finales Enero. Parter no loop.\nSaída Shanghai 31/01, chegada Joinville 05/02.' },
                 { id: '20', fornecedor: 'Lingshi', proforma: '25PX132', produtos: 'Reorder Bestseller/12-25', via: 'Aéreo', dataEncomenda: '2025-12-26', dataEntrada: '2025-12-26', embarque: '2026-05-10', entrega: '2026-05-25', campanha: '', duracao: 149, status: 'Em Fábrica', obs: 'Confirmada. Falta pagamento entrada. David ciente, pago agendado.\nAline confirma entrega 10/05.' },
-                { id: '21', fornecedor: 'Lingshi', proforma: '26PX015', produtos: 'Reorder Bestseller/03-25', via: 'Aéreo', dataEncomenda: '2026-03-16', dataEntrada: '2026-03-16', embarque: '2026-06-15', entrega: '2026-06-30', campanha: '', duracao: 104, status: 'Em Fábrica', obs: '' }
+                { id: '21', fornecedor: 'Lingshi', proforma: '26PX015', produtos: 'Reorder Bestseller/03-25', via: 'Aéreo', dataEncomenda: '2026-03-16', dataEntrada: '2026-03-16', embarque: '2026-06-15', entrega: '2026-06-30', campanha: '', duracao: 104, status: 'Em Fábrica', obs: '' },
+                { id: '15b', fornecedor: 'Lingshi', proforma: '26PX017', produtos: 'Metal Light (Akira,Kenji,Yuki,Hero,Hanna)', via: 'Aéreo', dataEncomenda: '2026-04-06', dataEntrada: '2026-04-06', embarque: '2026-07-05', entrega: '2026-07-20', campanha: '', duracao: 105, status: 'Em Fábrica', obs: '' },
+                { id: '30', fornecedor: 'Lingshi', proforma: '26PX030', produtos: 'Tags RFID', via: 'Aéreo', dataEncomenda: '2026-04-06', dataEntrada: '2026-04-06', embarque: '2026-04-27', entrega: '2026-05-10', campanha: '', duracao: 34, status: 'Em Fábrica', obs: '' },
+                { id: '37', fornecedor: 'Lingshi', proforma: '26PX037', produtos: 'Reorder Esportivos', via: 'Aéreo', dataEncomenda: '2026-04-15', dataEntrada: '2026-04-15', embarque: '2026-07-15', entrega: '2026-07-30', campanha: '', duracao: 106, status: 'Em Fábrica', obs: '' },
+                { id: '26OL1', fornecedor: 'Visual Packing', proforma: '26OLIMPIA001', produtos: 'Estojos Hardcase novas cores', via: 'Aéreo', dataEncomenda: '2026-04-01', dataEntrada: '2026-04-01', embarque: '2026-06-01', entrega: '2026-06-15', campanha: '', duracao: 75, status: 'Em Fábrica', obs: '' }
             ];
         }
+
+        // SKU mapping per import order (proforma)
+        const IMPORT_SKU_MAP = {
+            '25PX132': [
+                { sku: '462852902', ean: '7908170314565', familia: 'AMELIA', nome: 'AMELIA SOLAR DEMI VIOLETA', qtd: 150 },
+                { sku: '462852918', ean: '7908170314558', familia: 'AMELIA', nome: 'AMELIA DEMI VIOLETA', qtd: 150 },
+                { sku: '463451918', ean: '7908170315227', familia: 'CHER', nome: 'CHER DEMI CLÁSSICO', qtd: 120 },
+                { sku: '463451906', ean: '7908170315258', familia: 'CHER', nome: 'CHER SOLAR DEMI CLÁSSICO', qtd: 120 },
+                { sku: '463453907', ean: '7908170315241', familia: 'CHER', nome: 'CHER SOLAR BEGE DEGRADÊ', qtd: 120 },
+                { sku: '463453918', ean: '7908170315210', familia: 'CHER', nome: 'CHER BEGE DEGRADÊ', qtd: 120 },
+                { sku: '600400118', ean: '7908170314572', familia: 'MARCO', nome: 'MARCO DEMI CLASSICO', qtd: 150 },
+                { sku: '600400107', ean: '7908170314589', familia: 'MARCO', nome: 'MARCO SOLAR DEMI CLASSICO', qtd: 150 },
+                { sku: '463051907', ean: '7908170314954', familia: 'PETER', nome: 'PETER - SOLAR DEMI CLÁSSICO', qtd: 120 },
+                { sku: '463051918', ean: '7908170314923', familia: 'PETER', nome: 'PETER - DEMI CLÁSSICO', qtd: 120 },
+                { sku: '463049003', ean: '7908170314916', familia: 'PETER', nome: 'PETER - SOLAR MILITAR', qtd: 120 },
+                { sku: '463049018', ean: '7908170314947', familia: 'PETER', nome: 'PETER - MILITAR', qtd: 120 }
+            ],
+            '26PX015': [
+                { sku: '463351918', ean: '7908170314992', familia: 'ELVIS', nome: 'ELVIS DEMI CLÁSSICO', qtd: 150 },
+                { sku: '463351907', ean: '7908170315036', familia: 'ELVIS', nome: 'ELVIS SOLAR DEMI CLÁSSICO', qtd: 150 },
+                { sku: '463251918', ean: '7908170315135', familia: 'JOHNNY', nome: 'JOHNNY DEMI CLÁSSICO', qtd: 150 },
+                { sku: '463251907', ean: '7908170315166', familia: 'JOHNNY', nome: 'JOHNNY SOLAR DEMI CLÁSSICO', qtd: 150 },
+                { sku: '712453318', ean: '7908170314794', familia: 'JULES', nome: 'JULES DEMI LOIRO + BEGE', qtd: 120 },
+                { sku: '712447902', ean: '7908170311786', familia: 'JULES', nome: 'JULES SOLAR DEMI AZULADO', qtd: 120 },
+                { sku: '712453307', ean: '7908170314800', familia: 'JULES', nome: 'JULES SOLAR DEMI LOIRO + BEGE', qtd: 120 },
+                { sku: '712453202', ean: '7908170314787', familia: 'JULES', nome: 'JULES SOLAR VERDE + DEMI VERDE', qtd: 120 },
+                { sku: '712453218', ean: '7908170314770', familia: 'JULES', nome: 'JULES VERDE + DEMI VERDE', qtd: 120 },
+                { sku: '100901618', ean: '7908170306928', familia: 'RALPH', nome: 'RALPH DEMI RUIVO', qtd: 150 },
+                { sku: '100901607', ean: '7908170308052', familia: 'RALPH', nome: 'RALPH SOLAR DEMI RUIVO', qtd: 150 },
+                { sku: '460201606', ean: '7908170309240', familia: 'RUI', nome: 'RUI SOLAR DEMI RUIVO', qtd: 150 },
+                { sku: '462001618', ean: '7908170315647', familia: 'RUI', nome: 'RUI DEMI RUIVO', qtd: 150 }
+            ],
+            '26PX017': [
+                { sku: '464129307', ean: '7908170315654', familia: 'AKIRA', nome: 'AKIRA DEMI CINZA SOLAR + MARROM DEGRADE', qtd: 100 },
+                { sku: '464129318', ean: '7908170315807', familia: 'AKIRA', nome: 'AKIRA DEMI CINZA', qtd: 50 },
+                { sku: '464154956', ean: '7908170315661', familia: 'AKIRA', nome: 'AKIRA DEMI PINK SOLAR + ROXO', qtd: 100 },
+                { sku: '464154918', ean: '7908170315814', familia: 'AKIRA', nome: 'AKIRA DEMI PINK', qtd: 50 },
+                { sku: '464155029', ean: '7908170315678', familia: 'AKIRA', nome: 'AKIRA DEMI MARRON SOLAR + GREEN DEGRADÊ', qtd: 100 },
+                { sku: '464155018', ean: '7908170315821', familia: 'AKIRA', nome: 'AKIRA DEMI MARRON', qtd: 50 },
+                { sku: '464255129', ean: '7908170315685', familia: 'KENJI', nome: 'KENJI SILVER SOLAR + GREEN DEGRADÊ', qtd: 100 },
+                { sku: '464255118', ean: '7908170315838', familia: 'KENJI', nome: 'KENJI SILVER', qtd: 50 },
+                { sku: '464255255', ean: '7908170315692', familia: 'KENJI', nome: 'KENJI BRONZE SOLAR + AZUL DEGRADÊ', qtd: 100 },
+                { sku: '464255218', ean: '7908170315845', familia: 'KENJI', nome: 'KENJI BRONZE', qtd: 50 },
+                { sku: '464255302', ean: '7908170315708', familia: 'KENJI', nome: 'KENJI GUN SOLAR + CINZA DEGRADE', qtd: 100 },
+                { sku: '464255318', ean: '7908170315852', familia: 'KENJI', nome: 'KENJI GUN', qtd: 50 },
+                { sku: '464355407', ean: '7908170315715', familia: 'YUKI', nome: 'YUKI GOLD SOLAR + MARROM DEGRADE', qtd: 100 },
+                { sku: '464355418', ean: '7908170315869', familia: 'YUKI', nome: 'YUKI GOLD', qtd: 50 },
+                { sku: '464355255', ean: '7908170315722', familia: 'YUKI', nome: 'YUKI BRONZE SOLAR + AZUL DEGRADÊ', qtd: 100 },
+                { sku: '464355218', ean: '7908170315876', familia: 'YUKI', nome: 'YUKI BRONZE', qtd: 50 },
+                { sku: '464355129', ean: '7908170315739', familia: 'YUKI', nome: 'YUKI SILVER SOLAR + GREEN DEGRADÊ', qtd: 100 },
+                { sku: '464355118', ean: '7908170315883', familia: 'YUKI', nome: 'YUKI SILVER', qtd: 50 },
+                { sku: '464455407', ean: '7908170315746', familia: 'HERO', nome: 'HERO GOLD SOLAR + MARROM DEGRADE', qtd: 100 },
+                { sku: '464455418', ean: '7908170315890', familia: 'HERO', nome: 'HERO GOLD', qtd: 50 },
+                { sku: '464455229', ean: '7908170315753', familia: 'HERO', nome: 'HERO BRONZE SOLAR + GREEN DEGRADÊ', qtd: 100 },
+                { sku: '464455218', ean: '7908170315906', familia: 'HERO', nome: 'HERO BRONZE', qtd: 50 },
+                { sku: '464455102', ean: '7908170315760', familia: 'HERO', nome: 'HERO SILVER SOLAR + CINZA DEGRADE', qtd: 100 },
+                { sku: '464455118', ean: '7908170315913', familia: 'HERO', nome: 'HERO SILVER', qtd: 50 },
+                { sku: '464555055', ean: '7908170315777', familia: 'HANNA', nome: 'HANNA DEMI MARRON SOLAR + AZUL DEGRADÊ', qtd: 100 },
+                { sku: '464555018', ean: '7908170315920', familia: 'HANNA', nome: 'HANNA DEMI MARRON', qtd: 50 },
+                { sku: '464500329', ean: '7908170315784', familia: 'HANNA', nome: 'HANNA DEMI AMARELO SOLAR + GREEN DEGRADÊ', qtd: 100 },
+                { sku: '464500318', ean: '7908170315937', familia: 'HANNA', nome: 'HANNA DEMI AMARELO', qtd: 50 },
+                { sku: '464546707', ean: '7908170315791', familia: 'HANNA', nome: 'HANNA DEMI ROSA SOLAR + MARROM DEGRADE', qtd: 100 },
+                { sku: '464546718', ean: '7908170315944', familia: 'HANNA', nome: 'HANNA DEMI ROSA', qtd: 50 }
+            ],
+            '26PX037': [
+                { sku: '463754103', ean: '9900006261126', familia: 'BERNARDO', nome: 'BERNARDO STEEL', qtd: 300 },
+                { sku: '463754203', ean: '9900006261133', familia: 'BERNARDO', nome: 'BERNARDO FLASH', qtd: 300 },
+                { sku: '464054403', ean: '9900006261157', familia: 'AGATHA', nome: 'AGATHA GLOW', qtd: 300 },
+                { sku: '463954503', ean: '9900006261164', familia: 'AGATHA', nome: 'VITORIA DUSK', qtd: 300 }
+            ]
+        };
 
         function getDefaultPaymentData() {
             return {
@@ -5276,6 +5417,166 @@
         }
 
         // ===== LOGÍSTICA RENDERING =====
+        function getSkusForOrder(order) {
+            // Priority: order.skuItems (user-managed) > IMPORT_SKU_MAP (hardcoded fallback)
+            if (order.skuItems && order.skuItems.length > 0) return order.skuItems;
+            return IMPORT_SKU_MAP[order.proforma] || [];
+        }
+
+        // Re-render Performance SKU and related sections after manual SKU changes
+        function refreshAfterSkuChange() {
+            if (typeof processedData !== 'undefined' && processedData.length > 0) {
+                const classified = enrichWithManualImports(classifySKUsByABC(processedData));
+                renderPerformanceSKU(classified);
+                renderStatusImportacoes(classified);
+                renderReposicao(classified);
+                renderPainelGeral(classified);
+            }
+        }
+
+        function addSkuToOrder(orderIdx) {
+            const sku = prompt('SKU:');
+            if (!sku) return;
+            const ean = prompt('EAN (código de barras):') || '';
+            const familia = prompt('Família:') || '';
+            const nome = prompt('Nome do Produto:') || '';
+            const qtdStr = prompt('Quantidade:') || '0';
+            const qtd = parseInt(qtdStr) || 0;
+
+            const data = loadFornecedoresData();
+            const order = data.logistica[orderIdx];
+            if (!order) return;
+
+            // Initialize skuItems from hardcoded map if needed
+            if (!order.skuItems) {
+                order.skuItems = JSON.parse(JSON.stringify(IMPORT_SKU_MAP[order.proforma] || []));
+            }
+            order.skuItems.push({ sku, ean, familia, nome, qtd });
+            saveFornecedoresData(data);
+            renderLogistica();
+            refreshAfterSkuChange();
+        }
+
+        function removeSkuFromOrder(orderIdx, skuIdx) {
+            if (!confirm('Remover este SKU do pedido?')) return;
+            const data = loadFornecedoresData();
+            const order = data.logistica[orderIdx];
+            if (!order || !order.skuItems) return;
+            order.skuItems.splice(skuIdx, 1);
+            saveFornecedoresData(data);
+            renderLogistica();
+            refreshAfterSkuChange();
+        }
+
+        function editSkuInOrder(orderIdx, skuIdx) {
+            const data = loadFornecedoresData();
+            const order = data.logistica[orderIdx];
+            if (!order) return;
+            // Initialize from hardcoded if needed
+            if (!order.skuItems) {
+                order.skuItems = JSON.parse(JSON.stringify(IMPORT_SKU_MAP[order.proforma] || []));
+            }
+            const s = order.skuItems[skuIdx];
+            if (!s) return;
+
+            const sku = prompt('SKU:', s.sku);
+            if (sku === null) return;
+            const ean = prompt('EAN:', s.ean);
+            if (ean === null) return;
+            const familia = prompt('Família:', s.familia);
+            if (familia === null) return;
+            const nome = prompt('Nome:', s.nome);
+            if (nome === null) return;
+            const qtdStr = prompt('Quantidade:', s.qtd);
+            if (qtdStr === null) return;
+
+            s.sku = sku;
+            s.ean = ean;
+            s.familia = familia;
+            s.nome = nome;
+            s.qtd = parseInt(qtdStr) || 0;
+            saveFornecedoresData(data);
+            renderLogistica();
+            refreshAfterSkuChange();
+        }
+
+        function renderImportSkuTable(proforma, order, orderIdx) {
+            const skus = getSkusForOrder(order);
+            if (!skus || skus.length === 0) return `
+                <div style="margin:16px 0;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                        <div style="font-size:13px;font-weight:600;text-transform:uppercase;color:var(--text-secondary);">SKUs neste Pedido</div>
+                        <button class="forn-btn forn-btn-primary forn-btn-sm" onclick="addSkuToOrder(${orderIdx})" style="font-size:12px;padding:4px 12px;">+ Adicionar SKU</button>
+                    </div>
+                    <div style="color:var(--text-secondary);font-size:13px;padding:16px;text-align:center;background:#f8fafc;border-radius:8px;">Nenhum SKU cadastrado neste pedido</div>
+                </div>`;
+
+            const entregaDate = order.entrega ? formatDateBR(order.entrega) : '—';
+            const embarqueDate = order.embarque ? formatDateBR(order.embarque) : '—';
+            const statusTxt = order.status || '';
+            const isEntregado = ['Entregado', 'Entregue a Terceiro'].includes(statusTxt);
+
+            // Group by familia
+            const byFamilia = {};
+            let totalQtd = 0;
+            skus.forEach(s => {
+                if (!byFamilia[s.familia]) byFamilia[s.familia] = [];
+                byFamilia[s.familia].push(s);
+                totalQtd += s.qtd;
+            });
+            const familias = Object.keys(byFamilia);
+            const famSummary = familias.map(f => {
+                const fQtd = byFamilia[f].reduce((a,s) => a + s.qtd, 0);
+                return `<span style="display:inline-block;background:#f1f5f9;padding:3px 10px;border-radius:12px;font-size:13px;margin:2px 4px;font-weight:500;">${f} <strong>${fQtd}</strong></span>`;
+            }).join('');
+
+            const arrivalBadge = isEntregado
+                ? `<span style="background:#dcfce7;color:#166534;padding:4px 12px;border-radius:12px;font-size:13px;font-weight:600;">Entregue</span>`
+                : `<span style="background:#fef3c7;color:#92400e;padding:4px 12px;border-radius:12px;font-size:13px;font-weight:600;">Previsão: ${entregaDate}</span>`;
+
+            const isUserManaged = order.skuItems && order.skuItems.length > 0;
+            const rows = skus.map((s, si) => `
+                <tr>
+                    <td style="padding:6px 10px;border-bottom:1px solid #f1f5f9;font-size:13px;font-family:monospace;">${s.sku}</td>
+                    <td style="padding:6px 10px;border-bottom:1px solid #f1f5f9;font-size:13px;font-family:monospace;color:var(--text-secondary);">${s.ean}</td>
+                    <td style="padding:6px 10px;border-bottom:1px solid #f1f5f9;font-size:13px;font-weight:600;">${s.familia}</td>
+                    <td style="padding:6px 10px;border-bottom:1px solid #f1f5f9;font-size:13px;">${s.nome}</td>
+                    <td style="padding:6px 10px;border-bottom:1px solid #f1f5f9;font-size:14px;font-weight:700;text-align:center;">${s.qtd}</td>
+                    <td style="padding:6px 6px;border-bottom:1px solid #f1f5f9;text-align:center;white-space:nowrap;">
+                        <button onclick="editSkuInOrder(${orderIdx},${si})" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;" title="Editar">&#9998;</button>
+                        <button onclick="removeSkuFromOrder(${orderIdx},${si})" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;color:#ef4444;" title="Remover">&times;</button>
+                    </td>
+                </tr>`).join('');
+
+            return `
+                <div style="margin:16px 0;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+                        <div style="font-size:13px;font-weight:600;text-transform:uppercase;color:var(--text-secondary);">SKUs neste Pedido</div>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            ${arrivalBadge}
+                            <span style="font-size:14px;font-weight:700;color:var(--primary-blue);">${skus.length} SKUs &middot; ${totalQtd.toLocaleString('pt-BR')} peças</span>
+                            <button class="forn-btn forn-btn-primary forn-btn-sm" onclick="addSkuToOrder(${orderIdx})" style="font-size:12px;padding:4px 12px;">+ Adicionar SKU</button>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:10px;">${famSummary}</div>
+                    <div style="max-height:300px;overflow-y:auto;border:1px solid var(--border-color);border-radius:8px;">
+                        <table style="width:100%;border-collapse:collapse;">
+                            <thead>
+                                <tr style="background:#f8fafc;position:sticky;top:0;">
+                                    <th style="padding:8px 10px;text-align:left;font-size:12px;text-transform:uppercase;color:#64748b;border-bottom:2px solid #e2e8f0;">SKU</th>
+                                    <th style="padding:8px 10px;text-align:left;font-size:12px;text-transform:uppercase;color:#64748b;border-bottom:2px solid #e2e8f0;">EAN</th>
+                                    <th style="padding:8px 10px;text-align:left;font-size:12px;text-transform:uppercase;color:#64748b;border-bottom:2px solid #e2e8f0;">Família</th>
+                                    <th style="padding:8px 10px;text-align:left;font-size:12px;text-transform:uppercase;color:#64748b;border-bottom:2px solid #e2e8f0;">Produto</th>
+                                    <th style="padding:8px 10px;text-align:center;font-size:12px;text-transform:uppercase;color:#64748b;border-bottom:2px solid #e2e8f0;">Qtd</th>
+                                    <th style="padding:8px 6px;text-align:center;font-size:12px;text-transform:uppercase;color:#64748b;border-bottom:2px solid #e2e8f0;width:60px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                </div>`;
+        }
+
         function renderLogistica() {
             const data = loadFornecedoresData();
             const orders = data.logistica || [];
@@ -5381,6 +5682,9 @@
                                 ${order.entrega ? `<div class="forn-timeline-item ${order.status==='Entregado'||order.status==='Entregue a Terceiro'?'done':'pending'}"><div class="forn-timeline-date">${formatDateBR(order.entrega)}</div><div class="forn-timeline-text">Entrega prevista</div></div>` : ''}
                             </div>
                         </div>
+
+                        <!-- SKU breakdown -->
+                        ${renderImportSkuTable(order.proforma, order, idx)}
 
                         <div class="forn-obs-area">
                             <label>Observações</label>
@@ -6459,13 +6763,16 @@ ${reportBody}
         }
 
         function filterLogistica() {
-            const searchPI = (document.getElementById('log-search-pi').value || '').toLowerCase().trim();
+            const searchTerm = (document.getElementById('log-search-pi').value || '').toLowerCase().trim();
             const filterForn = document.getElementById('log-filter-fornecedor').value;
             const cards = document.querySelectorAll('#logistica-orders .forn-card');
             const data = loadFornecedoresData();
             const orders = data.logistica || [];
 
             const deliveredStatuses = ['Entregado', 'Entregue a Terceiro', 'Cancelado'];
+
+            // Build quick-result for SKU search
+            let skuResults = [];
 
             cards.forEach((card, idx) => {
                 if (idx >= orders.length) return;
@@ -6476,9 +6783,38 @@ ${reportBody}
                 if (logFilterMode === 'ativas' && deliveredStatuses.includes(order.status)) {
                     show = false;
                 }
-                // Search by PI
-                if (searchPI && !order.proforma.toLowerCase().includes(searchPI) && !order.produtos.toLowerCase().includes(searchPI)) {
-                    show = false;
+                // Search by PI, produto name, or SKU in IMPORT_SKU_MAP
+                if (searchTerm) {
+                    const matchPI = order.proforma.toLowerCase().includes(searchTerm);
+                    const matchProd = order.produtos.toLowerCase().includes(searchTerm);
+                    // Check SKU map (user-managed first, then hardcoded fallback)
+                    const skus = (order.skuItems && order.skuItems.length > 0) ? order.skuItems : (IMPORT_SKU_MAP[order.proforma] || []);
+                    const matchSKU = skus.some(s =>
+                        s.sku.toLowerCase().includes(searchTerm) ||
+                        s.nome.toLowerCase().includes(searchTerm) ||
+                        s.familia.toLowerCase().includes(searchTerm) ||
+                        s.ean.includes(searchTerm)
+                    );
+                    if (!matchPI && !matchProd && !matchSKU) {
+                        show = false;
+                    }
+                    // Collect matching SKUs for quick result
+                    if (show && searchTerm.length >= 2) {
+                        skus.filter(s =>
+                            s.nome.toLowerCase().includes(searchTerm) ||
+                            s.familia.toLowerCase().includes(searchTerm) ||
+                            s.sku.includes(searchTerm)
+                        ).forEach(s => {
+                            skuResults.push({
+                                sku: s.sku,
+                                nome: s.nome,
+                                qtd: s.qtd,
+                                proforma: order.proforma,
+                                entrega: order.entrega,
+                                status: order.status
+                            });
+                        });
+                    }
                 }
                 // Filter by fornecedor
                 if (filterForn && order.fornecedor !== filterForn) {
@@ -6486,7 +6822,50 @@ ${reportBody}
                 }
 
                 card.style.display = show ? '' : 'none';
+                // Auto-open card if it matches SKU search
+                if (show && searchTerm.length >= 2) {
+                    card.classList.add('open');
+                } else if (!searchTerm) {
+                    card.classList.remove('open');
+                }
             });
+
+            // Show quick results banner
+            const banner = document.getElementById('sku-search-results');
+            if (banner) {
+                if (skuResults.length > 0 && searchTerm.length >= 2) {
+                    const isEntregado = s => ['Entregado', 'Entregue a Terceiro'].includes(s.status);
+                    const rows = skuResults.slice(0, 10).map(r => `
+                        <tr>
+                            <td style="padding:5px 10px;font-size:13px;border-bottom:1px solid #e2e8f0;">${r.nome}</td>
+                            <td style="padding:5px 10px;font-size:13px;border-bottom:1px solid #e2e8f0;font-family:monospace;">${r.sku}</td>
+                            <td style="padding:5px 10px;font-size:13px;border-bottom:1px solid #e2e8f0;text-align:center;font-weight:700;">${r.qtd}</td>
+                            <td style="padding:5px 10px;font-size:13px;border-bottom:1px solid #e2e8f0;">${r.proforma}</td>
+                            <td style="padding:5px 10px;font-size:13px;border-bottom:1px solid #e2e8f0;">
+                                ${isEntregado(r)
+                                    ? '<span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:8px;font-weight:600;">Entregue</span>'
+                                    : '<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:8px;font-weight:600;">' + formatDateBR(r.entrega) + '</span>'}
+                            </td>
+                        </tr>`).join('');
+                    banner.innerHTML = `
+                        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 16px;margin-bottom:16px;">
+                            <div style="font-size:13px;font-weight:600;color:#1e40af;margin-bottom:8px;">Resultados para "${searchTerm}" — ${skuResults.length} SKU(s) encontrado(s)</div>
+                            <table style="width:100%;border-collapse:collapse;">
+                                <thead><tr style="background:#dbeafe;">
+                                    <th style="padding:5px 10px;text-align:left;font-size:11px;text-transform:uppercase;color:#64748b;">Produto</th>
+                                    <th style="padding:5px 10px;text-align:left;font-size:11px;text-transform:uppercase;color:#64748b;">SKU</th>
+                                    <th style="padding:5px 10px;text-align:center;font-size:11px;text-transform:uppercase;color:#64748b;">Qtd</th>
+                                    <th style="padding:5px 10px;text-align:left;font-size:11px;text-transform:uppercase;color:#64748b;">Pedido</th>
+                                    <th style="padding:5px 10px;text-align:left;font-size:11px;text-transform:uppercase;color:#64748b;">Chegada</th>
+                                </tr></thead>
+                                <tbody>${rows}</tbody>
+                            </table>
+                            ${skuResults.length > 10 ? '<div style="font-size:12px;color:#64748b;margin-top:6px;">...e mais ' + (skuResults.length - 10) + ' resultados</div>' : ''}
+                        </div>`;
+                } else {
+                    banner.innerHTML = '';
+                }
+            }
         }
 
         // ===== FORWARDER REPORT =====
