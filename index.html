@@ -3964,6 +3964,48 @@
         }
 
         // ==================== PURCHASE SUGGESTION ====================
+        // Allocate family MOQ (300) across SKUs respecting per-SKU MOQ (100)
+        function allocateFamilyMOQ(skus, pcsPerFamily, skuMOQ) {
+            const needsSKUs = skus.filter(s => s.coberturaMeses < 8 && s.vendaMedia > 0).sort((a, b) => a.coberturaMeses - b.coberturaMeses);
+            if (needsSKUs.length === 0) return [];
+
+            // Max SKUs we can fit respecting per-SKU MOQ
+            const maxSKUs = Math.floor(pcsPerFamily / skuMOQ);
+            const eligible = needsSKUs.slice(0, maxSKUs);
+
+            // Start each SKU at the minimum
+            const allocation = eligible.map(s => ({ sku: s, qtd: skuMOQ }));
+            let remaining = pcsPerFamily - (allocation.length * skuMOQ);
+
+            // Distribute remaining by urgency (lowest coverage first)
+            if (remaining > 0) {
+                const needs = allocation.map(a => {
+                    const need = Math.ceil((8 - Math.max(0, a.sku.coberturaMeses)) * a.sku.vendaMedia) - a.qtd;
+                    return Math.max(0, need);
+                });
+                const totalNeed = needs.reduce((s, n) => s + n, 0);
+
+                if (totalNeed > 0) {
+                    // Proportional distribution based on remaining need
+                    let distributed = 0;
+                    allocation.forEach((a, i) => {
+                        if (i === allocation.length - 1) {
+                            a.qtd += (remaining - distributed);
+                        } else {
+                            const share = Math.round(remaining * (needs[i] / totalNeed));
+                            a.qtd += share;
+                            distributed += share;
+                        }
+                    });
+                } else {
+                    // All needs met, give surplus to first (most urgent)
+                    allocation[0].qtd += remaining;
+                }
+            }
+
+            return allocation;
+        }
+
         function renderPurchaseSuggestion(data) {
             const families = {};
             data.forEach(d => {
@@ -3975,41 +4017,26 @@
                     families[d.familia].totalNeed += Math.ceil((8 - d.coberturaMeses) * d.vendaMedia);
                 }
             });
-            
+
             const sorted = Object.values(families).filter(f => f.urgency > 0).sort((a, b) => b.urgency - a.urgency).slice(0, 3);
-            
+
             const container = document.getElementById('purchaseFamilyCards');
             const summaryEl = document.getElementById('purchaseSummary');
             if (!container) return;
-            
+
             if (sorted.length === 0) {
                 container.innerHTML = '<div class="empty-state" style="grid-column:span 3;">Nenhuma fam\u00edlia precisa de reposi\u00e7\u00e3o urgente</div>';
                 return;
             }
-            
+
             const numFamilies = Math.min(sorted.length, 3);
             const pcsPerFamily = 300;
-            
+            const skuMOQ = 100;
+
             container.innerHTML = sorted.map(fam => {
-                const needsSKUs = fam.skus.filter(s => s.coberturaMeses < 8 && s.vendaMedia > 0).sort((a, b) => a.coberturaMeses - b.coberturaMeses);
-                let remaining = pcsPerFamily;
-                const allocation = [];
-                
-                needsSKUs.forEach(s => {
-                    if (remaining <= 0) return;
-                    const need = Math.ceil((8 - Math.max(0, s.coberturaMeses)) * s.vendaMedia);
-                    const alloc = Math.min(need, remaining);
-                    if (alloc > 0) {
-                        allocation.push({ sku: s, qtd: alloc });
-                        remaining -= alloc;
-                    }
-                });
-                
-                if (remaining > 0 && allocation.length > 0) {
-                    allocation[0].qtd += remaining;
-                }
-                
-                const mostUrgent = needsSKUs[0];
+                const allocation = allocateFamilyMOQ(fam.skus, pcsPerFamily, skuMOQ);
+
+                const mostUrgent = allocation.length > 0 ? allocation[0].sku : null;
                 const urgLabel = mostUrgent && mostUrgent.coberturaMeses < 2 ? 'CR\u00cdTICO' : mostUrgent && mostUrgent.coberturaMeses < 4 ? 'URGENTE' : 'PREVENTIVA';
                 const urgColor = urgLabel === 'CR\u00cdTICO' ? '#ef4444' : urgLabel === 'URGENTE' ? '#f59e0b' : '#3b82f6';
                 
@@ -4018,6 +4045,7 @@
                         <div style="font-size:16px;font-weight:700;">${fam.name}</div>
                         <span style="background:#0000E1;color:white;padding:2px 10px;border-radius:4px;font-size:13px;font-weight:600;">${pcsPerFamily} pzs</span>
                     </div>
+                    <div style="font-size:11px;color:#888;margin-bottom:8px;">MOQ: ${pcsPerFamily}/família · ${skuMOQ}/SKU · máx ${Math.floor(pcsPerFamily/skuMOQ)} SKUs</div>
                     <div style="font-size:13px;color:${urgColor};font-weight:600;margin-bottom:12px;">${urgLabel} \u2014 ${mostUrgent ? (mostUrgent.nome_produto || mostUrgent.sku) + ' em ' + mostUrgent.coberturaMeses.toFixed(1) + 'M' : ''}</div>
                     <table style="width:100%;border-collapse:collapse;font-size:13px;">
                         <thead><tr style="border-bottom:1px solid #e0e0e0;">
@@ -4058,16 +4086,7 @@
 
                 // Store allocation data for Excel download
                 window._purchaseAllocation = sorted.map(fam => {
-                    const needsSKUs = fam.skus.filter(s => s.coberturaMeses < 8 && s.vendaMedia > 0).sort((a, b) => a.coberturaMeses - b.coberturaMeses);
-                    let remaining = pcsPerFamily;
-                    const allocs = [];
-                    needsSKUs.forEach(s => {
-                        if (remaining <= 0) return;
-                        const need = Math.ceil((8 - Math.max(0, s.coberturaMeses)) * s.vendaMedia);
-                        const alloc = Math.min(need, remaining);
-                        if (alloc > 0) { allocs.push({ sku: s, qtd: alloc }); remaining -= alloc; }
-                    });
-                    if (remaining > 0 && allocs.length > 0) allocs[0].qtd += remaining;
+                    const allocs = allocateFamilyMOQ(fam.skus, pcsPerFamily, skuMOQ);
                     return { familia: fam.name, allocations: allocs };
                 });
             }
