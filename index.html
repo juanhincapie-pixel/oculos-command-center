@@ -1684,20 +1684,20 @@
                 
                 <!-- Purchase Suggestion -->
                 <div style="margin-bottom:20px;">
-                    <h3 class="section-title" style="color:#3b82f6;">Sugestão de Compra — 900 peças</h3>
-                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Distribuição sugerida por família considerando cobertura atual, tendência de venda e MOQ de 300 por família. Máximo 3 famílias por mês.</div>
+                    <h3 class="section-title" style="color:#3b82f6;" id="purchaseTitle">Sugestão de Compra</h3>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Distribuição sugerida por família considerando cobertura atual, tendência de venda e MOQ de 300 por família / 100 por SKU.</div>
                     <div id="purchaseFamilyCards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
                         <div class="empty-state" style="grid-column:span 3;">Calculando sugestão...</div>
                     </div>
                     
                     <!-- Summary bar -->
-                    <div id="purchaseSummary" style="background:var(--text-primary);border-radius:10px;padding:20px 24px;display:none;grid-template-columns:repeat(4,1fr);gap:20px;color:white;align-items:center;">
+                    <div id="purchaseSummary" style="background:var(--text-primary);border-radius:10px;padding:20px 24px;display:none;grid-template-columns:repeat(5,1fr);gap:16px;color:white;align-items:center;">
                     </div>
 
                     <!-- Download Excel button -->
                     <div style="margin-top:16px;text-align:right;">
                         <button onclick="downloadOrdenCompra900()" style="background:var(--livo-green);color:#000;border:none;border-radius:8px;padding:10px 24px;font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;cursor:pointer;">
-                            Descargar Excel — Orden de Compra 900 pzs
+                            Descargar Excel — Orden de Compra
                         </button>
                     </div>
                 </div>
@@ -4018,10 +4018,12 @@
                 }
             });
 
-            const sorted = Object.values(families).filter(f => f.urgency > 0).sort((a, b) => b.urgency - a.urgency).slice(0, 3);
+            const MAX_FAMILIES = 9;
+            const sorted = Object.values(families).filter(f => f.urgency > 0).sort((a, b) => b.urgency - a.urgency).slice(0, MAX_FAMILIES);
 
             const container = document.getElementById('purchaseFamilyCards');
             const summaryEl = document.getElementById('purchaseSummary');
+            const titleEl = document.getElementById('purchaseTitle');
             if (!container) return;
 
             if (sorted.length === 0) {
@@ -4029,49 +4031,92 @@
                 return;
             }
 
-            const numFamilies = Math.min(sorted.length, 3);
+            const numFamilies = Math.min(sorted.length, MAX_FAMILIES);
             const pcsPerFamily = 300;
             const skuMOQ = 100;
+            const totalPcs = numFamilies * pcsPerFamily;
 
-            container.innerHTML = sorted.map(fam => {
+            if (titleEl) titleEl.textContent = 'Sugest\u00e3o de Compra \u2014 ' + totalPcs.toLocaleString() + ' pe\u00e7as';
+
+            // Build global sales ranking
+            const allWithSales = data.filter(d => d.vendaMedia > 0).sort((a, b) => b.vendaMedia - a.vendaMedia);
+            const totalMonthlySales = allWithSales.reduce((s, d) => s + d.vendaMedia, 0);
+            const skuRankMap = {};
+            allWithSales.forEach((d, idx) => {
+                skuRankMap[d.sku] = { rank: idx + 1, share: totalMonthlySales > 0 ? (d.vendaMedia / totalMonthlySales * 100) : 0 };
+            });
+
+            container.innerHTML = sorted.map((fam, famIdx) => {
                 const allocation = allocateFamilyMOQ(fam.skus, pcsPerFamily, skuMOQ);
+                const familyShareRecovered = allocation.reduce((s, a) => {
+                    const info = skuRankMap[a.sku.sku];
+                    return s + (info ? info.share : 0);
+                }, 0);
 
                 const mostUrgent = allocation.length > 0 ? allocation[0].sku : null;
                 const urgLabel = mostUrgent && mostUrgent.coberturaMeses < 2 ? 'CR\u00cdTICO' : mostUrgent && mostUrgent.coberturaMeses < 4 ? 'URGENTE' : 'PREVENTIVA';
                 const urgColor = urgLabel === 'CR\u00cdTICO' ? '#ef4444' : urgLabel === 'URGENTE' ? '#f59e0b' : '#3b82f6';
-                
-                return `<div style="background:#f8fafc;border-radius:10px;padding:16px;border:1px solid #e2e8f0;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                        <div style="font-size:16px;font-weight:700;">${fam.name}</div>
-                        <span style="background:#0000E1;color:white;padding:2px 10px;border-radius:4px;font-size:13px;font-weight:600;">${pcsPerFamily} pzs</span>
+
+                return `<div style="background:#f8fafc;border-radius:10px;padding:14px;border:1px solid #e2e8f0;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <div style="font-size:15px;font-weight:700;">
+                            <span style="background:#e0e7ff;color:#3730a3;padding:1px 7px;border-radius:4px;font-size:12px;font-weight:700;margin-right:6px;">#${famIdx + 1}</span>
+                            ${fam.name}
+                        </div>
+                        <span style="background:#0000E1;color:white;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;">${pcsPerFamily} pzs</span>
                     </div>
-                    <div style="font-size:11px;color:#888;margin-bottom:8px;">MOQ: ${pcsPerFamily}/família · ${skuMOQ}/SKU · máx ${Math.floor(pcsPerFamily/skuMOQ)} SKUs</div>
-                    <div style="font-size:13px;color:${urgColor};font-weight:600;margin-bottom:12px;">${urgLabel} \u2014 ${mostUrgent ? (mostUrgent.nome_produto || mostUrgent.sku) + ' em ' + mostUrgent.coberturaMeses.toFixed(1) + 'M' : ''}</div>
-                    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                        <div style="font-size:12px;color:${urgColor};font-weight:600;">${urgLabel}</div>
+                        <div style="font-size:12px;color:#0000E1;font-weight:700;background:#e0e7ff;padding:1px 8px;border-radius:4px;">${familyShareRecovered.toFixed(1)}% share vendas</div>
+                    </div>
+                    <div style="font-size:11px;color:#888;margin-bottom:6px;">MOQ: ${pcsPerFamily}/fam \u00b7 ${skuMOQ}/SKU \u00b7 m\u00e1x ${Math.floor(pcsPerFamily/skuMOQ)} SKUs</div>
+                    <table style="width:100%;border-collapse:collapse;font-size:12px;">
                         <thead><tr style="border-bottom:1px solid #e0e0e0;">
-                            <th style="padding:6px 4px;text-align:left;color:#888;font-weight:600;">Modelo</th>
-                            <th style="padding:6px 4px;text-align:right;color:#888;font-weight:600;">Qtd</th>
+                            <th style="padding:5px 3px;text-align:left;color:#888;font-weight:600;">Modelo</th>
+                            <th style="padding:5px 3px;text-align:center;color:#888;font-weight:600;">Rank</th>
+                            <th style="padding:5px 3px;text-align:right;color:#888;font-weight:600;">Share</th>
+                            <th style="padding:5px 3px;text-align:right;color:#888;font-weight:600;">Qtd</th>
                         </tr></thead>
-                        <tbody>${allocation.map(a => `<tr${a.sku.coberturaMeses < 2 ? ' style="background:#fef2f2;"' : ''}>
-                            <td style="padding:6px 4px;">${a.sku.nome_produto || a.sku.sku} <span style="background:${(a.sku.descricao_classe||'').toLowerCase().includes('sol') ? '#dbeafe' : '#d1fae5'};color:${(a.sku.descricao_classe||'').toLowerCase().includes('sol') ? '#1e40af' : '#065f46'};padding:1px 6px;border-radius:3px;font-size:13px;">${a.sku.descricao_classe || ''}</span></td>
-                            <td style="padding:6px 4px;text-align:right;font-weight:700;${a.sku.coberturaMeses < 2 ? 'color:#ef4444;' : ''}">${a.qtd}</td>
-                        </tr>`).join('')}</tbody>
+                        <tbody>${allocation.map(a => {
+                            const info = skuRankMap[a.sku.sku] || { rank: '-', share: 0 };
+                            const rankDisplay = typeof info.rank === 'number' ? '#' + info.rank : '-';
+                            const isTop20 = typeof info.rank === 'number' && info.rank <= 20;
+                            return `<tr${a.sku.coberturaMeses < 2 ? ' style="background:#fef2f2;"' : ''}>
+                            <td style="padding:5px 3px;">${a.sku.nome_produto || a.sku.sku} <span style="background:${(a.sku.descricao_classe||'').toLowerCase().includes('sol') ? '#dbeafe' : '#d1fae5'};color:${(a.sku.descricao_classe||'').toLowerCase().includes('sol') ? '#1e40af' : '#065f46'};padding:0 5px;border-radius:3px;font-size:11px;">${a.sku.descricao_classe || ''}</span></td>
+                            <td style="padding:5px 3px;text-align:center;font-weight:600;${isTop20 ? 'color:#0000E1;' : ''}">${rankDisplay}</td>
+                            <td style="padding:5px 3px;text-align:right;font-size:11px;color:#666;">${info.share.toFixed(1)}%</td>
+                            <td style="padding:5px 3px;text-align:right;font-weight:700;${a.sku.coberturaMeses < 2 ? 'color:#ef4444;' : ''}">${a.qtd}</td>
+                        </tr>`;
+                        }).join('')}</tbody>
                     </table>
                 </div>`;
             }).join('');
-            
+
             if (summaryEl) {
                 summaryEl.style.display = 'grid';
+                const totalShareRecovered = sorted.reduce((total, fam) => {
+                    const alloc = allocateFamilyMOQ(fam.skus, pcsPerFamily, skuMOQ);
+                    return total + alloc.reduce((s, a) => {
+                        const info = skuRankMap[a.sku.sku];
+                        return s + (info ? info.share : 0);
+                    }, 0);
+                }, 0);
+
                 summaryEl.innerHTML = `
                     <div style="text-align:center;">
                         <div style="font-size:13px;color:rgba(255,255,255,0.7);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;">Total Compra</div>
-                        <div style="font-size:36px;font-weight:700;margin:6px 0;">${numFamilies * pcsPerFamily}</div>
-                        <div style="font-size:14px;color:rgba(255,255,255,0.6);">peças</div>
+                        <div style="font-size:36px;font-weight:700;margin:6px 0;">${totalPcs.toLocaleString()}</div>
+                        <div style="font-size:14px;color:rgba(255,255,255,0.6);">pe\u00e7as</div>
                     </div>
                     <div style="text-align:center;">
-                        <div style="font-size:13px;color:rgba(255,255,255,0.7);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;">Famílias</div>
+                        <div style="font-size:13px;color:rgba(255,255,255,0.7);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;">Fam\u00edlias</div>
                         <div style="font-size:36px;font-weight:700;margin:6px 0;">${numFamilies}</div>
                         <div style="font-size:14px;color:rgba(255,255,255,0.6);">${sorted.map(f => f.name).join(' + ')}</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:13px;color:rgba(255,255,255,0.7);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;">Share Recuperado</div>
+                        <div style="font-size:36px;font-weight:700;color:#10b981;margin:6px 0;">${totalShareRecovered.toFixed(1)}%</div>
+                        <div style="font-size:14px;color:rgba(255,255,255,0.6);">de vendas mensais</div>
                     </div>
                     <div style="text-align:center;">
                         <div style="font-size:13px;color:rgba(255,255,255,0.7);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;">Lead Time</div>
@@ -4081,10 +4126,9 @@
                     <div style="text-align:center;">
                         <div style="font-size:13px;color:rgba(255,255,255,0.7);text-transform:uppercase;font-weight:600;letter-spacing:0.5px;">Cobertura Objetivo</div>
                         <div style="font-size:36px;font-weight:700;color:var(--livo-green);margin:6px 0;">8M+</div>
-                        <div style="font-size:14px;color:rgba(255,255,255,0.6);">para SKUs A/B</div>
+                        <div style="font-size:14px;color:rgba(255,255,255,0.6);">para SKUs A/B/C</div>
                     </div>`;
 
-                // Store allocation data for Excel download
                 window._purchaseAllocation = sorted.map(fam => {
                     const allocs = allocateFamilyMOQ(fam.skus, pcsPerFamily, skuMOQ);
                     return { familia: fam.name, allocations: allocs };
