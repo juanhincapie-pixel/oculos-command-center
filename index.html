@@ -1697,7 +1697,7 @@
                     <!-- Download Excel button -->
                     <div style="margin-top:16px;text-align:right;">
                         <button onclick="downloadOrdenCompra900()" style="background:var(--livo-green);color:#000;border:none;border-radius:8px;padding:10px 24px;font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;cursor:pointer;">
-                            Descargar Excel — Orden de Compra
+                            Descargar Proposta Completa (.xlsx)
                         </button>
                     </div>
                 </div>
@@ -1868,10 +1868,11 @@
                 <!-- Leyenda KPIs -->
                 <div style="background:var(--card-bg);border-radius:10px;padding:14px 20px;margin-bottom:20px;border:1px solid var(--border-color);font-size:13px;color:var(--text-secondary);line-height:1.8;">
                     <strong style="color:var(--text-primary);">Como ler:</strong>
-                    <strong>Demanda total</strong> = peças que serão consumidas (vendas + estoque inicial lojas novas + ramp-up) no período projetado.
+                    <strong>Demanda total</strong> = consumo (vendas + estoque inicial lojas + ramp-up + lançamentos) no período.
                     <strong>Estoque atual + import.</strong> = peças disponíveis hoje na matriz + importações em trânsito.
-                    <strong style="color:#FC4F00;">Compra necessária</strong> = peças que precisam ser encomendadas ao fornecedor para cobrir a demanda.
-                    <strong style="color:#0000E1;">Compra acumulada</strong> = total de peças a encomendar ao longo do período.
+                    <strong style="color:#FC4F00;">Pedir (pzs)</strong> = peças a encomendar NESTE mês (já deslocadas pelo lead time). A tabela mostra quando PEDIR, não quando chega.
+                    <strong>Chega em</strong> = mês de chegada da mercadoria. <span style="color:#ef4444;">CNY (fevereiro)</span> = fábrica fechada, pedido adelantado a janeiro + 30d delay.
+                    <strong style="color:#f59e0b;">Pedido acumulado</strong> = total de peças encomendadas ao longo do período.
                 </div>
 
                 <!-- Two columns: Params + Ramp-up -->
@@ -1891,10 +1892,10 @@
                                 </div>
                             </div>
                             <div>
-                                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px;">Lead time</label>
+                                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px;">Lead time (dias)</label>
                                 <div style="display:flex;align-items:center;gap:4px;">
-                                    <input type="number" id="fcLeadTime" value="4" min="1" max="12" style="width:72px;padding:10px;font-size:20px;font-weight:600;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;text-align:center;" onchange="recalcForecast()">
-                                    <span style="font-size:12px;color:var(--text-secondary);">meses</span>
+                                    <input type="number" id="fcLeadTime" value="120" min="30" max="365" step="10" style="width:72px;padding:10px;font-size:20px;font-weight:600;border:1px solid var(--border-color);border-radius:8px;font-family:inherit;text-align:center;" onchange="recalcForecast()">
+                                    <span style="font-size:11px;color:var(--text-secondary);line-height:1.3;">dias<br><span style="color:#ef4444;">+30d CNY</span></span>
                                 </div>
                             </div>
                             <div>
@@ -1937,7 +1938,7 @@
                                 <div style="margin-top:6px;height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;"><div style="height:100%;width:100%;background:#10b981;border-radius:3px;transition:width 0.3s;" id="rampBar3"></div></div>
                             </div>
                         </div>
-                        <div style="font-size:11px;color:var(--text-secondary);text-align:center;">Estoque inicial: curva A = 2 pçs, B/C/D = 1 pç por SKU activo</div>
+                        <div style="font-size:11px;color:var(--text-secondary);text-align:center;">Estoque inicial: curva A = 2 pçs, B/C = 1 pç por SKU ativo (D excluído)</div>
                     </div>
                 </div>
 
@@ -1953,17 +1954,44 @@
                     <div id="fcStoreInputs"></div>
                 </div>
 
-                <!-- Chart -->
+                <!-- Lançamentos de modelos novos -->
                 <div style="background:var(--card-bg);border-radius:12px;padding:20px;box-shadow:var(--shadow-sm);margin-bottom:20px;">
-                    <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Demanda Projetada vs Estoque Disponível</h3>
-                    <div style="position:relative;height:420px;">
-                        <canvas id="fcChart"></canvas>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:18px;">\u2728</span>
+                            <h3 style="font-size:16px;font-weight:600;color:var(--text-primary);">Lançamentos / Compras Extra</h3>
+                        </div>
+                        <div id="fcLaunchSummary" style="font-size:14px;color:var(--text-secondary);display:flex;gap:20px;"></div>
+                    </div>
+                    <div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px;">Informe a quantidade de peças extras (lançamentos, compras pontuais) por mês. A compra será feita com antecedência de lead time.</div>
+                    <div id="fcLaunchInputs"></div>
+                </div>
+
+                <!-- Charts: Stock, Consumo, Compras -->
+                <div style="background:var(--card-bg);border-radius:12px;padding:20px;box-shadow:var(--shadow-sm);margin-bottom:16px;">
+                    <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Estoque Projetado</h3>
+                    <div style="position:relative;height:280px;">
+                        <canvas id="fcChartStock"></canvas>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+                    <div style="background:var(--card-bg);border-radius:12px;padding:20px;box-shadow:var(--shadow-sm);">
+                        <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Consumo Projetado</h3>
+                        <div style="position:relative;height:360px;">
+                            <canvas id="fcChartDemand"></canvas>
+                        </div>
+                    </div>
+                    <div style="background:var(--card-bg);border-radius:12px;padding:20px;box-shadow:var(--shadow-sm);">
+                        <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Plano de Compras (quando pedir)</h3>
+                        <div style="position:relative;height:360px;">
+                            <canvas id="fcChartOrders"></canvas>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Table consolidada -->
                 <div style="background:var(--card-bg);border-radius:12px;padding:20px;box-shadow:var(--shadow-sm);margin-bottom:20px;">
-                    <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Necessidade de Compra Mês a Mês — Consolidado</h3>
+                    <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;">Cronograma de Pedidos — Quando Pedir e Para Quando</h3>
                     <div class="table-container" style="max-height:500px;overflow-y:auto;">
                         <table id="fcTable">
                             <thead style="position:sticky;top:0;z-index:10;background:#f9fafb;">
@@ -1971,16 +1999,18 @@
                                     <th style="text-align:center;">Mês</th>
                                     <th style="text-align:center;">Lojas</th>
                                     <th style="text-align:center;">Demanda Base</th>
-                                    <th style="text-align:center;">Estoque Inicial</th>
+                                    <th style="text-align:center;">Est. Inicial</th>
+                                    <th style="text-align:center;">Lançamentos</th>
                                     <th style="text-align:center;">Ramp-up</th>
                                     <th style="text-align:center;">Demanda Total</th>
-                                    <th style="text-align:center;">Estoque Disponível</th>
-                                    <th style="text-align:center;">Necessidade Compra</th>
-                                    <th style="text-align:center;">Compra Acumulada</th>
+                                    <th style="text-align:center;">Est. Disponível</th>
+                                    <th style="text-align:center;">Pedir (pzs)</th>
+                                    <th style="text-align:center;">Chega em</th>
+                                    <th style="text-align:center;">Pedido Acum.</th>
                                 </tr>
                             </thead>
                             <tbody id="fcTableBody">
-                                <tr><td colspan="9" class="empty-state">Carregando dados...</td></tr>
+                                <tr><td colspan="13" class="empty-state">Carregando dados...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -2019,13 +2049,15 @@
                                     <th style="text-align:center;">Import.</th>
                                     <th style="text-align:center;">Cob.</th>
                                     <th style="text-align:center;">Demanda</th>
-                                    <th style="text-align:center;">Compra</th>
+                                    <th style="text-align:center;">Compra Total</th>
+                                    <th style="text-align:center;color:#FC4F00;">Repos.</th>
+                                    <th style="text-align:center;color:#0ea5e9;">Lojas</th>
                                     <th style="text-align:center;">Esgota em</th>
                                     <th style="text-align:center;">Prioridade</th>
                                 </tr>
                             </thead>
                             <tbody id="fcSkuTableBody">
-                                <tr><td colspan="11" class="empty-state">Carregando dados...</td></tr>
+                                <tr><td colspan="13" class="empty-state">Carregando dados...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -3261,18 +3293,24 @@
         }
 
         // ==================== PRONOSTICO DE COMPRAS ====================
-        let fcChartInstance = null;
+        let fcChartStockInstance = null;
+        let fcChartDemandInstance = null;
+        let fcChartOrdersInstance = null;
 
         let fcPrevStoreValues = {};
 
+        let fcPrevLaunchValues = {};
         function initForecast() {
             const container = document.getElementById('fcStoreInputs');
+            const launchContainer = document.getElementById('fcLaunchInputs');
             if (!container) return;
 
             // Save previous values before rebuilding
             for (let i = 0; i < 24; i++) {
                 const el = document.getElementById('fcStore_' + i);
                 if (el) fcPrevStoreValues[i] = parseInt(el.value) || 0;
+                const lel = document.getElementById('fcLaunch_' + i);
+                if (lel) fcPrevLaunchValues[i] = parseInt(lel.value) || 0;
             }
 
             const numMonths = parseInt((document.getElementById('fcMonths') || {}).value) || 15;
@@ -3282,9 +3320,11 @@
                 const d = new Date(now.getFullYear(), now.getMonth() + 1 + i, 1);
                 const mon = d.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase();
                 const yr = d.getFullYear();
-                months.push({ mon, yr, full: mon + ' ' + yr });
+                const realMonth = d.getMonth(); // 0=jan, 1=feb...
+                months.push({ mon, yr, full: mon + ' ' + yr, isFeb: realMonth === 1 });
             }
 
+            // Store inputs
             container.innerHTML = '<div style="display:flex;gap:6px;padding-bottom:8px;">' + months.map((m, i) => {
                 const prevVal = fcPrevStoreValues[i] || 0;
                 const hasVal = prevVal > 0;
@@ -3300,7 +3340,39 @@
                 </div>`;
             }).join('') + '</div>';
 
+            // Launch inputs
+            if (launchContainer) {
+                launchContainer.innerHTML = '<div style="display:flex;gap:6px;padding-bottom:8px;">' + months.map((m, i) => {
+                    const prevVal = fcPrevLaunchValues[i] || 0;
+                    const hasVal = prevVal > 0;
+                    const isFeb = m.isFeb;
+                    return `
+                    <div style="flex:1;text-align:center;min-width:50px;">
+                        <div style="font-size:10px;font-weight:600;color:var(--text-secondary);letter-spacing:0.5px;margin-bottom:2px;">${m.mon}</div>
+                        <div style="font-size:10px;color:var(--text-secondary);margin-bottom:6px;">${m.yr}</div>
+                        <input type="number" id="fcLaunch_${i}" value="${prevVal}" min="0" max="99999"
+                            style="width:72px;text-align:center;padding:10px 4px;font-size:18px;font-weight:600;border:2px solid ${hasVal ? '#8b5cf6' : 'var(--border-color)'};border-radius:10px;font-family:inherit;color:${hasVal ? '#8b5cf6' : 'var(--text-primary)'};background:${hasVal ? '#8b5cf610' : 'white'};transition:all 0.2s;"
+                            onchange="onLaunchInputChange(this);recalcForecast()"
+                            onfocus="this.select()">
+                        <div style="margin-top:4px;font-size:10px;font-weight:600;color:#8b5cf6;min-height:16px;">${hasVal ? prevVal + ' pçs' : ''}</div>
+                    </div>`;
+                }).join('') + '</div>';
+            }
+
             recalcForecast();
+        }
+
+        function onLaunchInputChange(input) {
+            const val = parseInt(input.value) || 0;
+            if (val > 0) {
+                input.style.borderColor = '#8b5cf6';
+                input.style.background = '#8b5cf610';
+                input.style.color = '#8b5cf6';
+            } else {
+                input.style.borderColor = 'var(--border-color)';
+                input.style.background = 'white';
+                input.style.color = 'var(--text-primary)';
+            }
         }
 
         function onStoreInputChange(input) {
@@ -3326,7 +3398,8 @@
 
             // Read params
             const numMonths = parseInt((document.getElementById('fcMonths') || {}).value) || 15;
-            const leadTime = parseInt(document.getElementById('fcLeadTime').value) || 4;
+            const leadTimeDays = parseInt(document.getElementById('fcLeadTime').value) || 120;
+            const cnyExtraDays = 30;
             const safetyMonths = parseInt(document.getElementById('fcSafetyStock').value) || 2;
             const growthPct = (parseFloat(document.getElementById('fcGrowth').value) || 0) / 100;
             const rampM1 = (parseInt(document.getElementById('fcRampM1').value) || 0) / 100;
@@ -3343,59 +3416,100 @@
 
             const currentStores = storeColumns.length || 18;
             const totalVendaMes = classified.reduce((s, d) => s + d.vendaMedia, 0);
-            const vendaPerStore = currentStores > 0 ? totalVendaMes / currentStores : 0;
 
-            // SKU counts for initial stock per store
+            // SKU counts for initial stock per store — ONLY A, B, C (exclude D)
             const activeSKUs = classified.filter(d => d.vendaMedia > 0 || d.estoqueMatriz > 0);
-            const skuCountA = activeSKUs.filter(d => d.curva === 'A').length;
-            const skuCountBCD = activeSKUs.filter(d => d.curva !== 'A').length;
-            const initialStockPerStore = (skuCountA * 2) + (skuCountBCD * 1);
+            const abcSKUs = activeSKUs.filter(d => d.curva !== 'D');
+            const skuCountA = abcSKUs.filter(d => d.curva === 'A').length;
+            const skuCountBC = abcSKUs.filter(d => d.curva === 'B' || d.curva === 'C').length;
+            const initialStockPerStore = (skuCountA * 2) + (skuCountBC * 1);
 
-            // Read new stores per month
+            // *** EXTENDED SIMULATION: simulate beyond visible window ***
+            const leadTimeMonths = Math.ceil(leadTimeDays / 30);
+            const extraMonths = leadTimeMonths + 2; // extra months beyond display
+            const simMonths = numMonths + extraMonths;
+
+            // Read new stores per month (only numMonths have inputs; extra = 0)
             const newStoresPerMonth = [];
-            for (let i = 0; i < numMonths; i++) {
-                newStoresPerMonth.push(parseInt((document.getElementById('fcStore_' + i) || {}).value) || 0);
+            for (let i = 0; i < simMonths; i++) {
+                if (i < numMonths) {
+                    newStoresPerMonth.push(parseInt((document.getElementById('fcStore_' + i) || {}).value) || 0);
+                } else {
+                    newStoresPerMonth.push(0);
+                }
             }
-            const totalNewStores = newStoresPerMonth.reduce((s, v) => s + v, 0);
+            const totalNewStores = newStoresPerMonth.slice(0, numMonths).reduce((s, v) => s + v, 0);
+
+            // Read launches per month (only numMonths have inputs; extra = 0)
+            const launchesPerMonth = [];
+            for (let i = 0; i < simMonths; i++) {
+                if (i < numMonths) {
+                    launchesPerMonth.push(parseInt((document.getElementById('fcLaunch_' + i) || {}).value) || 0);
+                } else {
+                    launchesPerMonth.push(0);
+                }
+            }
+            const totalLaunchPcs = launchesPerMonth.slice(0, numMonths).reduce((s, v) => s + v, 0);
+
+            // Update launch summary
+            const launchSummaryEl = document.getElementById('fcLaunchSummary');
+            if (launchSummaryEl) {
+                launchSummaryEl.innerHTML = '<span>Total peças extras: <strong style="color:#8b5cf6;">' + totalLaunchPcs.toLocaleString('pt-BR') + '</strong></span>';
+            }
 
             // Track ramp-up stores
             const rampStores = [];
             newStoresPerMonth.forEach((ns, i) => { if (ns > 0) rampStores.push({ month: i, qty: ns }); });
 
-            // ===== BOTTOM-UP: Calculate per SKU, then aggregate =====
-            const monthLabels = [];
+            // Build month metadata for ALL simMonths (labels, real month for CNY detection)
             const now = new Date();
-            for (let i = 0; i < numMonths; i++) {
+            const monthMeta = [];
+            for (let i = 0; i < simMonths; i++) {
                 const d = new Date(now.getFullYear(), now.getMonth() + 1 + i, 1);
                 const label = d.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
-                monthLabels.push(label.charAt(0).toUpperCase() + label.slice(1));
+                const realMonth = d.getMonth();
+                monthMeta.push({
+                    label: label.charAt(0).toUpperCase() + label.slice(1),
+                    isFeb: realMonth === 1,
+                    realMonth: realMonth
+                });
             }
 
-            // Initialize consolidated month accumulators
+            // Initialize consolidated month accumulators for ALL simMonths
             const monthAgg = [];
-            for (let i = 0; i < numMonths; i++) {
-                monthAgg.push({ baseDemand: 0, initStock: 0, rampDemand: 0, totalDemand: 0, needBuy: 0, stockAvail: 0 });
+            for (let i = 0; i < simMonths; i++) {
+                monthAgg.push({ baseDemand: 0, initStock: 0, launchDemand: launchesPerMonth[i], rampDemand: 0, totalDemand: 0, needBuy: 0, stockAvail: 0 });
             }
 
-            // Per-SKU simulation
+            // *** REORDER POINT per SKU ***
+            // When a SKU's stock drops below reorderThreshold months of demand,
+            // trigger a purchase to bring coverage up to targetCoverage months.
+            const reorderThreshold = leadTimeMonths; // e.g., 4 months
+            const targetCoverage = leadTimeMonths + safetyMonths; // e.g., 6 months
+
+            // Per-SKU simulation over simMonths
             fcSkuData = [];
             activeSKUs.forEach(item => {
                 const skuVendaPerStore = currentStores > 0 ? item.vendaMedia / currentStores : 0;
-                const minPerStore = item.curva === 'A' ? 2 : 1;
+                const isABC = item.curva !== 'D';
+                const isAB = item.curva === 'A' || item.curva === 'B';
+                const minPerStore = isABC ? (item.curva === 'A' ? 2 : 1) : 0;
                 let skuStock = item.estoqueMatriz + (item.importacoesPendentes || 0);
                 let skuTotalDemand = 0;
                 let skuTotalBuy = 0;
+                let skuTotalBuyConsumo = 0;
+                let skuTotalBuyInitStock = 0;
                 let skuFirstBuyMonth = -1;
                 const skuMonthly = [];
 
-                for (let i = 0; i < numMonths; i++) {
+                for (let i = 0; i < simMonths; i++) {
                     const gf = Math.pow(1 + growthPct, i);
                     const ns = newStoresPerMonth[i];
 
                     // Base demand for this SKU this month
                     const skuBaseDemand = item.vendaMedia * gf;
 
-                    // Initial stock for new stores
+                    // Initial stock for new stores (only A, B, C)
                     const skuInitStock = ns * minPerStore;
 
                     // Ramp-up from previously opened stores
@@ -3411,17 +3525,41 @@
 
                     // Consume stock
                     skuStock -= skuMonthDemand;
-                    const skuNeedBuy = skuStock < 0 ? Math.abs(skuStock) : 0;
-                    if (skuNeedBuy > 0) {
+                    let skuNeedBuy = 0;
+
+                    if (skuStock < 0 && isAB) {
+                        // Stock depleted — must buy (only A & B)
+                        skuNeedBuy = Math.abs(skuStock);
                         skuStock = 0;
                         if (skuFirstBuyMonth < 0) skuFirstBuyMonth = i;
+                    } else if (skuStock < 0) {
+                        // C & D: stock depleted but no reorder — just cap at 0
+                        skuStock = 0;
+                    } else if (item.vendaMedia > 0 && isAB) {
+                        // Reorder point check: if remaining coverage < reorderThreshold, top up
+                        const avgFutureDemand = item.vendaMedia * Math.pow(1 + growthPct, i);
+                        const coverageLeft = avgFutureDemand > 0 ? skuStock / avgFutureDemand : Infinity;
+                        if (coverageLeft < reorderThreshold) {
+                            const targetStock = Math.ceil(avgFutureDemand * targetCoverage);
+                            skuNeedBuy = Math.max(0, targetStock - skuStock);
+                            skuStock += skuNeedBuy; // replenish (order arrives at this month)
+                            if (skuFirstBuyMonth < 0) skuFirstBuyMonth = i;
+                        }
                     }
 
                     skuTotalDemand += skuMonthDemand;
                     skuTotalBuy += skuNeedBuy;
+                    // Breakdown: attribute buy to initStock first, rest to consumo
+                    if (skuNeedBuy > 0 && skuInitStock > 0) {
+                        const initPart = Math.min(skuNeedBuy, skuInitStock);
+                        skuTotalBuyInitStock += initPart;
+                        skuTotalBuyConsumo += (skuNeedBuy - initPart);
+                    } else {
+                        skuTotalBuyConsumo += skuNeedBuy;
+                    }
 
                     // Aggregate to consolidated
-                    monthAgg[i].baseDemand += Math.round(skuBaseDemand * gf / gf); // keep ungrown for display
+                    monthAgg[i].baseDemand += Math.round(skuBaseDemand);
                     monthAgg[i].initStock += skuInitStock;
                     monthAgg[i].rampDemand += Math.round(skuRamp);
                     monthAgg[i].totalDemand += skuMonthDemand;
@@ -3430,7 +3568,7 @@
                     skuMonthly.push({ demand: skuMonthDemand, buy: skuNeedBuy, stock: Math.max(skuStock, 0) });
                 }
 
-                // Priority
+                // Priority (based on visible window only)
                 let prioridad, prioColor;
                 if (skuFirstBuyMonth >= 0 && skuFirstBuyMonth <= 2 && (item.curva === 'A' || item.curva === 'B')) {
                     prioridad = 'Urgente!'; prioColor = '#ef4444';
@@ -3453,6 +3591,8 @@
                     coberturaMeses: item.coberturaMeses,
                     demanda15: skuTotalDemand,
                     compraNecesaria: skuTotalBuy,
+                    compraConsumo: skuTotalBuyConsumo,
+                    compraInitStock: skuTotalBuyInitStock,
                     firstBuyMonth: skuFirstBuyMonth,
                     prioridad: prioridad,
                     prioColor: prioColor,
@@ -3462,57 +3602,178 @@
 
             fcSkuData.sort((a, b) => b.compraNecesaria - a.compraNecesaria);
 
-            // Build consolidated monthData from aggregated SKU data
+            // Add launch demand to totalDemand per month
+            for (let i = 0; i < simMonths; i++) {
+                monthAgg[i].totalDemand += monthAgg[i].launchDemand;
+            }
+
+            // ===== PASS 1: Calculate demand and remaining stock per month (ALL simMonths) =====
             let runningStores = currentStores;
             let totalStockNow = classified.reduce((s, d) => s + d.estoqueMatriz + (d.importacoesPendentes || 0), 0);
-            let accumBuy = 0;
-            // Calculate running stock from SKU-level (sum all SKU stocks per month)
-            const monthData = [];
-            for (let i = 0; i < numMonths; i++) {
+            const arrivalData = [];
+
+            for (let i = 0; i < simMonths; i++) {
                 const ns = newStoresPerMonth[i];
                 runningStores += ns;
                 const ag = monthAgg[i];
-                accumBuy += ag.needBuy;
 
                 // Sum remaining stock across all SKUs for this month
                 let monthStockRemaining = 0;
                 fcSkuData.forEach(s => { monthStockRemaining += s.monthly[i].stock; });
 
-                monthData.push({
-                    month: monthLabels[i],
+                const skuNeedBuy = ag.needBuy;
+                const launchNeedBuy = ag.launchDemand;
+                const totalNeedBuy = skuNeedBuy + launchNeedBuy;
+
+                arrivalData.push({
+                    month: monthMeta[i].label,
                     stores: runningStores,
                     newStores: ns,
                     baseDemand: ag.baseDemand,
                     initStock: ag.initStock,
+                    launchDemand: ag.launchDemand,
+                    launches: launchesPerMonth[i],
                     rampDemand: ag.rampDemand,
                     totalDemand: ag.totalDemand,
                     stockAvail: monthStockRemaining,
-                    needBuy: ag.needBuy,
-                    accumBuy: accumBuy
+                    needBuyConsumo: skuNeedBuy,
+                    needBuyLaunches: launchNeedBuy,
+                    needBuyTotal: totalNeedBuy,
+                    isFeb: monthMeta[i].isFeb
+                });
+            }
+
+            // ===== PASS 2: Shift purchases to ORDER month using real dates =====
+            // Now covers simMonths: orders from extended months land in the visible window
+
+            const monthDates = [];
+            for (let i = 0; i < simMonths; i++) {
+                monthDates.push(new Date(now.getFullYear(), now.getMonth() + 1 + i, 1));
+            }
+
+            function dateToMonthIdx(d) {
+                for (let i = simMonths - 1; i >= 0; i--) {
+                    if (d >= monthDates[i]) return i;
+                }
+                return -1;
+            }
+
+            function crossesCNY(orderDate, arrivalDate) {
+                let d = new Date(orderDate);
+                while (d <= arrivalDate) {
+                    if (d.getMonth() === 1) return true;
+                    d.setMonth(d.getMonth() + 1);
+                    d.setDate(1);
+                }
+                return false;
+            }
+
+            // Order schedule only for visible months (0..numMonths-1)
+            const orderSchedule = [];
+            for (let i = 0; i < numMonths; i++) {
+                orderSchedule.push({ consumo: 0, initStock: 0, launches: 0, total: 0, arrivalDetails: [] });
+            }
+
+            // Iterate ALL simMonths for arrivals, place orders into visible window
+            for (let i = 0; i < simMonths; i++) {
+                const arr = arrivalData[i];
+                if (arr.needBuyTotal === 0) continue;
+
+                const arrivalDate = monthDates[i];
+                const tentativeOrderDate = new Date(arrivalDate.getTime() - leadTimeDays * 86400000);
+                const cnyCrossed = crossesCNY(tentativeOrderDate, arrivalDate);
+                const effectiveLeadDays = cnyCrossed ? leadTimeDays + cnyExtraDays : leadTimeDays;
+                const orderDate = new Date(arrivalDate.getTime() - effectiveLeadDays * 86400000);
+                let orderIdx = dateToMonthIdx(orderDate);
+                let cnyNote = cnyCrossed ? ' (+30d CNY)' : '';
+
+                const buyInitStock = arr.initStock > 0 ? Math.min(arr.needBuyConsumo, arr.initStock) : 0;
+                const buyConsumo = Math.max(0, arr.needBuyConsumo - buyInitStock);
+                const buyLaunches = arr.needBuyLaunches;
+
+                // Only place into visible window (0..numMonths-1)
+                if (orderIdx >= 0 && orderIdx < numMonths) {
+                    orderSchedule[orderIdx].consumo += buyConsumo;
+                    orderSchedule[orderIdx].initStock += buyInitStock;
+                    orderSchedule[orderIdx].launches += buyLaunches;
+                    orderSchedule[orderIdx].total += arr.needBuyTotal;
+                    orderSchedule[orderIdx].arrivalDetails.push({
+                        arrivalMonth: arr.month,
+                        total: arr.needBuyTotal,
+                        cnyNote: cnyNote,
+                        leadDays: effectiveLeadDays
+                    });
+                } else if (orderIdx < 0) {
+                    // Order date is before projection — place in month 0 as urgent
+                    orderSchedule[0].consumo += buyConsumo;
+                    orderSchedule[0].initStock += buyInitStock;
+                    orderSchedule[0].launches += buyLaunches;
+                    orderSchedule[0].total += arr.needBuyTotal;
+                    orderSchedule[0].arrivalDetails.push({
+                        arrivalMonth: arr.month,
+                        total: arr.needBuyTotal,
+                        cnyNote: ' ⚠️ YA!',
+                        leadDays: effectiveLeadDays
+                    });
+                }
+                // If orderIdx >= numMonths, order falls outside visible window (too far future — ok to skip)
+            }
+
+            // Build final monthData with ORDER perspective (only visible months)
+            let accumOrder = 0;
+            const monthData = [];
+            for (let i = 0; i < numMonths; i++) {
+                const arr = arrivalData[i];
+                const ord = orderSchedule[i];
+                accumOrder += ord.total;
+
+                let orderDesc = '';
+                if (ord.total > 0) {
+                    orderDesc = ord.arrivalDetails.map(d => 'p/ ' + d.arrivalMonth + d.cnyNote).join(', ');
+                }
+
+                monthData.push({
+                    month: arr.month,
+                    stores: arr.stores,
+                    newStores: arr.newStores,
+                    baseDemand: arr.baseDemand,
+                    initStock: arr.initStock,
+                    launchDemand: arr.launchDemand,
+                    launches: arr.launches,
+                    rampDemand: arr.rampDemand,
+                    totalDemand: arr.totalDemand,
+                    stockAvail: arr.stockAvail,
+                    orderTotal: ord.total,
+                    orderConsumo: ord.consumo,
+                    orderInitStock: ord.initStock,
+                    orderLaunches: ord.launches,
+                    orderDesc: orderDesc,
+                    accumOrder: accumOrder,
+                    isFeb: arr.isFeb,
+                    arrivalNeed: arr.needBuyTotal
                 });
             }
 
             // Update KPIs
             const el = id => document.getElementById(id);
             const totalDemandAll = monthData.reduce((s, m) => s + m.totalDemand, 0);
-            const totalInitStock = monthData.reduce((s, m) => s + m.initStock, 0);
-            const totalBuy = monthData.reduce((s, m) => s + m.needBuy, 0);
+            const totalInitStockPcs = monthData.reduce((s, m) => s + m.initStock, 0);
+            const totalOrder = monthData.reduce((s, m) => s + m.orderTotal, 0);
             if (el('fcLabelDemand')) el('fcLabelDemand').textContent = 'Demanda total ' + numMonths + 'M';
             if (el('fcTotalDemand')) el('fcTotalDemand').textContent = totalDemandAll.toLocaleString('pt-BR');
             if (el('fcTotalInitStock')) el('fcTotalInitStock').textContent = totalStockNow.toLocaleString('pt-BR');
-            if (el('fcTotalBuy')) el('fcTotalBuy').textContent = totalBuy.toLocaleString('pt-BR');
-            if (el('fcTotalAccum')) el('fcTotalAccum').textContent = accumBuy.toLocaleString('pt-BR');
+            if (el('fcTotalBuy')) el('fcTotalBuy').textContent = totalOrder.toLocaleString('pt-BR');
+            if (el('fcTotalAccum')) el('fcTotalAccum').textContent = accumOrder.toLocaleString('pt-BR');
 
             // Update store summary
             const summaryEl = el('fcStoreSummary');
             if (summaryEl) {
-                summaryEl.innerHTML = `
-                        <span>Atuais: <strong>${currentStores}</strong></span>
-                        <span>Novas: <strong style="color:#10b981;">+${totalNewStores}</strong></span>
-                        <span>Total: <strong>${currentStores + totalNewStores}</strong></span>
-                        <span>Estoque/loja: <strong style="color:#0000E1;">~${initialStockPerStore.toLocaleString('pt-BR')}</strong></span>
-                        <span>Estoque total novas: <strong style="color:#0000E1;">${totalInitStock.toLocaleString('pt-BR')} pçs</strong></span>
-                    `;
+                summaryEl.innerHTML =
+                    '<span>Atuais: <strong>' + currentStores + '</strong></span>' +
+                    '<span>Novas: <strong style="color:#10b981;">+' + totalNewStores + '</strong></span>' +
+                    '<span>Total: <strong>' + (currentStores + totalNewStores) + '</strong></span>' +
+                    '<span>Estoque/loja: <strong style="color:#0000E1;">~' + initialStockPerStore.toLocaleString('pt-BR') + '</strong> (só A/B/C)</span>' +
+                    '<span>Est. total novas: <strong style="color:#0000E1;">' + totalInitStockPcs.toLocaleString('pt-BR') + ' pçs</strong></span>';
             }
 
             // Render table
@@ -3520,174 +3781,424 @@
             if (tbody) {
                 tbody.innerHTML = monthData.map((m, i) => {
                     const isNewStore = m.newStores > 0;
-                    const bg = isNewStore ? 'background:#10b98108;' : '';
+                    const hasLaunch = m.launches > 0;
+                    const hasOrder = m.orderTotal > 0;
+                    const bg = hasOrder ? 'background:#FC4F0008;' : isNewStore ? 'background:#10b98108;' : hasLaunch ? 'background:#8b5cf608;' : '';
                     const stockColor = m.stockAvail === 0 ? '#ef4444' : m.stockAvail < totalVendaMes * 2 ? '#f59e0b' : '#10b981';
                     const c = 'text-align:center;';
-                    return `<tr style="${bg}">
-                        <td style="${c}"><strong>${m.month}</strong></td>
-                        <td style="${c}">${m.stores}${isNewStore ? ' <span style="color:#10b981;font-size:12px;font-weight:600;">+' + m.newStores + '</span>' : ''}</td>
-                        <td style="${c}">${m.baseDemand.toLocaleString('pt-BR')}</td>
-                        <td style="${c}${m.initStock > 0 ? 'color:#0000E1;font-weight:600;' : ''}">${m.initStock > 0 ? m.initStock.toLocaleString('pt-BR') : '—'}</td>
-                        <td style="${c}${m.rampDemand > 0 ? 'color:#7c3aed;' : ''}">${m.rampDemand > 0 ? m.rampDemand.toLocaleString('pt-BR') : '—'}</td>
-                        <td style="${c}font-weight:600;">${m.totalDemand.toLocaleString('pt-BR')}</td>
-                        <td style="${c}color:${stockColor};font-weight:600;">${m.stockAvail.toLocaleString('pt-BR')}</td>
-                        <td style="${c}${m.needBuy > 0 ? 'color:#ef4444;font-weight:600;' : ''}">${m.needBuy > 0 ? m.needBuy.toLocaleString('pt-BR') : '—'}</td>
-                        <td style="${c}font-weight:600;color:#f59e0b;">${m.accumBuy.toLocaleString('pt-BR')}</td>
-                    </tr>`;
+                    const febBg = m.isFeb ? 'background:#fef2f2;' : '';
+
+                    let orderBreakdown = '';
+                    if (hasOrder) {
+                        const parts = [];
+                        if (m.orderConsumo > 0) parts.push('Repos: ' + m.orderConsumo.toLocaleString('pt-BR'));
+                        if (m.orderInitStock > 0) parts.push('Lojas: ' + m.orderInitStock.toLocaleString('pt-BR'));
+                        if (m.orderLaunches > 0) parts.push('Lanc: ' + m.orderLaunches.toLocaleString('pt-BR'));
+                        orderBreakdown = '<div style="font-size:10px;color:#888;margin-top:2px;">' + parts.join(' | ') + '</div>';
+                    }
+
+                    return '<tr style="' + bg + febBg + '">' +
+                        '<td style="' + c + '"><strong>' + m.month + '</strong>' + (m.isFeb ? ' <span style="font-size:10px;color:#ef4444;">CNY</span>' : '') + '</td>' +
+                        '<td style="' + c + '">' + m.stores + (isNewStore ? ' <span style="color:#10b981;font-size:12px;font-weight:600;">+' + m.newStores + '</span>' : '') + '</td>' +
+                        '<td style="' + c + '">' + m.baseDemand.toLocaleString('pt-BR') + '</td>' +
+                        '<td style="' + c + (m.initStock > 0 ? 'color:#0000E1;font-weight:600;' : '') + '">' + (m.initStock > 0 ? m.initStock.toLocaleString('pt-BR') : '—') + '</td>' +
+                        '<td style="' + c + (hasLaunch ? 'color:#8b5cf6;font-weight:600;' : '') + '">' + (hasLaunch ? m.launchDemand.toLocaleString('pt-BR') + ' pzs' : '—') + '</td>' +
+                        '<td style="' + c + (m.rampDemand > 0 ? 'color:#7c3aed;' : '') + '">' + (m.rampDemand > 0 ? m.rampDemand.toLocaleString('pt-BR') : '—') + '</td>' +
+                        '<td style="' + c + 'font-weight:600;">' + m.totalDemand.toLocaleString('pt-BR') + '</td>' +
+                        '<td style="' + c + 'color:' + stockColor + ';font-weight:600;">' + m.stockAvail.toLocaleString('pt-BR') + '</td>' +
+                        '<td style="' + c + (hasOrder ? 'color:#FC4F00;font-weight:700;font-size:15px;' : '') + '">' + (hasOrder ? m.orderTotal.toLocaleString('pt-BR') + orderBreakdown : '—') + '</td>' +
+                        '<td style="' + c + 'font-size:11px;color:#666;">' + (m.orderDesc || '—') + '</td>' +
+                        '<td style="' + c + 'font-weight:600;color:#f59e0b;">' + m.accumOrder.toLocaleString('pt-BR') + '</td>' +
+                    '</tr>';
                 }).join('');
             }
 
             // Render chart
             renderForecastChart(monthData);
 
-            // Render SKU table (data already calculated above)
+            // Render SKU table
             renderForecastSKU();
         }
 
         function renderForecastChart(monthData) {
-            const canvas = document.getElementById('fcChart');
-            if (!canvas) return;
-
-            if (fcChartInstance) fcChartInstance.destroy();
-
-            const labels = monthData.map(m => m.month);
-            const demandTotal = monthData.map(m => m.totalDemand);
-            const stockAvail = monthData.map(m => m.stockAvail);
-            const needBuy = monthData.map(m => m.needBuy);
-            const accumBuy = monthData.map(m => m.accumBuy);
-
             const fmtK = v => { if (v === 0) return ''; return v >= 1000 ? (v/1000).toFixed(1) + 'K' : v.toString(); };
+            const labels = monthData.map(m => m.month);
+            const totalVendaMes = monthData.length > 0 ? monthData[0].baseDemand : 0;
 
-            fcChartInstance = new Chart(canvas, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Demanda total',
-                            data: demandTotal,
-                            backgroundColor: '#0000E1CC',
-                            borderRadius: 4,
-                            order: 3,
-                            yAxisID: 'yDemand',
-                            barPercentage: 0.7
-                        },
-                        {
-                            label: 'Necessidade compra',
-                            data: needBuy,
-                            backgroundColor: '#FC4F00CC',
-                            borderRadius: 4,
-                            order: 2,
-                            yAxisID: 'yDemand',
-                            barPercentage: 0.7
-                        },
-                        {
-                            label: 'Estoque disponível',
-                            data: stockAvail,
-                            type: 'line',
-                            borderColor: '#10b981',
-                            backgroundColor: '#10b98115',
-                            fill: true,
-                            tension: 0.3,
-                            pointRadius: 5,
-                            pointBackgroundColor: '#10b981',
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            borderWidth: 3,
-                            order: 1,
-                            yAxisID: 'yStock'
-                        },
-                        {
-                            label: 'Compra acumulada',
-                            data: accumBuy,
-                            type: 'line',
-                            borderColor: '#f59e0b',
-                            borderDash: [6, 4],
-                            pointRadius: 4,
-                            pointBackgroundColor: '#f59e0b',
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            borderWidth: 2,
-                            fill: false,
-                            order: 0,
-                            yAxisID: 'yStock'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { intersect: false, mode: 'index' },
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { usePointStyle: true, font: { size: 14, family: 'Poppins', weight: '500' }, padding: 24, pointStyleWidth: 12 }
-                        },
-                        datalabels: {
-                            display: function(ctx) { return true; },
-                            anchor: function(ctx) { return ctx.datasetIndex <= 1 ? 'end' : 'end'; },
-                            align: function(ctx) { return ctx.datasetIndex <= 1 ? 'top' : 'top'; },
-                            offset: 4,
-                            font: function(ctx) { return { size: ctx.datasetIndex <= 1 ? 12 : 11, family: 'Poppins', weight: '600' }; },
-                            color: function(ctx) {
-                                const colors = ['#0000E1', '#FC4F00', '#10b981', '#f59e0b'];
-                                return colors[ctx.datasetIndex] || '#333';
+            // ===== CHART 1: ESTOQUE PROJETADO =====
+            const canvasStock = document.getElementById('fcChartStock');
+            if (canvasStock) {
+                if (fcChartStockInstance) fcChartStockInstance.destroy();
+
+                const stockAvail = monthData.map(m => m.stockAvail);
+                const accumOrder = monthData.map(m => m.accumOrder);
+
+                // Zones: critical (<2M demand), warning (<4M), healthy
+                const zoneCritical = monthData.map(m => totalVendaMes * 2);
+                const zoneWarning = monthData.map(m => totalVendaMes * 4);
+
+                fcChartStockInstance = new Chart(canvasStock, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Estoque dispon\u00edvel',
+                                data: stockAvail,
+                                borderColor: '#10b981',
+                                backgroundColor: '#10b98118',
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 5,
+                                pointBackgroundColor: function(ctx) {
+                                    const v = ctx.raw;
+                                    if (v === 0) return '#ef4444';
+                                    if (v < totalVendaMes * 2) return '#f59e0b';
+                                    return '#10b981';
+                                },
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                borderWidth: 3,
+                                order: 1
                             },
-                            formatter: function(value) { return fmtK(value); }
-                        },
-                        tooltip: {
-                            titleFont: { size: 15, family: 'Poppins', weight: '600' },
-                            bodyFont: { size: 14, family: 'Poppins' },
-                            padding: 14,
-                            boxPadding: 6,
-                            callbacks: {
-                                label: function(ctx) {
-                                    return ' ' + ctx.dataset.label + ': ' + ctx.parsed.y.toLocaleString('pt-BR') + ' pçs';
+                            {
+                                label: 'Pedido acumulado',
+                                data: accumOrder,
+                                borderColor: '#f59e0b',
+                                borderDash: [6, 4],
+                                pointRadius: 3,
+                                pointBackgroundColor: '#f59e0b',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 1,
+                                borderWidth: 2,
+                                fill: false,
+                                order: 0
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'index' },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { usePointStyle: true, font: { size: 12, family: 'Poppins', weight: '500' }, padding: 14, pointStyleWidth: 10 }
+                            },
+                            datalabels: {
+                                display: true,
+                                anchor: 'end',
+                                align: 'top',
+                                offset: 4,
+                                font: { size: 11, family: 'Poppins', weight: '600' },
+                                color: function(ctx) {
+                                    if (ctx.datasetIndex === 1) return '#f59e0b';
+                                    const v = ctx.raw;
+                                    if (v === 0) return '#ef4444';
+                                    if (v < totalVendaMes * 2) return '#f59e0b';
+                                    return '#10b981';
+                                },
+                                formatter: v => fmtK(v)
+                            },
+                            tooltip: {
+                                titleFont: { size: 14, family: 'Poppins', weight: '600' },
+                                bodyFont: { size: 13, family: 'Poppins' },
+                                padding: 14,
+                                boxPadding: 6,
+                                callbacks: {
+                                    label: function(ctx) {
+                                        return ' ' + ctx.dataset.label + ': ' + ctx.parsed.y.toLocaleString('pt-BR') + ' p\u00e7s';
+                                    }
                                 }
                             }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            ticks: { font: { size: 13, family: 'Poppins' }, maxRotation: 45, autoSkip: false },
-                            grid: { display: false }
                         },
-                        yDemand: {
-                            position: 'left',
-                            beginAtZero: true,
-                            title: { display: true, text: 'Demanda (pçs/mês)', font: { size: 13, family: 'Poppins' }, color: '#0000E1' },
-                            ticks: { font: { size: 12, family: 'Poppins' }, color: '#0000E1', callback: v => fmtK(v) },
-                            grid: { color: '#0000E110' }
-                        },
-                        yStock: {
-                            position: 'right',
-                            beginAtZero: true,
-                            title: { display: true, text: 'Estoque / Acumulado (pçs)', font: { size: 13, family: 'Poppins' }, color: '#10b981' },
-                            ticks: { font: { size: 12, family: 'Poppins' }, color: '#10b981', callback: v => fmtK(v) },
-                            grid: { display: false }
+                        scales: {
+                            x: {
+                                ticks: { font: { size: 11, family: 'Poppins' }, maxRotation: 45, autoSkip: false },
+                                grid: { display: false }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Pe\u00e7as', font: { size: 12, family: 'Poppins' }, color: '#10b981' },
+                                ticks: { font: { size: 11, family: 'Poppins' }, color: '#10b981', callback: v => fmtK(v) },
+                                grid: { color: '#10b98110' }
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
+
+            // ===== CHART 2: CONSUMO (sin lanzamientos) =====
+            const canvasDemand = document.getElementById('fcChartDemand');
+            if (canvasDemand) {
+                if (fcChartDemandInstance) fcChartDemandInstance.destroy();
+
+                const demandBase = monthData.map(m => m.baseDemand);
+                const demandInitStock = monthData.map(m => m.initStock);
+                const demandRamp = monthData.map(m => m.rampDemand);
+
+                fcChartDemandInstance = new Chart(canvasDemand, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Consumo org\u00e2nico',
+                                data: demandBase,
+                                backgroundColor: '#0000E1CC',
+                                borderRadius: { topLeft: 0, topRight: 0, bottomLeft: 4, bottomRight: 4 },
+                                order: 4,
+                                barPercentage: 0.75,
+                                stack: 'consumption'
+                            },
+                            {
+                                label: 'Est. inicial lojas novas',
+                                data: demandInitStock,
+                                backgroundColor: '#0ea5e9CC',
+                                borderRadius: 0,
+                                order: 4,
+                                barPercentage: 0.75,
+                                stack: 'consumption'
+                            },
+                            {
+                                label: 'Ramp-up',
+                                data: demandRamp,
+                                backgroundColor: '#f59e0bCC',
+                                borderRadius: { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 },
+                                order: 4,
+                                barPercentage: 0.75,
+                                stack: 'consumption'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'index' },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { usePointStyle: true, font: { size: 11, family: 'Poppins', weight: '500' }, padding: 10, pointStyleWidth: 10 }
+                            },
+                            datalabels: {
+                                display: function(ctx) {
+                                    // Show total on top segment only
+                                    if (ctx.datasetIndex === 2 && ctx.dataset.data[ctx.dataIndex] > 0) return true;
+                                    if (ctx.datasetIndex === 1 && ctx.dataset.data[ctx.dataIndex] > 0 && monthData[ctx.dataIndex].rampDemand === 0) return true;
+                                    if (ctx.datasetIndex === 0 && monthData[ctx.dataIndex].initStock === 0 && monthData[ctx.dataIndex].rampDemand === 0) return true;
+                                    return false;
+                                },
+                                anchor: 'end',
+                                align: 'top',
+                                offset: 4,
+                                font: { size: 10, family: 'Poppins', weight: '600' },
+                                color: '#0000E1',
+                                formatter: function(value, ctx) {
+                                    const md = monthData[ctx.dataIndex];
+                                    // Total consumption = base + initStock + ramp (NO launches)
+                                    return fmtK(md.baseDemand + md.initStock + md.rampDemand);
+                                }
+                            },
+                            tooltip: {
+                                titleFont: { size: 13, family: 'Poppins', weight: '600' },
+                                bodyFont: { size: 12, family: 'Poppins' },
+                                padding: 12,
+                                boxPadding: 4,
+                                callbacks: {
+                                    label: function(ctx) {
+                                        return ' ' + ctx.dataset.label + ': ' + ctx.parsed.y.toLocaleString('pt-BR') + ' p\u00e7s';
+                                    },
+                                    afterBody: function(tooltipItems) {
+                                        const idx = tooltipItems[0].dataIndex;
+                                        const md = monthData[idx];
+                                        const total = md.baseDemand + md.initStock + md.rampDemand;
+                                        return ['', 'Total consumo: ' + total.toLocaleString('pt-BR') + ' p\u00e7s'];
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                stacked: true,
+                                ticks: { font: { size: 10, family: 'Poppins' }, maxRotation: 45, autoSkip: false },
+                                grid: { display: false }
+                            },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                title: { display: true, text: 'Consumo (p\u00e7s/m\u00eas)', font: { size: 11, family: 'Poppins' }, color: '#0000E1' },
+                                ticks: { font: { size: 10, family: 'Poppins' }, color: '#0000E1', callback: v => fmtK(v) },
+                                grid: { color: '#0000E110' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // ===== CHART 3: PLANO DE COMPRAS =====
+            const canvasOrders = document.getElementById('fcChartOrders');
+            if (canvasOrders) {
+                if (fcChartOrdersInstance) fcChartOrdersInstance.destroy();
+
+                const orderConsumo = monthData.map(m => m.orderConsumo || 0);
+                const orderInitStock = monthData.map(m => m.orderInitStock || 0);
+                const orderLaunches = monthData.map(m => m.orderLaunches || 0);
+                const accumOrder = monthData.map(m => m.accumOrder);
+
+                fcChartOrdersInstance = new Chart(canvasOrders, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Compra: reposi\u00e7\u00e3o',
+                                data: orderConsumo,
+                                backgroundColor: '#FC4F00CC',
+                                borderRadius: { topLeft: 0, topRight: 0, bottomLeft: 4, bottomRight: 4 },
+                                order: 3,
+                                yAxisID: 'yOrder',
+                                barPercentage: 0.75,
+                                stack: 'order'
+                            },
+                            {
+                                label: 'Compra: lojas novas',
+                                data: orderInitStock,
+                                backgroundColor: '#0ea5e9CC',
+                                borderRadius: 0,
+                                order: 3,
+                                yAxisID: 'yOrder',
+                                barPercentage: 0.75,
+                                stack: 'order'
+                            },
+                            {
+                                label: 'Compra: lan\u00e7amentos',
+                                data: orderLaunches,
+                                backgroundColor: '#8b5cf6CC',
+                                borderRadius: { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 },
+                                order: 3,
+                                yAxisID: 'yOrder',
+                                barPercentage: 0.75,
+                                stack: 'order'
+                            },
+                            {
+                                label: 'Pedido acumulado',
+                                data: accumOrder,
+                                type: 'line',
+                                borderColor: '#f59e0b',
+                                borderDash: [6, 4],
+                                pointRadius: 3,
+                                pointBackgroundColor: '#f59e0b',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 1,
+                                borderWidth: 2,
+                                fill: false,
+                                order: 0,
+                                yAxisID: 'yAccum'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'index' },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { usePointStyle: true, font: { size: 11, family: 'Poppins', weight: '500' }, padding: 10, pointStyleWidth: 10 }
+                            },
+                            datalabels: {
+                                display: function(ctx) {
+                                    if (ctx.datasetIndex === 2 && monthData[ctx.dataIndex].orderTotal > 0) return true;
+                                    if (ctx.datasetIndex === 1 && ctx.dataset.data[ctx.dataIndex] > 0 && monthData[ctx.dataIndex].orderLaunches === 0) return true;
+                                    if (ctx.datasetIndex === 0 && ctx.dataset.data[ctx.dataIndex] > 0 && monthData[ctx.dataIndex].orderInitStock === 0 && monthData[ctx.dataIndex].orderLaunches === 0) return true;
+                                    if (ctx.datasetIndex === 3) return true;
+                                    return false;
+                                },
+                                anchor: 'end',
+                                align: 'top',
+                                offset: 4,
+                                font: { size: 10, family: 'Poppins', weight: '600' },
+                                color: function(ctx) {
+                                    const colors = ['#FC4F00', '#0ea5e9', '#8b5cf6', '#f59e0b'];
+                                    return colors[ctx.datasetIndex] || '#333';
+                                },
+                                formatter: function(value, ctx) {
+                                    if (ctx.datasetIndex <= 2) {
+                                        const md = monthData[ctx.dataIndex];
+                                        if (md) return fmtK(md.orderTotal);
+                                    }
+                                    return fmtK(value);
+                                }
+                            },
+                            tooltip: {
+                                titleFont: { size: 13, family: 'Poppins', weight: '600' },
+                                bodyFont: { size: 12, family: 'Poppins' },
+                                padding: 12,
+                                boxPadding: 4,
+                                callbacks: {
+                                    label: function(ctx) {
+                                        return ' ' + ctx.dataset.label + ': ' + ctx.parsed.y.toLocaleString('pt-BR') + ' p\u00e7s';
+                                    },
+                                    afterBody: function(tooltipItems) {
+                                        const idx = tooltipItems[0].dataIndex;
+                                        const md = monthData[idx];
+                                        if (md && md.orderDesc) return ['', '\u27a1 ' + md.orderDesc];
+                                        return [];
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                stacked: true,
+                                ticks: { font: { size: 10, family: 'Poppins' }, maxRotation: 45, autoSkip: false },
+                                grid: { display: false }
+                            },
+                            yOrder: {
+                                stacked: true,
+                                position: 'left',
+                                beginAtZero: true,
+                                title: { display: true, text: 'Compra (p\u00e7s/m\u00eas)', font: { size: 11, family: 'Poppins' }, color: '#FC4F00' },
+                                ticks: { font: { size: 10, family: 'Poppins' }, color: '#FC4F00', callback: v => fmtK(v) },
+                                grid: { color: '#FC4F0010' }
+                            },
+                            yAccum: {
+                                position: 'right',
+                                beginAtZero: true,
+                                title: { display: true, text: 'Acumulado (p\u00e7s)', font: { size: 11, family: 'Poppins' }, color: '#f59e0b' },
+                                ticks: { font: { size: 10, family: 'Poppins' }, color: '#f59e0b', callback: v => fmtK(v) },
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            }
         }
 
         function downloadForecastXlsx() {
             const rows = document.querySelectorAll('#fcTableBody tr');
-            const data = [['Mes', 'Tiendas', 'Demanda Base', 'Stock Inicial', 'Ramp-up', 'Demanda Total', 'Stock Disponible', 'Necesidad Compra', 'Compra Acumulada']];
+            const data = [['Mes', 'Tiendas', 'Demanda Base', 'Est. Inicial', 'Lanzamientos', 'Ramp-up', 'Demanda Total', 'Est. Disponible', 'Pedir (pzs)', 'Chega em', 'Pedido Acum.']];
 
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
-                if (cells.length < 9) return;
+                if (cells.length < 11) return;
+                const parseNum = (cell) => {
+                    const t = cell.textContent.trim();
+                    if (t === '—' || t === '') return 0;
+                    return parseInt(t.replace(/\./g, '').replace(/[^\d-]/g, '')) || 0;
+                };
                 data.push([
                     cells[0].textContent.trim(),
                     parseInt(cells[1].textContent) || 0,
-                    parseInt(cells[2].textContent.replace(/\./g, '')) || 0,
-                    cells[3].textContent.trim() === '—' ? 0 : parseInt(cells[3].textContent.replace(/\./g, '')) || 0,
-                    cells[4].textContent.trim() === '—' ? 0 : parseInt(cells[4].textContent.replace(/\./g, '')) || 0,
-                    parseInt(cells[5].textContent.replace(/\./g, '')) || 0,
-                    parseInt(cells[6].textContent.replace(/\./g, '')) || 0,
-                    cells[7].textContent.trim() === '—' ? 0 : parseInt(cells[7].textContent.replace(/\./g, '')) || 0,
-                    parseInt(cells[8].textContent.replace(/\./g, '')) || 0
+                    parseNum(cells[2]),
+                    parseNum(cells[3]),
+                    cells[4].textContent.trim() === '—' ? 0 : cells[4].textContent.trim(),
+                    parseNum(cells[5]),
+                    parseNum(cells[6]),
+                    parseNum(cells[7]),
+                    parseNum(cells[8]),
+                    cells[9].textContent.trim() === '—' ? '' : cells[9].textContent.trim(),
+                    parseNum(cells[10])
                 ]);
             });
 
@@ -3695,11 +4206,11 @@
             const ws = XLSX.utils.aoa_to_sheet(data);
 
             const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 11 }, fill: { fgColor: { rgb: '0000E1' } }, alignment: { horizontal: 'center' } };
-            for (let c = 0; c < 9; c++) {
+            for (let c = 0; c < 11; c++) {
                 const ref = XLSX.utils.encode_cell({ r: 0, c: c });
                 if (ws[ref]) ws[ref].s = headerStyle;
             }
-            ws['!cols'] = [{ wch: 14 }, { wch: 10 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 16 }, { wch: 16 }, { wch: 16 }];
+            ws['!cols'] = [{ wch: 14 }, { wch: 10 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 16 }, { wch: 16 }, { wch: 18 }, { wch: 14 }];
 
             XLSX.utils.book_append_sheet(wb, ws, 'Previsão Compras');
             XLSX.writeFile(wb, 'pronostico-compras-15m.xlsx');
@@ -3740,13 +4251,15 @@
                     <td style="text-align:center;font-weight:600;color:${cobColor};">${cobStr}</td>
                     <td style="text-align:center;">${item.demanda15.toLocaleString('pt-BR')}</td>
                     <td style="text-align:center;font-weight:600;color:${item.compraNecesaria > 0 ? '#ef4444' : '#10b981'};">${item.compraNecesaria > 0 ? item.compraNecesaria.toLocaleString('pt-BR') : '—'}</td>
+                    <td style="text-align:center;font-size:11px;color:#FC4F00;">${item.compraConsumo > 0 ? item.compraConsumo.toLocaleString('pt-BR') : '—'}</td>
+                    <td style="text-align:center;font-size:11px;color:#0ea5e9;">${item.compraInitStock > 0 ? item.compraInitStock.toLocaleString('pt-BR') : '—'}</td>
                     <td style="text-align:center;font-weight:600;color:${fbmColor};">${fbm}</td>
                     <td style="text-align:center;"><span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:12px;font-weight:600;color:white;background:${item.prioColor};">${item.prioridad}</span></td>
                 </tr>`;
             }).join('');
 
             if (filtered.length > 200) {
-                tbody.innerHTML += '<tr><td colspan="11" style="text-align:center;color:var(--text-secondary);padding:12px;">... mostrando 200 de ' + filtered.length + ' SKUs. Use filtros para refinar.</td></tr>';
+                tbody.innerHTML += '<tr><td colspan="13" style="text-align:center;color:var(--text-secondary);padding:12px;">... mostrando 200 de ' + filtered.length + ' SKUs. Use filtros para refinar.</td></tr>';
             }
         }
 
@@ -3759,17 +4272,17 @@
 
             const data = [['SKU', 'Produto', 'Curva', 'Venda/Mês', 'Estoque', 'Import.', 'Cob.', 'Demanda', 'Compra Necessária', 'Esgota em (mês)', 'Prioridade']];
             filtered.forEach(d => {
-                data.push([d.sku, d.nome_produto, d.curva, Math.round(d.vendaMedia * 10) / 10, d.estoqueMatriz, d.importacoes || 0, d.coberturaMeses === Infinity ? 999 : Math.round(d.coberturaMeses * 10) / 10, d.demanda15, d.compraNecesaria, d.firstBuyMonth >= 0 ? d.firstBuyMonth + 1 : '', d.prioridad]);
+                data.push([d.sku, d.nome_produto, d.curva, Math.round(d.vendaMedia * 10) / 10, d.estoqueMatriz, d.importacoes || 0, d.coberturaMeses === Infinity ? 999 : Math.round(d.coberturaMeses * 10) / 10, d.demanda15, d.compraNecesaria, d.compraConsumo || 0, d.compraInitStock || 0, d.firstBuyMonth >= 0 ? d.firstBuyMonth + 1 : '', d.prioridad]);
             });
 
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet(data);
             const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' }, sz: 11 }, fill: { fgColor: { rgb: '0000E1' } }, alignment: { horizontal: 'center' } };
-            for (let c = 0; c < 11; c++) {
+            for (let c = 0; c < 13; c++) {
                 const ref = XLSX.utils.encode_cell({ r: 0, c: c });
                 if (ws[ref]) ws[ref].s = headerStyle;
             }
-            ws['!cols'] = [{ wch: 14 }, { wch: 30 }, { wch: 7 }, { wch: 10 }, { wch: 12 }, { wch: 10 }, { wch: 14 }, { wch: 16 }, { wch: 10 }];
+            ws['!cols'] = [{ wch: 14 }, { wch: 30 }, { wch: 7 }, { wch: 10 }, { wch: 12 }, { wch: 10 }, { wch: 7 }, { wch: 12 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 14 }, { wch: 12 }];
             XLSX.utils.book_append_sheet(wb, ws, 'Pronóstico SKU');
             XLSX.writeFile(wb, 'pronostico-por-sku.xlsx');
         }
@@ -4009,7 +4522,7 @@
         function renderPurchaseSuggestion(data) {
             const families = {};
             data.forEach(d => {
-                if (!d.familia || d.curva === 'D') return;
+                if (!d.familia || d.curva === 'C' || d.curva === 'D') return;
                 if (!families[d.familia]) families[d.familia] = { name: d.familia, skus: [], urgency: 0, totalNeed: 0 };
                 families[d.familia].skus.push(d);
                 if (d.coberturaMeses < 4 && d.vendaMedia > 0) {
@@ -4138,22 +4651,23 @@
 
         // ==================== REPOSICAO (enhanced) ====================
         function renderReposicao(data) {
+            window._allData = data;
             // NEW: render conversions and purchase suggestion
             renderConversions(data);
             renderPurchaseSuggestion(data);
             
             // Existing reposition table logic
-            const abcSKUs = data.filter(d => d.curva === 'A' || d.curva === 'B' || d.curva === 'C');
+            const abSKUs = data.filter(d => d.curva === 'A' || d.curva === 'B');
             const cobEfetiva = (d) => d.vendaMedia > 0 ? (d.estoqueMatriz + (d.importacoesPendentes || 0)) / d.vendaMedia : Infinity;
-            const critical = abcSKUs.filter(d => cobEfetiva(d) < 2);
-            const alert = abcSKUs.filter(d => cobEfetiva(d) >= 2 && cobEfetiva(d) < 4);
+            const critical = abSKUs.filter(d => cobEfetiva(d) < 2);
+            const alert = abSKUs.filter(d => cobEfetiva(d) >= 2 && cobEfetiva(d) < 4);
 
             const repEl = id => document.getElementById(id);
-            if (repEl('repPortfolioActive')) repEl('repPortfolioActive').textContent = abcSKUs.length;
+            if (repEl('repPortfolioActive')) repEl('repPortfolioActive').textContent = abSKUs.length;
             if (repEl('repCriticalCount')) repEl('repCriticalCount').textContent = critical.length;
             if (repEl('repAlertCount')) repEl('repAlertCount').textContent = alert.length;
 
-            const toReorder = data.filter(d => (d.curva === 'A' || d.curva === 'B' || d.curva === 'C') && cobEfetiva(d) < 8 && cobEfetiva(d) !== Infinity)
+            const toReorder = data.filter(d => (d.curva === 'A' || d.curva === 'B') && cobEfetiva(d) < 8 && cobEfetiva(d) !== Infinity)
                 .sort((a, b) => cobEfetiva(a) - cobEfetiva(b));
 
             const tbody = document.getElementById('reposicaoBody');
@@ -4401,97 +4915,267 @@
 
             const now = new Date();
             const ts = now.getFullYear().toString().slice(2) + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + String(now.getHours()).padStart(2,'0') + String(now.getMinutes()).padStart(2,'0');
-            const fileName = `OC${ts}.xlsx`;
+            const fileName = `Proposta_Compra_China_${ts}.xlsx`;
 
-            const headerStyle = { font: { bold: true, color: { rgb: 'FFFFFF' }, name: 'Calibri', sz: 11 }, fill: { fgColor: { rgb: '0000E1' } }, alignment: { horizontal: 'center' }, border: { bottom: { style: 'thin', color: { rgb: '000000' } } } };
-            const cellStyle = { font: { name: 'Calibri', sz: 11 }, alignment: { horizontal: 'left' }, border: { bottom: { style: 'thin', color: { rgb: 'E0E0E0' } } } };
-            const numStyle = { ...cellStyle, alignment: { horizontal: 'center' } };
+            // Styles
+            const hdrMain = { font: { bold: true, color: { rgb: 'FFFFFF' }, name: 'Arial', sz: 11 }, fill: { fgColor: { rgb: '0000E1' } }, alignment: { horizontal: 'center', vertical: 'center', wrapText: true }, border: { bottom: { style: 'thin', color: { rgb: '000000' } } } };
+            const hdrGreen = { font: { bold: true, color: { rgb: 'FFFFFF' }, name: 'Arial', sz: 11 }, fill: { fgColor: { rgb: '217346' } }, alignment: { horizontal: 'center', vertical: 'center', wrapText: true }, border: { bottom: { style: 'thin', color: { rgb: '000000' } } } };
+            const hdrGray = { font: { bold: true, color: { rgb: 'FFFFFF' }, name: 'Arial', sz: 10 }, fill: { fgColor: { rgb: '555555' } }, alignment: { horizontal: 'center', vertical: 'center' }, border: { bottom: { style: 'thin', color: { rgb: '333333' } } } };
+            const cell = { font: { name: 'Arial', sz: 10 }, alignment: { horizontal: 'left', vertical: 'center' }, border: { bottom: { style: 'thin', color: { rgb: 'E8E8E8' } } } };
+            const cellC = { ...cell, alignment: { horizontal: 'center', vertical: 'center' } };
+            const cellR = { ...cell, alignment: { horizontal: 'right', vertical: 'center' } };
+            const cellBold = { font: { name: 'Arial', sz: 10, bold: true }, alignment: { horizontal: 'right', vertical: 'center' }, border: { top: { style: 'medium', color: { rgb: '0000E1' } }, bottom: { style: 'medium', color: { rgb: '0000E1' } } } };
+            const titleStyle = { font: { bold: true, sz: 16, name: 'Arial', color: { rgb: '0000E1' } } };
+            const subtitleStyle = { font: { bold: true, sz: 12, name: 'Arial', color: { rgb: '333333' } } };
+            const paramLabel = { font: { name: 'Arial', sz: 10, color: { rgb: '666666' } }, alignment: { horizontal: 'left' } };
+            const paramValue = { font: { name: 'Arial', sz: 10, bold: true }, alignment: { horizontal: 'left' } };
+            const criticalBg = { fill: { fgColor: { rgb: 'FEF2F2' } } };
+            const urgentBg = { fill: { fgColor: { rgb: 'FFFBEB' } } };
 
-            const rows = [['Código Barras', 'SKU', 'Produto', 'Família', 'Classe', 'Curva', 'Venda/Mês', 'Est. Matriz', 'Cob. Atual', 'Qtd Compra']];
-            let totalQtd = 0;
+            // Build global ranking
+            const allData = window._allData || [];
+            const allWithSales = allData.filter(d => d.vendaMedia > 0).sort((a, b) => b.vendaMedia - a.vendaMedia);
+            const totalMonthlySales = allWithSales.reduce((s, d) => s + d.vendaMedia, 0);
+            const skuRankMap = {};
+            allWithSales.forEach((d, idx) => {
+                skuRankMap[d.sku] = { rank: idx + 1, share: totalMonthlySales > 0 ? (d.vendaMedia / totalMonthlySales * 100) : 0 };
+            });
 
+            const cobEfetiva = (d) => d.vendaMedia > 0 ? (d.estoqueMatriz + (d.importacoesPendentes || 0)) / d.vendaMedia : Infinity;
+            const leadTimeDays = parseInt((document.getElementById('fcLeadTime') || {}).value) || 120;
+            const arrivalDate = new Date(now.getTime() + leadTimeDays * 86400000);
+
+            const wb = XLSX.utils.book_new();
+
+            // ===== SHEET 1: RESUMO EJECUTIVO =====
+            const s1 = [];
+            s1.push(['PROPOSTA DE COMPRA — IMPORTAÇÃO CHINA']);
+            s1.push(['']);
+            s1.push(['Parâmetro', 'Valor']);
+            s1.push(['Data de emissão', now.toLocaleDateString('pt-BR')]);
+            s1.push(['Lead time', leadTimeDays + ' dias']);
+            const crossesFeb = (function() { let d = new Date(now); const end = arrivalDate; while (d <= end) { if (d.getMonth() === 1) return true; d.setMonth(d.getMonth() + 1); d.setDate(1); } return false; })();
+            const effectiveLT = crossesFeb ? leadTimeDays + 30 : leadTimeDays;
+            if (crossesFeb) s1.push(['Lead time efetivo (CNY +30d)', effectiveLT + ' dias']);
+            s1.push(['Data estimada chegada', arrivalDate.toLocaleDateString('pt-BR')]);
+            s1.push(['MOQ por família', '300 pçs']);
+            s1.push(['MOQ por SKU', '100 pçs']);
+            s1.push(['Cobertura objetivo', '8 meses']);
+            s1.push(['Famílias incluídas', allocs.length]);
+            const totalPcsAll = allocs.reduce((s, f) => s + f.allocations.reduce((ss, a) => ss + a.qtd, 0), 0);
+            const totalSkusAll = allocs.reduce((s, f) => s + f.allocations.length, 0);
+            s1.push(['Total peças', totalPcsAll]);
+            s1.push(['Total SKUs', totalSkusAll]);
+            const totalShareAll = allocs.reduce((s, f) => s + f.allocations.reduce((ss, a) => { const info = skuRankMap[a.sku.sku]; return ss + (info ? info.share : 0); }, 0), 0);
+            s1.push(['Share vendas recuperado', totalShareAll.toFixed(1) + '%']);
+            s1.push(['']);
+            s1.push(['DETALLE POR FAMÍLIA']);
+            s1.push(['Família', 'Urgência', 'SKUs', 'Peças', 'Share Vendas', 'SKU mais urgente', 'Cobertura atual']);
+            allocs.forEach(fam => {
+                const famQtd = fam.allocations.reduce((ss, a) => ss + a.qtd, 0);
+                const famShare = fam.allocations.reduce((ss, a) => { const info = skuRankMap[a.sku.sku]; return ss + (info ? info.share : 0); }, 0);
+                const mostUrg = fam.allocations.length > 0 ? fam.allocations[0].sku : null;
+                const urgLabel = mostUrg && mostUrg.coberturaMeses < 2 ? 'CRÍTICO' : mostUrg && mostUrg.coberturaMeses < 4 ? 'URGENTE' : 'PREVENTIVA';
+                const urgCob = mostUrg ? (mostUrg.coberturaMeses === Infinity ? '∞' : mostUrg.coberturaMeses.toFixed(1) + 'M') : '-';
+                s1.push([fam.familia, urgLabel, fam.allocations.length, famQtd, famShare.toFixed(1) + '%', mostUrg ? (mostUrg.nome_produto || mostUrg.sku) : '-', urgCob]);
+            });
+
+            const ws1 = XLSX.utils.aoa_to_sheet(s1);
+            ws1['!cols'] = [{ wch: 28 }, { wch: 14 }, { wch: 8 }, { wch: 10 }, { wch: 14 }, { wch: 32 }, { wch: 14 }];
+            const t1 = ws1[XLSX.utils.encode_cell({ r: 0, c: 0 })];
+            if (t1) t1.s = titleStyle;
+            const paramRow = ws1[XLSX.utils.encode_cell({ r: 2, c: 0 })];
+            if (paramRow) { paramRow.s = hdrGray; const v = ws1[XLSX.utils.encode_cell({ r: 2, c: 1 })]; if (v) v.s = hdrGray; }
+            for (let r = 3; r <= 13; r++) {
+                const lbl = ws1[XLSX.utils.encode_cell({ r, c: 0 })];
+                const val = ws1[XLSX.utils.encode_cell({ r, c: 1 })];
+                if (lbl) lbl.s = paramLabel;
+                if (val) val.s = paramValue;
+            }
+            const detHdrRow = s1.findIndex(r => r[0] === 'Família');
+            if (detHdrRow >= 0) {
+                for (let c = 0; c < 7; c++) {
+                    const hc = ws1[XLSX.utils.encode_cell({ r: detHdrRow, c })];
+                    if (hc) hc.s = hdrMain;
+                }
+                for (let r = detHdrRow + 1; r < s1.length; r++) {
+                    for (let c = 0; c < 7; c++) {
+                        const dc = ws1[XLSX.utils.encode_cell({ r, c })];
+                        if (dc) dc.s = c >= 2 ? cellC : cell;
+                    }
+                }
+            }
+            XLSX.utils.book_append_sheet(wb, ws1, 'Resumo Ejecutivo');
+
+            // ===== SHEET 2: ORDEN DE COMPRA (all SKUs flat) =====
+            const s2 = [['#', 'Código Barras', 'SKU', 'Produto', 'Família', 'Classe', 'Curva', 'Rank Global', 'Share Vendas', 'Venda/Mês', 'Est. Matriz', 'Import. Pendente', 'Cob. Atual (meses)', 'Cob. Efetiva', 'Qtd Compra', 'Cob. Pós-Compra']];
+            let rowNum = 0;
             allocs.forEach(fam => {
                 fam.allocations.forEach(a => {
-                    rows.push([
+                    rowNum++;
+                    const info = skuRankMap[a.sku.sku] || { rank: '-', share: 0 };
+                    const cobAtual = a.sku.coberturaMeses === Infinity ? 'N/A' : +a.sku.coberturaMeses.toFixed(1);
+                    const efet = cobEfetiva(a.sku);
+                    const cobEfStr = efet === Infinity ? 'N/A' : +efet.toFixed(1);
+                    const cobPos = a.sku.vendaMedia > 0 ? +((a.sku.estoqueMatriz + (a.sku.importacoesPendentes || 0) + a.qtd) / a.sku.vendaMedia).toFixed(1) : 'N/A';
+                    s2.push([
+                        rowNum,
                         a.sku.codigo_barras || '',
                         a.sku.sku || '',
                         a.sku.nome_produto || '',
                         fam.familia,
                         a.sku.descricao_classe || '',
                         a.sku.curva || '',
+                        typeof info.rank === 'number' ? info.rank : '-',
+                        +info.share.toFixed(2),
                         Math.round(a.sku.vendaMedia),
                         a.sku.estoqueMatriz,
-                        a.sku.coberturaMeses === Infinity ? 'N/A' : a.sku.coberturaMeses.toFixed(1) + 'M',
-                        a.qtd
+                        a.sku.importacoesPendentes || 0,
+                        cobAtual,
+                        cobEfStr,
+                        a.qtd,
+                        cobPos
                     ]);
-                    totalQtd += a.qtd;
                 });
             });
+            s2.push(['', '', '', '', '', '', '', '', '', '', '', '', '', 'TOTAL', totalPcsAll, '']);
 
-            // Add total row
-            rows.push(['', '', '', '', '', '', '', '', 'TOTAL', totalQtd]);
-
-            const ws = XLSX.utils.aoa_to_sheet(rows);
-
-            // Column widths
-            ws['!cols'] = [
-                { wch: 18 }, // Codigo Barras
-                { wch: 14 }, // SKU
-                { wch: 35 }, // Produto
-                { wch: 14 }, // Familia
-                { wch: 16 }, // Classe
-                { wch: 6 },  // Curva
-                { wch: 10 }, // Venda/Mes
-                { wch: 10 }, // Est Matriz
-                { wch: 10 }, // Cob Atual
-                { wch: 12 }, // Qtd Compra
+            const ws2 = XLSX.utils.aoa_to_sheet(s2);
+            ws2['!cols'] = [
+                { wch: 4 }, { wch: 18 }, { wch: 14 }, { wch: 32 }, { wch: 14 }, { wch: 16 }, { wch: 6 },
+                { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 14 }
             ];
-
-            // Style headers
-            for (let c = 0; c < 10; c++) {
-                const cell = ws[XLSX.utils.encode_cell({ r: 0, c })];
-                if (cell) cell.s = headerStyle;
+            for (let c = 0; c < 16; c++) {
+                const hc = ws2[XLSX.utils.encode_cell({ r: 0, c })];
+                if (hc) hc.s = hdrMain;
             }
-
-            // Style data rows
-            for (let r = 1; r < rows.length; r++) {
-                for (let c = 0; c < 10; c++) {
-                    const cell = ws[XLSX.utils.encode_cell({ r, c })];
-                    if (cell) {
-                        cell.s = (c >= 6) ? numStyle : cellStyle;
-                        // Bold total row
-                        if (r === rows.length - 1) cell.s = { ...cell.s, font: { ...cell.s.font, bold: true } };
+            for (let r = 1; r < s2.length; r++) {
+                const isTotal = r === s2.length - 1;
+                for (let c = 0; c < 16; c++) {
+                    const dc = ws2[XLSX.utils.encode_cell({ r, c })];
+                    if (dc) {
+                        if (isTotal) { dc.s = cellBold; }
+                        else {
+                            const cob = s2[r][12];
+                            const bgExtra = typeof cob === 'number' && cob < 2 ? criticalBg : typeof cob === 'number' && cob < 4 ? urgentBg : {};
+                            dc.s = c >= 7 ? { ...cellC, ...bgExtra } : { ...cell, ...bgExtra };
+                        }
                     }
                 }
             }
+            ws2['!autofilter'] = { ref: 'A1:P' + s2.length };
+            XLSX.utils.book_append_sheet(wb, ws2, 'Orden de Compra');
 
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Orden Compra');
+            // ===== SHEET 3: TODOS SKUs QUE NECESITAN REPOSICIÓN =====
+            const allAB = (allData.length > 0 ? allData : []).filter(d => (d.curva === 'A' || d.curva === 'B') && cobEfetiva(d) < 8 && d.vendaMedia > 0)
+                .sort((a, b) => cobEfetiva(a) - cobEfetiva(b));
+            if (allAB.length > 0) {
+                const s3 = [['SKU', 'Produto', 'Família', 'Classe', 'Curva', 'Rank Global', 'Share %', 'Venda/Mês', 'Est. Matriz', 'Import. Pend.', 'Cob. Efetiva', 'Qtd p/ 8M', 'Incluido na OC?']];
+                const ocsSkus = new Set();
+                allocs.forEach(f => f.allocations.forEach(a => ocsSkus.add(a.sku.sku)));
+                allAB.forEach(d => {
+                    const efet = cobEfetiva(d);
+                    const info = skuRankMap[d.sku] || { rank: '-', share: 0 };
+                    const needed = Math.max(0, Math.ceil((8 - efet) * d.vendaMedia));
+                    s3.push([
+                        d.sku,
+                        d.nome_produto || '',
+                        d.familia || '',
+                        d.descricao_classe || '',
+                        d.curva,
+                        typeof info.rank === 'number' ? info.rank : '-',
+                        +info.share.toFixed(2),
+                        Math.round(d.vendaMedia),
+                        d.estoqueMatriz,
+                        d.importacoesPendentes || 0,
+                        +efet.toFixed(1),
+                        needed,
+                        ocsSkus.has(d.sku) ? 'SÍ' : 'NO'
+                    ]);
+                });
 
-            // Add summary sheet
-            const summaryRows = [
-                ['ORDEN DE COMPRA — SUGESTÃO AUTOMÁTICA'],
-                [''],
-                ['Fecha', now.toLocaleDateString('pt-BR')],
-                ['Total Peças', totalQtd],
-                ['Famílias', allocs.map(a => a.familia).join(', ')],
-                ['MOQ por Família', 300],
-                ['Lead Time', '4 meses'],
-                ['Cobertura Objetivo', '8 meses'],
-                [''],
-                ['DETALLE POR FAMÍLIA'],
-            ];
-            allocs.forEach(fam => {
-                const famQtd = fam.allocations.reduce((s, a) => s + a.qtd, 0);
-                summaryRows.push([fam.familia, famQtd + ' pzs', fam.allocations.length + ' SKUs']);
+                const ws3 = XLSX.utils.aoa_to_sheet(s3);
+                ws3['!cols'] = [
+                    { wch: 14 }, { wch: 32 }, { wch: 14 }, { wch: 16 }, { wch: 6 }, { wch: 10 },
+                    { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 11 }, { wch: 11 }, { wch: 10 }, { wch: 12 }
+                ];
+                for (let c = 0; c < 13; c++) {
+                    const hc = ws3[XLSX.utils.encode_cell({ r: 0, c })];
+                    if (hc) hc.s = hdrGreen;
+                }
+                for (let r = 1; r < s3.length; r++) {
+                    for (let c = 0; c < 13; c++) {
+                        const dc = ws3[XLSX.utils.encode_cell({ r, c })];
+                        if (dc) {
+                            const cob = s3[r][10];
+                            const bgE = typeof cob === 'number' && cob < 2 ? criticalBg : typeof cob === 'number' && cob < 4 ? urgentBg : {};
+                            dc.s = c >= 5 ? { ...cellC, ...bgE } : { ...cell, ...bgE };
+                        }
+                    }
+                }
+                ws3['!autofilter'] = { ref: 'A1:M' + s3.length };
+                XLSX.utils.book_append_sheet(wb, ws3, 'Todos SKUs Reposição');
+            }
+
+            // ===== SHEET 4: DETALLE POR FAMILIA (one section per family) =====
+            const s4 = [];
+            allocs.forEach((fam, fi) => {
+                if (fi > 0) s4.push(['']); // spacer
+                const famQtd = fam.allocations.reduce((ss, a) => ss + a.qtd, 0);
+                const famShare = fam.allocations.reduce((ss, a) => { const info = skuRankMap[a.sku.sku]; return ss + (info ? info.share : 0); }, 0);
+                s4.push(['FAMÍLIA #' + (fi + 1) + ': ' + fam.familia, '', 'Peças: ' + famQtd, 'Share: ' + famShare.toFixed(1) + '%']);
+                s4.push(['SKU', 'Produto', 'Curva', 'Rank', 'Share %', 'Venda/Mês', 'Est. Matriz', 'Cob. Atual', 'Qtd Compra', 'Cob. Pós']);
+                fam.allocations.forEach(a => {
+                    const info = skuRankMap[a.sku.sku] || { rank: '-', share: 0 };
+                    const cobPos = a.sku.vendaMedia > 0 ? +((a.sku.estoqueMatriz + (a.sku.importacoesPendentes || 0) + a.qtd) / a.sku.vendaMedia).toFixed(1) : 'N/A';
+                    s4.push([
+                        a.sku.sku,
+                        a.sku.nome_produto || '',
+                        a.sku.curva,
+                        typeof info.rank === 'number' ? info.rank : '-',
+                        +info.share.toFixed(2),
+                        Math.round(a.sku.vendaMedia),
+                        a.sku.estoqueMatriz,
+                        a.sku.coberturaMeses === Infinity ? 'N/A' : +a.sku.coberturaMeses.toFixed(1),
+                        a.qtd,
+                        cobPos
+                    ]);
+                });
+                s4.push(['', '', '', '', '', '', '', 'Subtotal:', famQtd, '']);
             });
 
-            const ws2 = XLSX.utils.aoa_to_sheet(summaryRows);
-            ws2['!cols'] = [{ wch: 25 }, { wch: 15 }, { wch: 15 }];
-            const titleCell = ws2[XLSX.utils.encode_cell({ r: 0, c: 0 })];
-            if (titleCell) titleCell.s = { font: { bold: true, sz: 14, name: 'Calibri', color: { rgb: '0000E1' } } };
+            const ws4 = XLSX.utils.aoa_to_sheet(s4);
+            ws4['!cols'] = [
+                { wch: 14 }, { wch: 32 }, { wch: 6 }, { wch: 8 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 11 }, { wch: 11 }, { wch: 10 }
+            ];
+            // Style family headers and sub-headers
+            let sr = 0;
+            allocs.forEach((fam, fi) => {
+                if (fi > 0) sr++; // spacer
+                const famTitleCell = ws4[XLSX.utils.encode_cell({ r: sr, c: 0 })];
+                if (famTitleCell) famTitleCell.s = subtitleStyle;
+                sr++;
+                for (let c = 0; c < 10; c++) {
+                    const hc = ws4[XLSX.utils.encode_cell({ r: sr, c })];
+                    if (hc) hc.s = hdrGray;
+                }
+                sr++;
+                fam.allocations.forEach(() => {
+                    for (let c = 0; c < 10; c++) {
+                        const dc = ws4[XLSX.utils.encode_cell({ r: sr, c })];
+                        if (dc) dc.s = c >= 3 ? cellC : cell;
+                    }
+                    sr++;
+                });
+                // subtotal row
+                for (let c = 0; c < 10; c++) {
+                    const dc = ws4[XLSX.utils.encode_cell({ r: sr, c })];
+                    if (dc) dc.s = cellBold;
+                }
+                sr++;
+            });
+            XLSX.utils.book_append_sheet(wb, ws4, 'Detalle por Família');
 
-            XLSX.utils.book_append_sheet(wb, ws2, 'Resumo');
             XLSX.writeFile(wb, fileName);
         }
 
@@ -5107,7 +5791,7 @@
                 const numM = parseInt((document.getElementById('fcMonths') || {}).value) || 15;
                 html = '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);margin-bottom:12px;">Pronostico</div>';
                 html += metric('Horizonte', numM + ' meses');
-                html += metric('Lead time China', (parseInt((document.getElementById('fcLeadTime') || {}).value) || 4) + ' meses');
+                html += metric('Lead time China', (parseInt((document.getElementById('fcLeadTime') || {}).value) || 120) + ' dias (90d fab. + 30d transporte)');
                 html += metric('Stock actual', totalStock.toLocaleString('pt-BR') + ' pzs');
                 html += metric('Import. en camino', totalImport.toLocaleString('pt-BR') + ' pzs', '#10b981');
                 html += metric('Total disponible', (totalStock + totalImport).toLocaleString('pt-BR') + ' pzs', '#0000E1');
