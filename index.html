@@ -3475,6 +3475,40 @@
                 });
             }
 
+            // *** BUILD PER-SKU IMPORT ARRIVAL SCHEDULE ***
+            // Maps sku -> { monthIdx: qty } for non-delivered orders based on entrega date
+            const skuImportByMonth = {};
+            try {
+                const fornDataFC = loadFornecedoresData();
+                const logOrdersFC = fornDataFC.logistica || [];
+                logOrdersFC.forEach(order => {
+                    const isEntregado = ['Entregado', 'Entregue a Terceiro', 'Cancelado'].includes(order.status);
+                    if (isEntregado || !order.entrega) return;
+                    const entregaDate = new Date(order.entrega);
+                    let arrMonthIdx = -1;
+                    for (let mi = 0; mi < simMonths; mi++) {
+                        const mStart = new Date(now.getFullYear(), now.getMonth() + 1 + mi, 1);
+                        const mEnd = new Date(now.getFullYear(), now.getMonth() + 2 + mi, 0);
+                        if (entregaDate >= mStart && entregaDate <= mEnd) { arrMonthIdx = mi; break; }
+                    }
+                    if (arrMonthIdx < 0) {
+                        const simStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+                        if (entregaDate < simStart) arrMonthIdx = 0;
+                    }
+                    if (arrMonthIdx < 0) return;
+                    const skus = (order.skuItems && order.skuItems.length > 0)
+                        ? order.skuItems
+                        : (IMPORT_SKU_MAP[order.proforma] || []);
+                    skus.forEach(s => {
+                        if (!skuImportByMonth[s.sku]) skuImportByMonth[s.sku] = {};
+                        skuImportByMonth[s.sku][arrMonthIdx] = (skuImportByMonth[s.sku][arrMonthIdx] || 0) + (s.qtd || 0);
+                    });
+                });
+            } catch(e) { console.warn('Import schedule build error:', e); }
+            // Track ACTUAL imports injected per month (only SKUs in processedData)
+            const actualImportByMonth = [];
+            for (let ii = 0; ii < simMonths; ii++) actualImportByMonth.push(0);
+
             // Initialize consolidated month accumulators for ALL simMonths
             const monthAgg = [];
             for (let i = 0; i < simMonths; i++) {
@@ -3494,7 +3528,7 @@
                 const isABC = item.curva !== 'D';
                 const isAB = item.curva === 'A' || item.curva === 'B';
                 const minPerStore = isABC ? (item.curva === 'A' ? 2 : 1) : 0;
-                let skuStock = item.estoqueMatriz + (item.importacoesPendentes || 0);
+                let skuStock = item.estoqueMatriz; // imports injected per-month below
                 let skuTotalDemand = 0;
                 let skuTotalBuy = 0;
                 let skuTotalBuyConsumo = 0;
@@ -3508,6 +3542,11 @@
 
                     // Base demand for this SKU this month
                     const skuBaseDemand = item.vendaMedia * gf;
+
+                    // Inject import arrivals for this SKU this month
+                    const skuImportThisMonth = (skuImportByMonth[item.sku] && skuImportByMonth[item.sku][i]) || 0;
+                    skuStock += skuImportThisMonth;
+                    actualImportByMonth[i] += skuImportThisMonth;
 
                     // Initial stock for new stores (only A, B, C)
                     const skuInitStock = ns * minPerStore;
@@ -3587,7 +3626,7 @@
                     curva: item.curva,
                     vendaMedia: item.vendaMedia,
                     estoqueMatriz: item.estoqueMatriz,
-                    importacoes: item.importacoesPendentes || 0,
+                    importacoes: Object.values(skuImportByMonth[item.sku] || {}).reduce((a, b) => a + b, 0),
                     coberturaMeses: item.coberturaMeses,
                     demanda15: skuTotalDemand,
                     compraNecesaria: skuTotalBuy,
@@ -3609,7 +3648,7 @@
 
             // ===== PASS 1: Calculate demand and remaining stock per month (ALL simMonths) =====
             let runningStores = currentStores;
-            let totalStockNow = classified.reduce((s, d) => s + d.estoqueMatriz + (d.importacoesPendentes || 0), 0);
+            let totalStockNow = classified.reduce((s, d) => s + d.estoqueMatriz, 0); // imports tracked per-month
             const arrivalData = [];
 
             for (let i = 0; i < simMonths; i++) {
@@ -3639,7 +3678,8 @@
                     needBuyConsumo: skuNeedBuy,
                     needBuyLaunches: launchNeedBuy,
                     needBuyTotal: totalNeedBuy,
-                    isFeb: monthMeta[i].isFeb
+                    isFeb: monthMeta[i].isFeb,
+                    importArrivals: actualImportByMonth[i] || 0
                 });
             }
 
@@ -3750,7 +3790,8 @@
                     orderDesc: orderDesc,
                     accumOrder: accumOrder,
                     isFeb: arr.isFeb,
-                    arrivalNeed: arr.needBuyTotal
+                    arrivalNeed: arr.needBuyTotal,
+                    importArrivals: arr.importArrivals || 0
                 });
             }
 
@@ -3832,16 +3873,38 @@
 
                 const stockAvail = monthData.map(m => m.stockAvail);
                 const accumOrder = monthData.map(m => m.accumOrder);
+                const importArrivals = monthData.map(m => m.importArrivals || 0);
 
                 // Zones: critical (<2M demand), warning (<4M), healthy
                 const zoneCritical = monthData.map(m => totalVendaMes * 2);
                 const zoneWarning = monthData.map(m => totalVendaMes * 4);
+
+                // Scale import arrivals to use right axis so small bars are visible
+                const maxImport = Math.max(...importArrivals, 1);
 
                 fcChartStockInstance = new Chart(canvasStock, {
                     type: 'line',
                     data: {
                         labels: labels,
                         datasets: [
+                            {
+                                label: 'Chegada importa\u00e7\u00f5es',
+                                type: 'bar',
+                                data: importArrivals,
+                                backgroundColor: function(ctx) {
+                                    const v = ctx.raw || 0;
+                                    if (v === 0) return 'transparent';
+                                    return '#22c55eBB';
+                                },
+                                borderColor: function(ctx) {
+                                    return (ctx.raw || 0) > 0 ? '#16a34a' : 'transparent';
+                                },
+                                borderWidth: 2,
+                                borderRadius: 6,
+                                barPercentage: 0.45,
+                                order: 2,
+                                yAxisID: 'yImport'
+                            },
                             {
                                 label: 'Estoque dispon\u00edvel',
                                 data: stockAvail,
@@ -3859,7 +3922,8 @@
                                 pointBorderColor: '#fff',
                                 pointBorderWidth: 2,
                                 borderWidth: 3,
-                                order: 1
+                                order: 1,
+                                yAxisID: 'y'
                             },
                             {
                                 label: 'Pedido acumulado',
@@ -3872,7 +3936,8 @@
                                 pointBorderWidth: 1,
                                 borderWidth: 2,
                                 fill: false,
-                                order: 0
+                                order: 0,
+                                yAxisID: 'y'
                             }
                         ]
                     },
@@ -3886,19 +3951,26 @@
                                 labels: { usePointStyle: true, font: { size: 12, family: 'Poppins', weight: '500' }, padding: 14, pointStyleWidth: 10 }
                             },
                             datalabels: {
-                                display: true,
-                                anchor: 'end',
-                                align: 'top',
+                                display: function(ctx) { if (ctx.datasetIndex === 0) return ctx.raw > 0; return true; },
+                                anchor: function(ctx) { return ctx.datasetIndex === 0 ? 'end' : 'end'; },
+                                align: function(ctx) { return ctx.datasetIndex === 0 ? 'start' : 'top'; },
                                 offset: 4,
-                                font: { size: 11, family: 'Poppins', weight: '600' },
+                                font: function(ctx) {
+                                    if (ctx.datasetIndex === 0) return { size: 11, family: 'Poppins', weight: '700' };
+                                    return { size: 11, family: 'Poppins', weight: '600' };
+                                },
                                 color: function(ctx) {
-                                    if (ctx.datasetIndex === 1) return '#f59e0b';
+                                    if (ctx.datasetIndex === 0) return '#16a34a';
+                                    if (ctx.datasetIndex === 2) return '#f59e0b';
                                     const v = ctx.raw;
                                     if (v === 0) return '#ef4444';
                                     if (v < totalVendaMes * 2) return '#f59e0b';
                                     return '#10b981';
                                 },
-                                formatter: v => fmtK(v)
+                                formatter: function(v, ctx) { if (ctx.datasetIndex === 0 && v > 0) return '+' + fmtK(v); return fmtK(v); },
+                                backgroundColor: function(ctx) { return ctx.datasetIndex === 0 && ctx.raw > 0 ? '#f0fdf4' : null; },
+                                borderRadius: function(ctx) { return ctx.datasetIndex === 0 ? 4 : 0; },
+                                padding: function(ctx) { return ctx.datasetIndex === 0 ? { top: 2, bottom: 2, left: 4, right: 4 } : 0; }
                             },
                             tooltip: {
                                 titleFont: { size: 14, family: 'Poppins', weight: '600' },
@@ -3907,6 +3979,7 @@
                                 boxPadding: 6,
                                 callbacks: {
                                     label: function(ctx) {
+                                        if (ctx.datasetIndex === 0 && ctx.parsed.y === 0) return null;
                                         return ' ' + ctx.dataset.label + ': ' + ctx.parsed.y.toLocaleString('pt-BR') + ' p\u00e7s';
                                     }
                                 }
@@ -3918,10 +3991,20 @@
                                 grid: { display: false }
                             },
                             y: {
+                                type: 'linear',
+                                position: 'left',
                                 beginAtZero: true,
                                 title: { display: true, text: 'Pe\u00e7as', font: { size: 12, family: 'Poppins' }, color: '#10b981' },
                                 ticks: { font: { size: 11, family: 'Poppins' }, color: '#10b981', callback: v => fmtK(v) },
                                 grid: { color: '#10b98110' }
+                            },
+                            yImport: {
+                                type: 'linear',
+                                display: false,
+                                beginAtZero: true,
+                                max: maxImport * 5,
+                                position: 'right',
+                                grid: { display: false }
                             }
                         }
                     }
@@ -6049,6 +6132,13 @@
             // Mark local version as current timestamp so local edits take priority
             localStorage.setItem(FORN_STORAGE_KEY + '_version', String(Date.now()));
             showSaveNotice();
+            // Auto-refresh forecast + SKU table when imports change (dynamic)
+            if (typeof recalcForecast === 'function') {
+                try { recalcForecast(); } catch(e) { /* forecast not initialized yet */ }
+            }
+            if (typeof renderAllSections === 'function' && processedData && processedData.length > 0) {
+                try { renderAllSections(); } catch(e) { /* sections not ready yet */ }
+            }
         }
 
         // Export current data as downloadable data.json
